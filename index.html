@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>KeeprCards</title>
+<meta property="og:title" content="You've got a card 💌"/>
+<meta property="og:description" content="Someone made you something special. Tap to open it."/>
+<meta property="og:image" content="https://proviewmedia.github.io/SendCardly/og-image.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="KeeprCards"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="You've got a card 💌"/>
+<meta name="twitter:description" content="Someone made you something special. Tap to open it."/>
+<meta name="twitter:image" content="https://proviewmedia.github.io/SendCardly/og-image.png"/>
+<meta name="theme-color" content="#f7f6f3"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Caveat:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Josefin+Sans:wght@300;400;600;700&family=Lora:wght@400;500;600;700&family=Mali:wght@300;400;600;700&family=Manrope:wght@300;400;600;700;800&family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:wght@400;700;900&family=Righteous&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #f7f6f3;
+  --panel: #ffffff;
+  --area: #edece8;
+  --border: #e2e0db;
+  --borderLight: #eeedea;
+  --text: #1a1a1a;
+  --text2: #666360;
+  --text3: #9e9a95;
+  --text4: #c8c4be;
+  --accent: #1a1a1a;
+  --accentLight: #f0efed;
+  --input: #f7f6f3;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: var(--bg);
+  overflow-x: hidden;
+  color: var(--text);
+}
+button { font-family: 'Outfit', sans-serif; cursor: pointer; }
+input, textarea { font-family: 'Outfit', sans-serif; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+@keyframes cardReveal { 0% { transform: scale(0.7) rotateY(90deg); opacity: 0; } 60% { transform: scale(1.02) rotateY(0); opacity: 1; } 100% { transform: scale(1) rotateY(0); opacity: 1; } }
+@keyframes cA { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(-170px) translateX(-35px) rotate(500deg); opacity: 0; } }
+@keyframes cB { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(-190px) translateX(45px) rotate(-450deg); opacity: 0; } }
+@keyframes cC { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(-155px) translateX(-60px) rotate(380deg); opacity: 0; } }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #f5f5f5; }
+::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 4px; }
+textarea:focus, input:focus { outline: none; border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(26,26,26,0.06) !important; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.onerror = function(msg, src, line, col, err) {
+  document.getElementById("app").innerHTML = "<div style=\"padding:40px;font-family:monospace\"><h2 style=\"color:red\">Error</h2><p>" + msg + "</p><p>Line: " + line + " Col: " + col + "</p><pre>" + (err && err.stack ? err.stack : "") + "</pre></div>";
+  return true;
+};
+
+// ═══════════════════════════════════════
+// KeeprCards — Pure Vanilla JS
+// ═══════════════════════════════════════
+
+var BASE_URL = "https://proviewmedia.github.io/SendCardly/";
+
+var OCCASIONS = [
+  { id: "celebrate", emoji: "🎉", label: "Celebrate", desc: "Birthdays, wins & milestones" },
+  { id: "thank", emoji: "🙏", label: "Thank You", desc: "Gratitude & appreciation" },
+  { id: "love", emoji: "❤️", label: "Love", desc: "Romance & deep feels" },
+  { id: "justbecause", emoji: "✨", label: "Just Because", desc: "No reason needed" },
+  { id: "sorry", emoji: "💙", label: "I'm Sorry", desc: "Making things right" },
+  { id: "hypeup", emoji: "🔥", label: "Hype Up", desc: "Gas them up" },
+  { id: "congrats", emoji: "🏆", label: "Congrats", desc: "They earned it" },
+  { id: "missyou", emoji: "🌙", label: "Miss You", desc: "Wish you were here" }
+];
+
+var BG_CATEGORIES = [
+  { label: "Gradients", items: [
+    { id: "g1", type: "gradient", value: "linear-gradient(135deg, #667eea, #764ba2)", label: "Twilight" },
+    { id: "g2", type: "gradient", value: "linear-gradient(135deg, #f093fb, #f5576c)", label: "Rose" },
+    { id: "g3", type: "gradient", value: "linear-gradient(135deg, #f5af19, #f12711)", label: "Ember" },
+    { id: "g4", type: "gradient", value: "linear-gradient(135deg, #43cea2, #185a9d)", label: "Tidal" },
+    { id: "g5", type: "gradient", value: "linear-gradient(135deg, #c94b4b, #4b134f)", label: "Berry" },
+    { id: "g6", type: "gradient", value: "linear-gradient(135deg, #a8edea, #fed6e3)", label: "Sorbet" },
+    { id: "g7", type: "gradient", value: "linear-gradient(135deg, #2c3e50, #4ca1af)", label: "Stormy" },
+    { id: "g8", type: "gradient", value: "linear-gradient(135deg, #f7971e, #ffd200)", label: "Honey" },
+    { id: "g9", type: "gradient", value: "linear-gradient(135deg, #c33764, #1d2671)", label: "Velvet" },
+    { id: "g10", type: "gradient", value: "linear-gradient(135deg, #11998e, #38ef7d)", label: "Forest" },
+    { id: "g11", type: "gradient", value: "linear-gradient(135deg, #ee9ca7, #ffdde1)", label: "Blush" },
+    { id: "g12", type: "gradient", value: "linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b)", label: "Horizon" }
+  ]},
+  { label: "Solids", items: [
+    { id: "s1", type: "solid", value: "#1a1a2e", label: "Midnight" },
+    { id: "s2", type: "solid", value: "#faf3e0", label: "Parchment" },
+    { id: "s3", type: "solid", value: "#0d1b2a", label: "Navy" },
+    { id: "s4", type: "solid", value: "#2d2d2d", label: "Charcoal" },
+    { id: "s5", type: "solid", value: "#f8edeb", label: "Linen" },
+    { id: "s6", type: "solid", value: "#184e77", label: "Ocean" },
+    { id: "s7", type: "solid", value: "#8B2252", label: "Plum" },
+    { id: "s8", type: "solid", value: "#fefae0", label: "Cream" },
+    { id: "s9", type: "solid", value: "#d4a373", label: "Caramel" },
+    { id: "s10", type: "solid", value: "#606c38", label: "Olive" }
+  ]},
+  { label: "Textures", items: [
+    { id: "t1", type: "texture", value: "radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px)", label: "Dotted", bgSize: "16px 16px", bgColor: "#f5f0eb" },
+    { id: "t2", type: "texture", value: "radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)", label: "Starfield", bgSize: "20px 20px", bgColor: "#1a1a2e" },
+    { id: "t3", type: "texture", value: "repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(0,0,0,0.03) 8px, rgba(0,0,0,0.03) 16px)", label: "Pinstripe", bgColor: "#f9f6f2" },
+    { id: "t4", type: "texture", value: "radial-gradient(ellipse at 20% 50%, rgba(102,126,234,0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 50%, rgba(240,147,251,0.12) 0%, transparent 50%)", label: "Aurora", bgColor: "#f8f6ff" },
+    { id: "t5", type: "texture", value: "repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(0,0,0,0.04) 28px, rgba(0,0,0,0.04) 29px), repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(0,0,0,0.04) 28px, rgba(0,0,0,0.04) 29px)", label: "Grid", bgColor: "#fafafa" },
+    { id: "t6", type: "texture", value: "radial-gradient(circle at 30% 30%, rgba(255,107,53,0.12) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(108,79,224,0.1) 0%, transparent 50%)", label: "Glow", bgColor: "#fef9f5" }
+  ]}
+];
+var ALL_BGS = BG_CATEGORIES.flatMap(function(c) { return c.items; });
+
+var LAYOUT_CATEGORIES = [
+  { label: "Classic", items: [
+    { id: "top-aligned", label: "Top", desc: "Message sits near the top" },
+    { id: "centered", label: "Centered", desc: "Message right in the middle" },
+    { id: "bottom-aligned", label: "Bottom", desc: "Message anchored at the bottom" }
+  ]},
+  { label: "Editorial", items: [
+    { id: "offset-left", label: "Left Aligned", desc: "Text hugs the left side" },
+    { id: "offset-right", label: "Right Aligned", desc: "Text hugs the right side" },
+    { id: "typographic", label: "Type Forward", desc: "Big, bold, statement text" }
+  ]},
+  { label: "Photo", desc: "Add a photo in the Photo tab to see these in action", items: [
+    { id: "photo-circle", label: "Circle Frame", desc: "Round photo at the top, message below" },
+    { id: "photo-full", label: "Full Bleed", desc: "Photo fills the top half, text over it" },
+    { id: "photo-corner", label: "Corner Snap", desc: "Small photo in the top right corner" }
+  ]}
+];
+var ALL_LAYOUTS = LAYOUT_CATEGORIES.flatMap(function(c) { return c.items; });
+
+var FONT_CATEGORIES = [
+  { label: "Elegant", items: [
+    { id: "playfair", name: "Playfair Display", style: "serif", preview: "Timeless serif" },
+    { id: "cormorant", name: "Cormorant Garamond", style: "serif", preview: "Light and refined" },
+    { id: "lora", name: "Lora", style: "serif", preview: "Warm and readable" }
+  ]},
+  { label: "Modern", items: [
+    { id: "outfit", name: "Outfit", style: "sans-serif", preview: "Clean geometric" },
+    { id: "syne", name: "Syne", style: "sans-serif", preview: "Bold and expressive" },
+    { id: "manrope", name: "Manrope", style: "sans-serif", preview: "Friendly and clear" }
+  ]},
+  { label: "Handwritten", items: [
+    { id: "caveat", name: "Caveat", style: "cursive", preview: "Casual handwriting" },
+    { id: "dancing", name: "Dancing Script", style: "cursive", preview: "Flowing script" },
+    { id: "mali", name: "Mali", style: "cursive", preview: "Playful and cute" }
+  ]},
+  { label: "Display", items: [
+    { id: "righteous", name: "Righteous", style: "sans-serif", preview: "Retro and fun" },
+    { id: "abril", name: "Abril Fatface", style: "serif", preview: "Dramatic headlines" },
+    { id: "josefin", name: "Josefin Sans", style: "sans-serif", preview: "Chic and airy" }
+  ]}
+];
+var ALL_FONTS = FONT_CATEGORIES.flatMap(function(c) { return c.items; });
+
+var TEXT_COLORS = [
+  { id: "white", color: "#ffffff", label: "White" },
+  { id: "snow", color: "#f0f0f0", label: "Snow" },
+  { id: "ink", color: "#1a1a1a", label: "Ink" },
+  { id: "charcoal", color: "#444444", label: "Charcoal" },
+  { id: "gold", color: "#b8860b", label: "Gold" },
+  { id: "rose", color: "#c2185b", label: "Rose" },
+  { id: "navy", color: "#1a237e", label: "Navy" },
+  { id: "forest", color: "#1b5e20", label: "Forest" }
+];
+
+var MESSAGE_PROMPTS = {
+  celebrate: ["You did the damn thing and I am so proud...", "This milestone deserves all the confetti...", "Nobody works harder or deserves this more..."],
+  thank: ["You didn't have to, but you did, and that meant...", "I keep thinking about how you...", "The world needs more people like you because..."],
+  love: ["Every day with you feels like...", "You make the ordinary feel...", "I never knew I needed someone who..."],
+  justbecause: ["I was just thinking about you and...", "No reason, just wanted you to know...", "Random thought: you are one of those people who..."],
+  sorry: ["I have been replaying it in my head and...", "You deserved better from me when...", "I want to make this right because you matter..."],
+  hypeup: ["You are about to crush this because...", "Reminder: you are literally THAT person...", "The energy you bring is unmatched..."],
+  congrats: ["All that hard work just paid off...", "You set the bar and then jumped over it...", "This is your moment, soak it in..."],
+  missyou: ["It is not the same without you here...", "I keep wanting to tell you things and...", "Distance means nothing when someone means..."]
+};
+
+var EMOJI_CATEGORIES = [
+  { label: "Faces", emojis: ["😊","🥰","😂","🤩","😭","🥺","😎","🤗","😤","🫠","🤭","😏"] },
+  { label: "Hearts", emojis: ["❤️","🧡","💛","💚","💙","💜","🖤","🤍","💕","💖","💗","💝"] },
+  { label: "Celebration", emojis: ["🎉","🎊","🎈","🎁","🎂","🥂","🍾","🎆","🎇","🪅","🏆","🥇"] },
+  { label: "Nature", emojis: ["🌸","🌺","🌻","🌹","🌈","⭐","🌙","☀️","🍀","🦋","🌊","🔥"] },
+  { label: "Fun", emojis: ["💫","✨","💎","🎵","🎀","👑","🧸","🎮","📸","💌","🪩","🫧"] },
+  { label: "Food", emojis: ["🍕","🍩","🧁","🍰","☕","🍷","🌮","🍦","🫶","🍓","🥑","🍪"] },
+  { label: "Gestures", emojis: ["👏","🙌","🤝","✌️","🤞","👊","💪","🫂","👋","🫡","🤙","✊"] }
+];
+
+var TABS = [
+  { id: "message", label: "Message", icon: "✎" },
+  { id: "background", label: "Background", icon: "◑" },
+  { id: "layout", label: "Layout", icon: "⊞" },
+  { id: "typography", label: "Type", icon: "Aa" },
+  { id: "emoji", label: "Emoji", icon: "☺" },
+  { id: "photo", label: "Photo", icon: "⌖" }
+];
+
+var LAYOUT_MAP = {
+  "centered":      { justifyContent: "center",    alignItems: "center",     textAlign: "center" },
+  "top-aligned":   { justifyContent: "flex-start", alignItems: "center",     textAlign: "center",  paddingTop: "40px" },
+  "bottom-aligned":{ justifyContent: "flex-end",   alignItems: "center",     textAlign: "center",  paddingBottom: "40px" },
+  "offset-left":   { justifyContent: "center",     alignItems: "flex-start", textAlign: "left" },
+  "offset-right":  { justifyContent: "center",     alignItems: "flex-end",   textAlign: "right" },
+  "typographic":   { justifyContent: "center",     alignItems: "center",     textAlign: "center" },
+  "photo-circle":  { justifyContent: "flex-end",   alignItems: "center",     textAlign: "center",  paddingBottom: "36px" },
+  "photo-full":    { justifyContent: "flex-end",   alignItems: "center",     textAlign: "center",  paddingBottom: "28px" },
+  "photo-corner":  { justifyContent: "flex-end",   alignItems: "flex-start", textAlign: "left",    paddingBottom: "36px" }
+};
+
+// ── HELPERS ──
+
+function encodeCard(data) {
+  try { return btoa(unescape(encodeURIComponent(JSON.stringify(data)))); }
+  catch (e) { return ""; }
+}
+
+function decodeCard(str) {
+  try { return JSON.parse(decodeURIComponent(escape(atob(str)))); }
+  catch (e) { return null; }
+}
+
+function getSharedCard() {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var cardParam = params.get("card");
+    return cardParam ? decodeCard(cardParam) : null;
+  } catch (e) { return null; }
+}
+
+function getBgStyle(bg) {
+  if (bg.type === "solid") return "background-color:" + bg.value;
+  if (bg.type === "texture") {
+    var style = "background-image:" + bg.value + ";background-color:" + (bg.bgColor || "#fff");
+    if (bg.bgSize) style += ";background-size:" + bg.bgSize;
+    return style;
+  }
+  return "background-image:" + bg.value;
+}
+
+function isBgLight(bg) {
+  var hex = (bg.type === "solid" ? bg.value : bg.bgColor || "").replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(hex)) return false;
+  var r = parseInt(hex.substring(0, 2), 16);
+  var g = parseInt(hex.substring(2, 4), 16);
+  var b = parseInt(hex.substring(4, 6), 16);
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.55;
+}
+
+// WCAG contrast ratio checker
+function hexToLuminance(hex) {
+  hex = hex.replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(hex)) return -1;
+  var r = parseInt(hex.substring(0, 2), 16) / 255;
+  var g = parseInt(hex.substring(2, 4), 16) / 255;
+  var b = parseInt(hex.substring(4, 6), 16) / 255;
+  r = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
+  g = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
+  b = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function getContrastRatio(hex1, hex2) {
+  var l1 = hexToLuminance(hex1);
+  var l2 = hexToLuminance(hex2);
+  if (l1 < 0 || l2 < 0) return -1;
+  var lighter = Math.max(l1, l2);
+  var darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function checkContrast(textColor, background) {
+  var bgHex = background.type === "solid" ? background.value : (background.bgColor || "");
+  if (!bgHex || background.type === "gradient") return null;
+  var ratio = getContrastRatio(textColor.color, bgHex);
+  if (ratio < 0) return null;
+  if (ratio < 2) return "This text will be very hard to read on this background. Try a different text color or background.";
+  if (ratio < 3) return "This text may be difficult to read. Consider choosing a color with more contrast.";
+  return null;
+}
+
+// DOM helper: create element with props and children
+function h(tag, props, kids) {
+  var element = document.createElement(tag);
+  if (props) {
+    for (var key in props) {
+      if (key === "style" && typeof props[key] === "string") {
+        element.style.cssText = props[key];
+      } else if (key === "style" && typeof props[key] === "object") {
+        for (var sk in props[key]) element.style[sk] = props[key][sk];
+      } else if (key.indexOf("on") === 0) {
+        element.addEventListener(key.slice(2).toLowerCase(), props[key]);
+      } else if (key === "className") {
+        element.className = props[key];
+      } else if (key === "html") {
+        element.innerHTML = props[key];
+      } else {
+        element.setAttribute(key, props[key]);
+      }
+    }
+  }
+  if (kids != null) {
+    if (!Array.isArray(kids)) kids = [kids];
+    for (var i = 0; i < kids.length; i++) {
+      var child = kids[i];
+      if (child != null) {
+        if (typeof child === "string" || typeof child === "number") {
+          element.appendChild(document.createTextNode(child));
+        } else {
+          element.appendChild(child);
+        }
+      }
+    }
+  }
+  return element;
+}
+
+function isMobile() { return window.innerWidth < 768; }
+
+
+// ── STATE ──
+
+var shared = getSharedCard();
+
+var state = {
+  screen:        shared ? "reveal" : "occasion",
+  occasion:      shared ? OCCASIONS.find(function(o) { return o.id === shared.oc; }) || null : null,
+  background:    shared ? ALL_BGS.find(function(b) { return b.id === shared.bg; }) || BG_CATEGORIES[0].items[0] : BG_CATEGORIES[0].items[0],
+  layout:        shared ? ALL_LAYOUTS.find(function(l) { return l.id === shared.ly; }) || ALL_LAYOUTS[0] : ALL_LAYOUTS[0],
+  font:          shared ? ALL_FONTS.find(function(f) { return f.id === shared.fn; }) || ALL_FONTS[0] : ALL_FONTS[0],
+  textColor:     shared ? TEXT_COLORS.find(function(t) { return t.id === shared.tc; }) || TEXT_COLORS[0] : TEXT_COLORS[0],
+  message:       shared ? shared.ms || "" : "",
+  recipientName: shared ? shared.to || "" : "",
+  senderName:    shared ? shared.fr || "" : "",
+  stickers:      shared && shared.st ? shared.st.map(function(s, i) { s.id = i + Math.random(); return s; }) : [],
+  photoUrl:      null,
+  envelopeOpen:  false,
+  cardRevealed:  false,
+  copied:        false,
+  tab:           "message",
+  emojiCat:      0,
+  bgCat:         0,
+  layoutCat:     0,
+  fontCat:       0,
+  showReveal:    false,
+  drawerOpen:    true
+};
+
+function setState(updates) {
+  for (var key in updates) state[key] = updates[key];
+  render();
+}
+
+
+// ── CARD RENDERER ──
+
+function renderCard(size, interactive) {
+  var scaleMap = { small: 0.48, preview: 0.82, mobile: Math.min((window.innerWidth - 40) / 360, 0.85), reveal: 0.88, normal: 1.15 };
+  var scale = scaleMap[size] || 1;
+  var cardWidth = 360 * scale;
+  var cardHeight = 480 * scale;
+  var isTypographic = state.layout.id === "typographic";
+  var layoutConfig = LAYOUT_MAP[state.layout.id] || LAYOUT_MAP["centered"];
+
+  var card = h("div", { style: "width:" + cardWidth + "px;height:" + cardHeight + "px;border-radius:" + (20 * scale) + "px;overflow:hidden;position:relative;flex-shrink:0;box-shadow:0 8px 32px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06);" + getBgStyle(state.background) });
+  if (interactive) card.id = "cardZone";
+
+  // Photo layers (show placeholder when photo layout selected but no photo uploaded)
+  var isPhotoLayout = state.layout.id === "photo-full" || state.layout.id === "photo-circle" || state.layout.id === "photo-corner";
+  var photoSrc = state.photoUrl;
+  var showPlaceholder = isPhotoLayout && !photoSrc;
+
+  if (state.layout.id === "photo-full") {
+    var photoWrap = h("div", { style: "position:absolute;inset:0" });
+    if (photoSrc) {
+      photoWrap.appendChild(h("img", { src: photoSrc, style: "width:100%;height:60%;object-fit:cover" }));
+    } else {
+      photoWrap.appendChild(h("div", { style: "width:100%;height:60%;background:linear-gradient(135deg, rgba(0,0,0,0.08), rgba(0,0,0,0.03));display:flex;align-items:center;justify-content:center" }, [
+        h("span", { style: "font-size:" + (28 * scale) + "px;opacity:0.3" }, "📷")
+      ]));
+    }
+    photoWrap.appendChild(h("div", { style: "position:absolute;inset:0;background:linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.6) 100%)" }));
+    card.appendChild(photoWrap);
+  }
+  if (state.layout.id === "photo-circle") {
+    var circleSize = 110 * scale;
+    var circleWrap = h("div", { style: "position:absolute;top:" + (28 * scale) + "px;left:50%;transform:translateX(-50%);width:" + circleSize + "px;height:" + circleSize + "px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,0.5);box-shadow:0 6px 20px rgba(0,0,0,0.12)" });
+    if (photoSrc) {
+      circleWrap.appendChild(h("img", { src: photoSrc, style: "width:100%;height:100%;object-fit:cover" }));
+    } else {
+      circleWrap.appendChild(h("div", { style: "width:100%;height:100%;background:linear-gradient(135deg, rgba(0,0,0,0.08), rgba(0,0,0,0.03));display:flex;align-items:center;justify-content:center" }, [
+        h("span", { style: "font-size:" + (22 * scale) + "px;opacity:0.3" }, "📷")
+      ]));
+    }
+    card.appendChild(circleWrap);
+  }
+  if (state.layout.id === "photo-corner") {
+    var cornerWrap = h("div", { style: "position:absolute;top:" + (16 * scale) + "px;right:" + (16 * scale) + "px;width:" + (100 * scale) + "px;height:" + (100 * scale) + "px;border-radius:" + (12 * scale) + "px;overflow:hidden;border:2px solid rgba(255,255,255,0.4)" });
+    if (photoSrc) {
+      cornerWrap.appendChild(h("img", { src: photoSrc, style: "width:100%;height:100%;object-fit:cover" }));
+    } else {
+      cornerWrap.appendChild(h("div", { style: "width:100%;height:100%;background:linear-gradient(135deg, rgba(0,0,0,0.08), rgba(0,0,0,0.03));display:flex;align-items:center;justify-content:center" }, [
+        h("span", { style: "font-size:" + (20 * scale) + "px;opacity:0.3" }, "📷")
+      ]));
+    }
+    card.appendChild(cornerWrap);
+  }
+
+  // Inner text content
+  var fontFamily = "'" + state.font.name + "'," + state.font.style;
+  var innerStyle = "position:absolute;inset:0;display:flex;flex-direction:column;z-index:5;" +
+    "padding:" + Math.round(28 * scale) + "px " + Math.round(24 * scale) + "px;" +
+    "justify-content:" + (layoutConfig.justifyContent || "center") + ";" +
+    "align-items:" + (layoutConfig.alignItems || "center") + ";" +
+    "text-align:" + (layoutConfig.textAlign || "center") + ";" +
+    (layoutConfig.paddingTop ? "padding-top:" + layoutConfig.paddingTop + ";" : "") +
+    (layoutConfig.paddingBottom ? "padding-bottom:" + layoutConfig.paddingBottom + ";" : "");
+
+  var inner = h("div", { style: innerStyle });
+
+  if (state.recipientName) {
+    inner.appendChild(h("p", { style: "font-family:" + fontFamily + ";font-size:" + (12 * scale) + "px;color:" + state.textColor.color + ";opacity:0.6;margin:0 0 " + (6 * scale) + "px;letter-spacing:2.5px;text-transform:uppercase" }, "Dear " + state.recipientName));
+  }
+
+  var maxWidth = state.layout.id === "photo-corner" ? "65%" : (state.layout.id.indexOf("offset") > -1 ? "80%" : "90%");
+  inner.appendChild(h("p", { style: "font-family:" + fontFamily + ";font-size:" + ((isTypographic ? 24 : 16) * scale) + "px;font-weight:" + (isTypographic ? "800" : "400") + ";color:" + state.textColor.color + ";line-height:" + (isTypographic ? "1.3" : "1.65") + ";margin:0;max-width:" + maxWidth + ";word-break:break-word;" + (state.photoUrl ? "text-shadow:0 1px 3px rgba(0,0,0,0.2);" : "") }, state.message || "Your message here..."));
+
+  if (state.senderName) {
+    inner.appendChild(h("p", { style: "font-family:" + fontFamily + ";font-size:" + (13 * scale) + "px;color:" + state.textColor.color + ";opacity:0.5;margin:" + (14 * scale) + "px 0 0;font-style:italic" }, state.senderName));
+  }
+  card.appendChild(inner);
+
+  // Stickers
+  for (var si = 0; si < state.stickers.length; si++) {
+    (function(sticker) {
+      var stickerEl = h("div", {
+        style: "position:absolute;left:" + sticker.x + "%;top:" + sticker.y + "%;transform:rotate(" + sticker.rotation + "deg) scale(" + sticker.scale + ");font-size:" + ((sticker.size || 28) * scale) + "px;user-select:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.12));touch-action:none;z-index:10;cursor:" + (interactive ? "grab" : "default"),
+        html: sticker.emoji
+      });
+      stickerEl.dataset.sid = sticker.id;
+      if (interactive) {
+        stickerEl.addEventListener("mousedown", function(e) { e.preventDefault(); startDrag(sticker.id, e.clientX, e.clientY); });
+        stickerEl.addEventListener("touchstart", function(e) { startDrag(sticker.id, e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+        stickerEl.addEventListener("click", function(e) { e.stopPropagation(); toggleStickerDelete(sticker.id); });
+      }
+      if (activeStickerDelete === sticker.id && interactive) {
+        var delBtn = h("button", {
+          style: "position:absolute;top:-10px;right:-10px;width:20px;height:20px;border-radius:50%;background:#dc2626;border:2px solid #fff;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0",
+          onClick: function(e) { e.stopPropagation(); removeSticker(sticker.id); }
+        }, "×");
+        stickerEl.appendChild(delBtn);
+      }
+      card.appendChild(stickerEl);
+    })(state.stickers[si]);
+  }
+
+  // Occasion watermark
+  if (state.occasion) {
+    card.appendChild(h("div", { style: "position:absolute;bottom:" + (12 * scale) + "px;right:" + (14 * scale) + "px;font-size:" + (18 * scale) + "px;opacity:0.15;z-index:2", html: state.occasion.emoji }));
+  }
+
+  return card;
+}
+
+
+// ── STICKER DRAG SYSTEM ──
+
+var dragState = { active: false, id: null, offsetX: 0, offsetY: 0 };
+var activeStickerDelete = null;
+
+function startDrag(id, clientX, clientY) {
+  var cardEl = document.getElementById("cardZone");
+  if (!cardEl) return;
+  var rect = cardEl.getBoundingClientRect();
+  var sticker = state.stickers.find(function(s) { return s.id === id; });
+  if (!sticker) return;
+  dragState = {
+    active: true,
+    id: id,
+    offsetX: clientX - rect.left - (sticker.x / 100) * rect.width,
+    offsetY: clientY - rect.top - (sticker.y / 100) * rect.height
+  };
+}
+
+function handleDragMove(clientX, clientY) {
+  if (!dragState.active) return;
+  var cardEl = document.getElementById("cardZone");
+  if (!cardEl) return;
+  var rect = cardEl.getBoundingClientRect();
+  var newX = Math.max(0, Math.min(92, ((clientX - rect.left - dragState.offsetX) / rect.width) * 100));
+  var newY = Math.max(0, Math.min(92, ((clientY - rect.top - dragState.offsetY) / rect.height) * 100));
+  state.stickers = state.stickers.map(function(s) {
+    if (s.id === dragState.id) { s.x = newX; s.y = newY; }
+    return s;
+  });
+  render();
+}
+
+document.addEventListener("mousemove", function(e) { handleDragMove(e.clientX, e.clientY); });
+document.addEventListener("mouseup", function() { dragState.active = false; });
+document.addEventListener("touchmove", function(e) {
+  if (dragState.active) { e.preventDefault(); handleDragMove(e.touches[0].clientX, e.touches[0].clientY); }
+}, { passive: false });
+document.addEventListener("touchend", function() { dragState.active = false; });
+
+function toggleStickerDelete(id) {
+  activeStickerDelete = activeStickerDelete === id ? null : id;
+  render();
+}
+
+function removeSticker(id) {
+  state.stickers = state.stickers.filter(function(s) { return s.id !== id; });
+  activeStickerDelete = null;
+  render();
+}
+
+function addSticker(emoji) {
+  state.stickers.push({
+    emoji: emoji,
+    id: Date.now() + Math.random(),
+    x: 15 + Math.random() * 50,
+    y: 15 + Math.random() * 50,
+    rotation: -20 + Math.random() * 40,
+    scale: 0.9 + Math.random() * 0.4,
+    size: 28
+  });
+  render();
+}
+
+// ── PILL BUTTON FACTORY ──
+// Uses closure to capture the correct index value
+
+function makePill(label, isActive, onClick) {
+  var btn = h("button", {
+    style: "border-radius:8px;padding:5px 13px;font-size:12px;white-space:nowrap;" +
+      "font-weight:" + (isActive ? "700" : "500") + ";" +
+      "border:1.5px solid " + (isActive ? "rgba(26,26,26,0.2)" : "var(--border)") + ";" +
+      "background:" + (isActive ? "var(--accentLight)" : "transparent") + ";" +
+      "color:" + (isActive ? "var(--accent)" : "var(--text3)"),
+    onClick: onClick
+  }, label);
+  return btn;
+}
+
+function makeSectionLabel(text) {
+  return h("p", { style: "color:var(--text2);font-size:12px;margin:0 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700" }, text);
+}
+
+
+// ── TAB CONTENT RENDERER ──
+
+function renderTabContent(container) {
+
+  // === BACKGROUND TAB ===
+  if (state.tab === "background") {
+    container.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin-bottom:14px;line-height:1.5" }, "Set the mood with a background color, gradient, or texture."));
+    var catRow = h("div", { style: "display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap" });
+    for (var ci = 0; ci < BG_CATEGORIES.length; ci++) {
+      (function(catIndex) {
+        catRow.appendChild(makePill(BG_CATEGORIES[catIndex].label, state.bgCat === catIndex, function() {
+          setState({ bgCat: catIndex });
+        }));
+      })(ci);
+    }
+    container.appendChild(catRow);
+
+    var grid = h("div", { style: "display:grid;grid-template-columns:repeat(3,1fr);gap:10px" });
+    var currentItems = BG_CATEGORIES[state.bgCat].items;
+    for (var bi = 0; bi < currentItems.length; bi++) {
+      (function(bg) {
+        var selected = state.background.id === bg.id;
+        var light = isBgLight(bg);
+        var btn = h("button", {
+          style: "width:100%;aspect-ratio:3/4;border-radius:10px;cursor:pointer;position:relative;overflow:hidden;transition:all 0.2s;" +
+            getBgStyle(bg) + ";" +
+            "border:" + (selected ? "3px solid var(--accent)" : "1.5px solid var(--border)") + ";" +
+            (selected ? "transform:scale(1.03);box-shadow:0 0 0 2px rgba(26,26,26,0.15);" : "box-shadow:0 1px 3px rgba(0,0,0,0.05);"),
+          onClick: function() { setState({ background: bg }); }
+        });
+        // Mini card lines
+        var lineColor1 = light ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.4)";
+        var lineColor2 = light ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.22)";
+        var lineColor3 = light ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.12)";
+        var lines = h("div", { style: "position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;gap:4px" });
+        lines.appendChild(h("div", { style: "width:50%;height:3px;border-radius:2px;background:" + lineColor1 }));
+        lines.appendChild(h("div", { style: "width:38%;height:3px;border-radius:2px;background:" + lineColor2 }));
+        lines.appendChild(h("div", { style: "width:28%;height:2px;border-radius:2px;background:" + lineColor3 + ";margin-top:2px" }));
+        btn.appendChild(lines);
+        // Label
+        var labelBg = light ? "linear-gradient(to top, rgba(255,255,255,0.75) 0%, transparent 100%)" : "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%)";
+        var labelColor = light ? "#333" : "#fff";
+        btn.appendChild(h("span", { style: "position:absolute;bottom:0;left:0;right:0;padding:12px 5px 4px;font-size:10px;font-weight:600;background:" + labelBg + ";color:" + labelColor }, bg.label));
+        // Checkmark
+        if (selected) {
+          var check = h("div", { style: "position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center" });
+          check.appendChild(h("span", { style: "color:#fff;font-size:10px;font-weight:800" }, "✓"));
+          btn.appendChild(check);
+        }
+        grid.appendChild(btn);
+      })(currentItems[bi]);
+    }
+    container.appendChild(grid);
+    container.appendChild(h("p", { style: "color:var(--text3);font-size:11px;margin-top:10px;text-align:center" }, "Tap to select"));
+  }
+
+  // === LAYOUT TAB ===
+  if (state.tab === "layout") {
+    container.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin-bottom:14px;line-height:1.5" }, "Choose how your message is arranged on the card."));
+    var catRow = h("div", { style: "display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap" });
+    for (var ci = 0; ci < LAYOUT_CATEGORIES.length; ci++) {
+      (function(catIndex) {
+        catRow.appendChild(makePill(LAYOUT_CATEGORIES[catIndex].label, state.layoutCat === catIndex, function() {
+          setState({ layoutCat: catIndex });
+        }));
+      })(ci);
+    }
+    container.appendChild(catRow);
+
+    // Show hint when photo category is selected
+    var currentCategory = LAYOUT_CATEGORIES[state.layoutCat];
+    if (currentCategory.desc) {
+      container.appendChild(h("p", { style: "color:var(--text4);font-size:11px;margin-bottom:12px;font-style:italic;line-height:1.4" }, currentCategory.desc));
+    }
+
+    // If on photo layouts and no photo, show a nudge
+    if (state.layoutCat === 2 && !state.photoUrl) {
+      var photoHint = h("div", { style: "background:var(--input);border:1px solid var(--borderLight);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px" });
+      photoHint.appendChild(h("span", { style: "font-size:16px" }, "📷"));
+      photoHint.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin:0;line-height:1.4" }, "A placeholder shows where your photo will go. Upload one in the Photo tab to see it for real."));
+      container.appendChild(photoHint);
+    }
+
+    var currentLayouts = currentCategory.items;
+    for (var li = 0; li < currentLayouts.length; li++) {
+      (function(layoutItem) {
+        var selected = state.layout.id === layoutItem.id;
+        var btn = h("button", {
+          style: "display:flex;align-items:center;gap:14px;width:100%;border-radius:10px;padding:13px 14px;cursor:pointer;margin-bottom:6px;text-align:left;transition:all 0.15s;" +
+            "border:1.5px solid " + (selected ? "rgba(26,26,26,0.2)" : "var(--borderLight)") + ";" +
+            "background:" + (selected ? "var(--accentLight)" : "#fff"),
+          onClick: function() { setState({ layout: layoutItem }); }
+        });
+        btn.appendChild(h("div", { style: "width:6px;height:6px;border-radius:50%;flex-shrink:0;background:" + (selected ? "var(--accent)" : "var(--text4)") }));
+        var textWrap = h("div");
+        textWrap.appendChild(h("p", { style: "font-size:13px;font-weight:600;margin:0" }, layoutItem.label));
+        textWrap.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin:2px 0 0" }, layoutItem.desc));
+        btn.appendChild(textWrap);
+        container.appendChild(btn);
+      })(currentLayouts[li]);
+    }
+  }
+
+  // === TYPOGRAPHY TAB ===
+  if (state.tab === "typography") {
+    container.appendChild(makeSectionLabel("Font"));
+    var catRow = h("div", { style: "display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap" });
+    for (var ci = 0; ci < FONT_CATEGORIES.length; ci++) {
+      (function(catIndex) {
+        catRow.appendChild(makePill(FONT_CATEGORIES[catIndex].label, state.fontCat === catIndex, function() {
+          setState({ fontCat: catIndex });
+        }));
+      })(ci);
+    }
+    container.appendChild(catRow);
+
+    var currentFonts = FONT_CATEGORIES[state.fontCat].items;
+    for (var fi = 0; fi < currentFonts.length; fi++) {
+      (function(fontItem) {
+        var selected = state.font.id === fontItem.id;
+        var btn = h("button", {
+          style: "display:block;width:100%;border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;margin-bottom:6px;transition:all 0.15s;" +
+            "border:1.5px solid " + (selected ? "rgba(26,26,26,0.2)" : "var(--borderLight)") + ";" +
+            "background:" + (selected ? "var(--accentLight)" : "#fff"),
+          onClick: function() { setState({ font: fontItem }); }
+        });
+        btn.appendChild(h("span", { style: "font-family:'" + fontItem.name + "'," + fontItem.style + ";font-size:19px;display:block;color:var(--text)" }, fontItem.name));
+        btn.appendChild(h("span", { style: "font-size:12px;color:var(--text3)" }, fontItem.preview));
+        container.appendChild(btn);
+      })(currentFonts[fi]);
+    }
+
+    container.appendChild(h("p", { style: "color:var(--text3);font-size:11px;margin:20px 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700" }, "Text Color"));
+    var colorRow = h("div", { style: "display:flex;gap:6px;flex-wrap:wrap" });
+    for (var ti = 0; ti < TEXT_COLORS.length; ti++) {
+      (function(colorItem) {
+        var selected = state.textColor.id === colorItem.id;
+        var isWhitish = colorItem.id === "white" || colorItem.id === "snow";
+        colorRow.appendChild(h("button", {
+          title: colorItem.label,
+          "aria-label": "Text color: " + colorItem.label,
+          style: "width:44px;height:44px;border-radius:50%;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;" +
+            "background:" + colorItem.color + ";" +
+            "border:" + (selected ? "3px solid #1a1a1a" : (isWhitish ? "2px solid var(--border)" : "2px solid transparent")) + ";" +
+            "box-shadow:" + (selected ? "0 0 0 2px rgba(26,26,26,0.12)" : "0 1px 3px rgba(0,0,0,0.08)"),
+          onClick: function() { setState({ textColor: colorItem }); }
+        }));
+      })(TEXT_COLORS[ti]);
+    }
+    container.appendChild(colorRow);
+
+    // Contrast warning
+    var contrastWarning = checkContrast(state.textColor, state.background);
+    if (contrastWarning) {
+      var warningBox = h("div", { style: "margin-top:12px;padding:10px 14px;background:#FEF3CD;border:1px solid #F0D060;border-radius:10px;display:flex;align-items:flex-start;gap:10px" });
+      warningBox.appendChild(h("span", { style: "font-size:16px;flex-shrink:0;line-height:1.4" }, "⚠"));
+      var warningText = h("div");
+      warningText.appendChild(h("p", { style: "font-size:12px;font-weight:600;margin:0 0 2px;color:#856404" }, "Low contrast"));
+      warningText.appendChild(h("p", { style: "font-size:11px;color:#856404;margin:0;line-height:1.4" }, contrastWarning));
+      warningBox.appendChild(warningText);
+      container.appendChild(warningBox);
+    }
+  }
+
+  // === MESSAGE TAB ===
+  if (state.tab === "message") {
+    container.appendChild(makeSectionLabel("To"));
+    var toInput = h("input", {
+      type: "text",
+      "data-field": "to-name",
+      value: state.recipientName,
+      placeholder: "Their name",
+      style: "width:100%;background:var(--input);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;margin-bottom:18px;color:var(--text)"
+    });
+    toInput.addEventListener("input", function(e) { state.recipientName = e.target.value; render(); });
+    container.appendChild(toInput);
+
+    container.appendChild(makeSectionLabel("Your Message"));
+
+    // Message prompts
+    if (state.occasion && MESSAGE_PROMPTS[state.occasion.id]) {
+      var promptWrap = h("div", { style: "margin-bottom:12px" });
+      promptWrap.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin-bottom:6px" }, "Need a starting point?"));
+      var prompts = MESSAGE_PROMPTS[state.occasion.id];
+      for (var pi = 0; pi < prompts.length; pi++) {
+        (function(promptText) {
+          var promptBtn = h("button", {
+            style: "display:block;width:100%;background:var(--input);border:1px solid var(--borderLight);border-radius:7px;padding:8px 10px;color:var(--text3);font-size:12px;cursor:pointer;text-align:left;margin-bottom:5px;font-style:italic;transition:all 0.15s",
+            onClick: function() { state.message = promptText; render(); }
+          }, '"' + promptText + '"');
+          promptBtn.onmouseenter = function() { promptBtn.style.color = "var(--text)"; promptBtn.style.borderColor = "rgba(26,26,26,0.2)"; };
+          promptBtn.onmouseleave = function() { promptBtn.style.color = "var(--text3)"; promptBtn.style.borderColor = "var(--borderLight)"; };
+          promptWrap.appendChild(promptBtn);
+        })(prompts[pi]);
+      }
+      container.appendChild(promptWrap);
+    }
+
+    var textarea = h("textarea", {
+      "data-field": "msg-area",
+      rows: "5",
+      placeholder: "Write something meaningful...",
+      style: "width:100%;background:var(--input);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;resize:vertical;line-height:1.6;color:var(--text);font-family:'" + state.font.name + "'," + state.font.style
+    });
+    textarea.value = state.message;
+    textarea.addEventListener("input", function(e) { state.message = e.target.value; render(); });
+    container.appendChild(textarea);
+    container.appendChild(h("p", { style: "color:var(--text3);font-size:11px;text-align:right;margin-top:4px" }, state.message.length + " / 300"));
+
+    container.appendChild(h("p", { style: "color:var(--text3);font-size:11px;margin:18px 0 10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700" }, "From"));
+    var fromInput = h("input", {
+      type: "text",
+      "data-field": "from-name",
+      value: state.senderName,
+      placeholder: "Your name",
+      style: "width:100%;background:var(--input);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text)"
+    });
+    fromInput.addEventListener("input", function(e) { state.senderName = e.target.value; render(); });
+    container.appendChild(fromInput);
+  }
+
+  // === EMOJI TAB ===
+  if (state.tab === "emoji") {
+    container.appendChild(makeSectionLabel("Add Emoji Stickers"));
+    container.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin-bottom:12px" }, "Tap to add, drag to move, tap placed emoji to remove."));
+    var catRow = h("div", { style: "display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap" });
+    for (var ci = 0; ci < EMOJI_CATEGORIES.length; ci++) {
+      (function(catIndex) {
+        catRow.appendChild(makePill(EMOJI_CATEGORIES[catIndex].label, state.emojiCat === catIndex, function() {
+          setState({ emojiCat: catIndex });
+        }));
+      })(ci);
+    }
+    container.appendChild(catRow);
+
+    var emojiGrid = h("div", { style: "display:grid;grid-template-columns:repeat(6,1fr);gap:5px" });
+    var currentEmojis = EMOJI_CATEGORIES[state.emojiCat].emojis;
+    for (var ei = 0; ei < currentEmojis.length; ei++) {
+      (function(emoji) {
+        var emojiBtn = h("button", {
+          style: "width:100%;aspect-ratio:1;font-size:22px;background:#fff;border:1.5px solid var(--borderLight);border-radius:8px;display:flex;align-items:center;justify-content:center;transition:all 0.12s",
+          onClick: function() { addSticker(emoji); },
+          html: emoji
+        });
+        emojiBtn.onmouseenter = function() { emojiBtn.style.transform = "scale(1.1)"; emojiBtn.style.borderColor = "rgba(26,26,26,0.2)"; };
+        emojiBtn.onmouseleave = function() { emojiBtn.style.transform = ""; emojiBtn.style.borderColor = "var(--borderLight)"; };
+        emojiGrid.appendChild(emojiBtn);
+      })(currentEmojis[ei]);
+    }
+    container.appendChild(emojiGrid);
+
+    if (state.stickers.length > 0) {
+      var stickerInfo = h("div", { style: "margin-top:16px;display:flex;justify-content:space-between" });
+      stickerInfo.appendChild(h("span", { style: "color:var(--text3);font-size:12px" }, state.stickers.length + " placed"));
+      stickerInfo.appendChild(h("button", {
+        style: "background:none;border:none;color:#dc2626;font-size:12px;font-weight:600",
+        onClick: function() { state.stickers = []; activeStickerDelete = null; render(); }
+      }, "Clear all"));
+      container.appendChild(stickerInfo);
+    }
+  }
+
+  // === PHOTO TAB ===
+  if (state.tab === "photo") {
+    container.appendChild(makeSectionLabel("Upload a Photo"));
+    var isPhotoLayout = state.layout.id.indexOf("photo") === 0;
+    if (isPhotoLayout) {
+      container.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin-bottom:12px;line-height:1.4" }, "You're using the " + state.layout.label + " layout. Upload a photo to see it on your card."));
+    } else {
+      var layoutHint = h("div", { style: "background:var(--input);border:1px solid var(--borderLight);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px" });
+      layoutHint.appendChild(h("span", { style: "font-size:16px" }, "💡"));
+      layoutHint.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin:0;line-height:1.4" }, "To use a photo, switch to a Photo layout first in the Layout tab (Circle Frame, Full Bleed, or Corner Snap)."));
+      container.appendChild(layoutHint);
+    }
+    var fileInput = h("input", { type: "file", accept: "image/*", style: "display:none" });
+    fileInput.addEventListener("change", function(e) {
+      var file = (e.target.files || [])[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function(ev) { state.photoUrl = ev.target.result; render(); };
+        reader.readAsDataURL(file);
+      }
+    });
+    container.appendChild(fileInput);
+    container.appendChild(h("button", {
+      style: "width:100%;border-radius:12px;padding:24px 16px;font-size:13px;font-weight:600;" +
+        "background:" + (state.photoUrl ? "rgba(26,26,26,0.03)" : "var(--input)") + ";" +
+        "border:" + (state.photoUrl ? "2px solid rgba(26,26,26,0.15)" : "2px dashed var(--border)") + ";" +
+        "color:" + (state.photoUrl ? "var(--text)" : "var(--text3)"),
+      onClick: function() { fileInput.click(); }
+    }, state.photoUrl ? "✓ Photo added (tap to change)" : "📷  Choose a photo"));
+
+    if (state.photoUrl) {
+      var photoPreview = h("div", { style: "margin-top:14px;border-radius:10px;overflow:hidden;border:1px solid var(--border)" });
+      photoPreview.appendChild(h("img", { src: state.photoUrl, style: "width:100%;height:140px;object-fit:cover;display:block" }));
+      container.appendChild(photoPreview);
+      container.appendChild(h("button", {
+        style: "background:none;border:none;color:#dc2626;font-size:12px;font-weight:600;margin-top:8px",
+        onClick: function() { state.photoUrl = null; render(); }
+      }, "Remove"));
+    }
+  }
+}
+
+// ── MAIN RENDER FUNCTION ──
+
+function render() {
+  var app = document.getElementById("app");
+
+  // Save focus state before clearing
+  var activeElement = document.activeElement;
+  var focusField = null;
+  var cursorPosition = null;
+  if (activeElement && (activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA")) {
+    focusField = activeElement.getAttribute("data-field");
+    cursorPosition = activeElement.selectionStart;
+  }
+
+  app.innerHTML = "";
+  var mobile = isMobile();
+
+  // ═══ OCCASION SCREEN ═══
+  if (state.screen === "occasion") {
+    var screen = h("div", { style: mobile
+      ? "height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px;overflow:hidden"
+      : "min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;animation:fadeUp 0.6s ease-out" });
+    var header = h("div", { style: "text-align:center;margin-bottom:" + (mobile ? "20px" : "48px") + ";flex-shrink:0" });
+    header.appendChild(h("h1", { style: "font-size:" + (mobile ? "34" : "54") + "px;font-weight:800;color:transparent;letter-spacing:-2px;line-height:1;background-image:linear-gradient(135deg, #FF6B35, #E8366D, #6C4FE0, #0EA5A5, #D4960A, #FF6B35);background-size:300% auto;background-clip:text;-webkit-background-clip:text;animation:shimmer 5s linear infinite;margin:0 0 6px" }, "KeeprCards"));
+    header.appendChild(h("p", { style: "color:var(--text3);font-size:" + (mobile ? "11" : "14") + "px;letter-spacing:5px;text-transform:uppercase" }, "say it with a card"));
+    screen.appendChild(header);
+    screen.appendChild(h("p", { style: "color:var(--text2);font-size:" + (mobile ? "15" : "18") + "px;margin-bottom:" + (mobile ? "16px" : "32px") + ";animation:fadeUp 0.6s ease-out 0.1s both;flex-shrink:0" }, "What's the vibe?"));
+    var grid = h("div", { style: "display:grid;grid-template-columns:repeat(" + (mobile ? "2" : "4") + ",1fr);gap:" + (mobile ? "8" : "12") + "px;max-width:540px;width:100%;flex-shrink:0" });
+    for (var oi = 0; oi < OCCASIONS.length; oi++) {
+      (function(occasion, index) {
+        var btn = h("button", {
+          style: "background:#fff;border:1px solid var(--border);border-radius:" + (mobile ? "12" : "16") + "px;padding:" + (mobile ? "12px 6px 10px" : "22px 8px 18px") + ";display:flex;flex-direction:column;align-items:center;gap:" + (mobile ? "3" : "7") + "px;transition:all 0.3s;animation:fadeUp 0.5s ease-out " + (0.12 + index * 0.04) + "s both;box-shadow:0 1px 2px rgba(0,0,0,0.03)",
+          onClick: function() { setState({ occasion: occasion, screen: "builder" }); }
+        });
+        btn.onmouseenter = function() { btn.style.transform = "translateY(-5px)"; btn.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)"; };
+        btn.onmouseleave = function() { btn.style.transform = ""; btn.style.boxShadow = "0 1px 2px rgba(0,0,0,0.03)"; };
+        btn.appendChild(h("span", { style: "font-size:" + (mobile ? "22" : "30") + "px;animation:float 3.5s ease-in-out infinite;animation-delay:" + (index * 0.15) + "s", html: occasion.emoji }));
+        btn.appendChild(h("span", { style: "color:var(--text);font-size:" + (mobile ? "11" : "13") + "px;font-weight:700" }, occasion.label));
+        if (!mobile) btn.appendChild(h("span", { style: "color:var(--text3);font-size:12px;line-height:1.3" }, occasion.desc));
+        grid.appendChild(btn);
+      })(OCCASIONS[oi], oi);
+    }
+    screen.appendChild(grid);
+    app.appendChild(screen);
+    return;
+  }
+
+  // ═══ BUILDER SCREEN ═══
+  if (state.screen === "builder") {
+    var wrapper = h("div", { style: mobile
+      ? "position:fixed;inset:0;display:flex;flex-direction:column;background:var(--area);overflow:hidden"
+      : "display:flex;flex-direction:column;min-height:100vh" });
+
+    // Header bar: Back | KeeprCards (centered, clickable) | Preview
+    var headerBar = h("div", { style: "padding:8px " + (mobile ? "12" : "20") + "px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid var(--borderLight);background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);flex-shrink:0;z-index:60" });
+    // Left: Back
+    headerBar.appendChild(h("button", { style: "background:none;border:none;color:var(--text3);font-size:14px;padding:6px 8px;min-height:44px;display:flex;align-items:center;justify-self:start", onClick: function() { setState({ screen: "occasion" }); } }, "← Back"));
+    // Center: Logo (clickable, goes home)
+    headerBar.appendChild(h("button", { style: "background:none;border:none;cursor:pointer;font-size:" + (mobile ? "16" : "18") + "px;font-weight:800;color:transparent;letter-spacing:-0.5px;background-image:linear-gradient(135deg, #FF6B35, #E8366D, #6C4FE0);background-size:200% auto;background-clip:text;-webkit-background-clip:text;justify-self:center;padding:4px 8px;min-height:44px;display:flex;align-items:center", onClick: function() { setState({ screen: "occasion" }); } }, "KeeprCards"));
+    // Right: Preview
+    var headerRight = h("div", { style: "justify-self:end" });
+    headerRight.appendChild(h("button", { style: "background:var(--accent);border:none;color:#fff;font-size:13px;font-weight:600;padding:8px 20px;border-radius:20px;min-height:40px", onClick: function() { setState({ screen: "preview" }); } }, "Preview"));
+    headerBar.appendChild(headerRight);
+    wrapper.appendChild(headerBar);
+
+    if (mobile) {
+      // Occasion label above card
+      if (state.occasion) {
+        wrapper.appendChild(h("div", { style: "text-align:center;padding:8px 0 0;flex-shrink:0;background:var(--area)" }, [
+          h("span", { style: "color:var(--text3);font-size:12px;font-weight:500" }, state.occasion.emoji + " " + state.occasion.label)
+        ]));
+      }
+      // Card preview area: centered when drawer closed, pushed up when drawer open
+      var cardAlign = state.drawerOpen ? "flex-start" : "center";
+      var cardPadTop = state.drawerOpen ? "8px" : "16px";
+      var previewArea = h("div", { style: "flex:1;display:flex;align-items:" + cardAlign + ";justify-content:center;padding:" + cardPadTop + " 16px 0;background:var(--area);overflow:hidden;transition:align-items 0.3s ease" });
+      previewArea.appendChild(renderCard("mobile", true));
+      wrapper.appendChild(previewArea);
+
+      // Fixed bottom drawer overlay
+      var drawerHeight = state.drawerOpen ? "55vh" : "48px";
+      var panel = h("div", {
+        style: "position:fixed;bottom:0;left:0;right:0;z-index:50;" +
+          "height:" + drawerHeight + ";transition:height 0.3s ease;" +
+          "background:var(--panel);border-radius:20px 20px 0 0;" +
+          "box-shadow:0 -4px 20px rgba(0,0,0,0.1);" +
+          "display:flex;flex-direction:column;overflow:hidden"
+      });
+
+      // Drawer handle (larger touch target)
+      var drawerHandle = h("div", {
+        style: "display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;cursor:pointer;flex-shrink:0;min-height:48px",
+        onClick: function() { setState({ drawerOpen: !state.drawerOpen }); }
+      });
+      drawerHandle.appendChild(h("div", { style: "width:40px;height:5px;border-radius:3px;background:var(--border)" }));
+      drawerHandle.appendChild(h("span", { style: "font-size:11px;color:var(--text3);margin-top:4px" }, state.drawerOpen ? "Tap to minimize" : "Tap to edit"));
+      panel.appendChild(drawerHandle);
+
+      // Tabs row (flex:1 so they fill the full width, min 44px touch target)
+      var tabsRow = h("div", { style: "display:flex;border-bottom:1px solid var(--borderLight);flex-shrink:0" });
+      for (var ti = 0; ti < TABS.length; ti++) {
+        (function(tabItem) {
+          var isActive = state.tab === tabItem.id;
+          var tabBtn = h("button", {
+            style: "flex:1;background:none;border:none;" +
+              "border-bottom:2px solid " + (isActive ? "var(--accent)" : "transparent") + ";" +
+              "color:" + (isActive ? "var(--text)" : "var(--text3)") + ";" +
+              "padding:8px 4px 6px;min-height:44px;" +
+              "font-size:10px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all 0.15s",
+            onClick: function() { setState({ tab: tabItem.id, drawerOpen: true }); }
+          });
+          tabBtn.appendChild(h("span", { style: "font-size:14px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;line-height:1" }, tabItem.icon));
+          tabBtn.appendChild(h("span", null, tabItem.label));
+          tabsRow.appendChild(tabBtn);
+        })(TABS[ti]);
+      }
+      panel.appendChild(tabsRow);
+
+      // Tab content (only thing that scrolls)
+      var tabContent = h("div", { style: "flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px;overscroll-behavior:contain" });
+      renderTabContent(tabContent);
+      panel.appendChild(tabContent);
+
+      wrapper.appendChild(panel);
+    } else {
+      // Desktop layout
+      var body = h("div", { style: "display:flex;flex-direction:row;flex:1;overflow:hidden" });
+
+      var previewArea = h("div", { style: "flex:1;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--area)" });
+      previewArea.appendChild(renderCard("normal", true));
+      body.appendChild(previewArea);
+
+      var panel = h("div", { style: "width:420px;border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--panel)" });
+
+      var tabsRow = h("div", { style: "display:flex;border-bottom:1px solid var(--borderLight);flex-shrink:0" });
+      for (var ti = 0; ti < TABS.length; ti++) {
+        (function(tabItem) {
+          var isActive = state.tab === tabItem.id;
+          var tabBtn = h("button", {
+            style: "flex:1;background:none;border:none;" +
+              "border-bottom:2px solid " + (isActive ? "var(--accent)" : "transparent") + ";" +
+              "color:" + (isActive ? "var(--text)" : "var(--text3)") + ";" +
+              "padding:10px 2px 8px;min-height:44px;" +
+              "font-size:10px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all 0.15s;white-space:nowrap",
+            onClick: function() { setState({ tab: tabItem.id }); }
+          });
+          tabBtn.appendChild(h("span", { style: "font-size:15px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;line-height:1" }, tabItem.icon));
+          tabBtn.appendChild(h("span", null, tabItem.label));
+          tabsRow.appendChild(tabBtn);
+        })(TABS[ti]);
+      }
+      panel.appendChild(tabsRow);
+
+      var tabContent = h("div", { style: "flex:1;overflow:auto;padding:20px" });
+      renderTabContent(tabContent);
+      panel.appendChild(tabContent);
+
+      body.appendChild(panel);
+      wrapper.appendChild(body);
+    }
+    app.appendChild(wrapper);
+
+    // Restore focus
+    if (focusField) {
+      var el = app.querySelector('[data-field="' + focusField + '"]');
+      if (el) {
+        el.focus();
+        if (cursorPosition != null) {
+          try { el.setSelectionRange(cursorPosition, cursorPosition); } catch (e) {}
+        }
+      }
+    }
+    return;
+  }
+
+  // ═══ PREVIEW SCREEN ═══
+  if (state.screen === "preview" && !state.showReveal) {
+    if (mobile) {
+      var screen = h("div", { style: "height:100vh;display:flex;flex-direction:column;overflow:hidden" });
+      // Header
+      var headerBar = h("div", { style: "padding:8px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid var(--borderLight);background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);flex-shrink:0" });
+      headerBar.appendChild(h("button", { style: "background:none;border:none;color:var(--text3);font-size:14px;padding:6px 8px;min-height:44px;display:flex;align-items:center;justify-self:start", onClick: function() { setState({ screen: "builder" }); } }, "← Edit"));
+      headerBar.appendChild(h("button", { style: "background:none;border:none;cursor:pointer;font-size:16px;font-weight:800;color:transparent;letter-spacing:-0.5px;background-image:linear-gradient(135deg, #FF6B35, #E8366D, #6C4FE0);background-size:200% auto;background-clip:text;-webkit-background-clip:text;justify-self:center;padding:4px 8px;min-height:44px;display:flex;align-items:center", onClick: function() { setState({ screen: "occasion" }); } }, "KeeprCards"));
+      headerBar.appendChild(h("div", { style: "justify-self:end" }));
+      screen.appendChild(headerBar);
+      // Card area
+      var cardArea = h("div", { style: "flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;background:var(--area);overflow:hidden" });
+      cardArea.appendChild(h("p", { style: "color:var(--text2);font-size:14px;margin-bottom:10px;flex-shrink:0" }, "Looking good ✨"));
+      var cardWrap = h("div", { style: "flex-shrink:0;margin-bottom:10px" });
+      cardWrap.appendChild(renderCard("mobile"));
+      cardArea.appendChild(cardWrap);
+      // Buttons
+      var buttons = h("div", { style: "display:flex;gap:8px;flex-shrink:0;padding-bottom:8px" });
+      buttons.appendChild(h("button", { style: "border-radius:22px;padding:10px 18px;font-size:13px;font-weight:600;border:1px solid var(--border);background:#fff;color:var(--text);min-height:44px", onClick: function() { setState({ screen: "builder" }); } }, "← Edit"));
+      buttons.appendChild(h("button", { style: "border-radius:22px;padding:10px 22px;font-size:13px;font-weight:700;border:none;background:var(--accent);color:#fff;min-height:44px", onClick: function() { setState({ screen: "send" }); } }, "Send Card →"));
+      buttons.appendChild(h("button", { style: "border-radius:22px;padding:10px 14px;font-size:12px;border:1px solid var(--border);background:#fff;color:var(--text3);min-height:44px", onClick: function() { setState({ showReveal: true, envelopeOpen: false, cardRevealed: false }); } }, "👁 Reveal"));
+      cardArea.appendChild(buttons);
+      screen.appendChild(cardArea);
+    } else {
+      var screen = h("div", { style: "min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:var(--area);animation:fadeUp 0.5s ease-out" });
+      var header = h("div", { style: "text-align:center;margin-bottom:24px" });
+      header.appendChild(h("h2", { style: "font-size:24px;font-weight:700;margin:0 0 4px" }, "Looking good ✨"));
+      header.appendChild(h("p", { style: "color:var(--text3);font-size:14px" }, "Here is how your card will look"));
+      screen.appendChild(header);
+      var cardWrap = h("div", { style: "animation:fadeUp 0.5s ease-out 0.1s both;margin-bottom:32px" });
+      cardWrap.appendChild(renderCard("preview"));
+      screen.appendChild(cardWrap);
+      var buttons = h("div", { style: "display:flex;gap:8px;flex-wrap:wrap;justify-content:center;animation:fadeUp 0.5s ease-out 0.2s both" });
+      buttons.appendChild(h("button", { style: "border-radius:22px;padding:10px 22px;font-size:13px;font-weight:600;border:1px solid var(--border);background:#fff;color:var(--text)", onClick: function() { setState({ screen: "builder" }); } }, "← Edit"));
+      buttons.appendChild(h("button", { style: "border-radius:22px;padding:10px 26px;font-size:13px;font-weight:700;border:none;background:var(--accent);color:#fff", onClick: function() { setState({ screen: "send" }); } }, "Send Card →"));
+      buttons.appendChild(h("button", { style: "border-radius:22px;padding:10px 16px;font-size:12px;border:1px solid var(--border);background:#fff;color:var(--text3)", onClick: function() { setState({ showReveal: true, envelopeOpen: false, cardRevealed: false }); } }, "👁 Reveal"));
+      screen.appendChild(buttons);
+    }
+    app.appendChild(screen);
+    return;
+  }
+
+  // ═══ REVEAL SCREEN ═══
+  if (state.showReveal || state.screen === "reveal") {
+    var isFromSharedLink = !!shared && state.screen === "reveal";
+    var screen = h("div", { style: "min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;animation:fadeUp 0.6s ease-out" });
+    if (!state.envelopeOpen) {
+      var envelopeWrap = h("div", { style: "text-align:center" });
+      envelopeWrap.appendChild(h("p", { style: "color:var(--text2);font-size:15px;margin-bottom:6px" }, state.senderName ? state.senderName + " sent you something" : "You got something special"));
+      var envelope = h("div", {
+        style: "width:200px;height:140px;margin:40px auto;background:linear-gradient(135deg, #333, #555);border-radius:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;animation:pulse 2.5s ease-in-out infinite;box-shadow:0 12px 40px rgba(0,0,0,0.12);position:relative;overflow:hidden",
+        onClick: function() { setState({ envelopeOpen: true }); setTimeout(function() { setState({ cardRevealed: true }); }, 700); }
+      });
+      envelope.appendChild(h("div", { style: "position:absolute;top:0;left:0;right:0;height:50%;background:rgba(0,0,0,0.1);clip-path:polygon(0 0, 50% 65%, 100% 0)" }));
+      envelope.appendChild(h("span", { style: "font-size:38px;z-index:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.15))", html: "💌" }));
+      envelopeWrap.appendChild(envelope);
+      envelopeWrap.appendChild(h("p", { style: "color:var(--text4);font-size:13px;animation:pulse 2.5s ease-in-out infinite" }, "Tap to open"));
+      screen.appendChild(envelopeWrap);
+    } else if (!state.cardRevealed) {
+      screen.appendChild(h("div", { style: "width:16px;height:16px;border-radius:50%;background:var(--accent);margin:0 auto;animation:pulse 0.5s ease-in-out infinite" }));
+    } else {
+      var revealWrap = h("div", { style: "text-align:center" });
+      // Confetti
+      var confettiContainer = h("div", { style: "position:fixed;top:40%;left:50%;pointer-events:none;z-index:10" });
+      var confettiEmojis = ["🎊","✨","💫","⭐","🎉","💖","🎈","🌟"];
+      var confettiAnims = ["cA","cB","cC"];
+      for (var ci = 0; ci < confettiEmojis.length; ci++) {
+        confettiContainer.appendChild(h("span", {
+          style: "position:absolute;font-size:20px;animation:" + confettiAnims[ci % 3] + " 1.5s ease-out " + (ci * 0.07) + "s forwards;left:" + (-55 + ci * 16) + "px",
+          html: confettiEmojis[ci]
+        }));
+      }
+      revealWrap.appendChild(confettiContainer);
+      var cardWrap = h("div", { style: "animation:cardReveal 0.9s ease-out;margin-bottom:24px" });
+      cardWrap.appendChild(renderCard(mobile ? "mobile" : "reveal"));
+      revealWrap.appendChild(cardWrap);
+      if (isFromSharedLink) {
+        var sharedFooter = h("div", { style: "animation:fadeUp 0.5s ease-out 0.4s both" });
+        sharedFooter.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin-bottom:12px" }, "Sent with 💌 via KeeprCards"));
+        sharedFooter.appendChild(h("button", {
+          style: "border-radius:22px;padding:10px 24px;font-size:13px;font-weight:600;border:none;background:var(--accent);color:#fff",
+          onClick: function() { window.history.replaceState(null, "", window.location.pathname); window.location.reload(); }
+        }, "Create Your Own Card"));
+        revealWrap.appendChild(sharedFooter);
+      } else {
+        revealWrap.appendChild(h("button", {
+          style: "border-radius:22px;padding:9px 20px;font-size:13px;font-weight:600;border:1px solid var(--border);background:#fff;color:var(--text);animation:fadeUp 0.5s ease-out 0.4s both",
+          onClick: function() { setState({ showReveal: false, envelopeOpen: false, cardRevealed: false }); }
+        }, "← Back"));
+      }
+      screen.appendChild(revealWrap);
+    }
+    app.appendChild(screen);
+    return;
+  }
+
+  // ═══ SEND SCREEN ═══
+  if (state.screen === "send") {
+    var cardPayload = {
+      oc: state.occasion && state.occasion.id,
+      bg: state.background.id,
+      ly: state.layout.id,
+      fn: state.font.id,
+      tc: state.textColor.id,
+      ms: state.message,
+      to: state.recipientName,
+      fr: state.senderName,
+      st: state.stickers.map(function(s) {
+        return { emoji: s.emoji, x: Math.round(s.x), y: Math.round(s.y), rotation: Math.round(s.rotation), scale: Math.round(s.scale * 100) / 100, size: s.size };
+      })
+    };
+    var shareUrl = BASE_URL + "?card=" + encodeCard(cardPayload);
+    var fromName = state.senderName || "Someone special";
+    var toName = state.recipientName || "you";
+    var emailSubject = fromName + " sent you a card on KeeprCards 💌";
+    var emailBody = "Hey " + toName + "!\n\n" + fromName + " made you a personal greeting card on KeeprCards.\n\nOpen your card here:\n" + shareUrl + "\n\n— Sent with love via KeeprCards";
+    var smsBody = "💌 " + fromName + " sent you a card! Open it here: " + shareUrl;
+
+    var screen = h("div", { style: "min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:" + (mobile ? "30px 16px" : "40px 20px") + ";animation:fadeUp 0.5s ease-out" });
+    var header = h("div", { style: "text-align:center;margin-bottom:20px" });
+    header.appendChild(h("h2", { style: "font-size:" + (mobile ? "20" : "24") + "px;font-weight:700;margin:0 0 4px" }, "Send your card 💌"));
+    header.appendChild(h("p", { style: "color:var(--text3);font-size:14px" }, "Choose how to deliver it"));
+    screen.appendChild(header);
+    var cardWrap = h("div", { style: "margin-bottom:24px;animation:fadeUp 0.5s ease-out 0.1s both" });
+    cardWrap.appendChild(renderCard("small"));
+    screen.appendChild(cardWrap);
+
+    // Link preview mockup
+    var linkPreview = h("div", { style: "width:100%;max-width:360px;margin-bottom:20px;animation:fadeUp 0.5s ease-out 0.15s both" });
+    linkPreview.appendChild(h("p", { style: "color:var(--text3);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin-bottom:6px;text-align:center" }, "Link Preview"));
+    var previewCard = h("div", { style: "background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04)" });
+    previewCard.appendChild(h("div", { style: "height:6px;background:linear-gradient(90deg, #FF6B35, #E8366D, #6C4FE0, #0EA5A5);border-radius:12px 12px 0 0" }));
+    var previewInner = h("div", { style: "padding:14px 16px" });
+    previewInner.appendChild(h("p", { style: "color:var(--text3);font-size:11px;margin:0 0 4px;font-weight:500" }, "proviewmedia.github.io/SendCardly"));
+    previewInner.appendChild(h("p", { style: "font-size:14px;font-weight:700;margin:0 0 4px" }, fromName + " sent " + toName + " a card on KeeprCards 💌"));
+    previewInner.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin:0" }, "You have been sent a personal greeting card. Tap to open and see your message!"));
+    previewCard.appendChild(previewInner);
+    linkPreview.appendChild(previewCard);
+    screen.appendChild(linkPreview);
+
+    // Send options
+    var optionsWrap = h("div", { style: "display:flex;flex-direction:column;gap:8px;width:100%;max-width:360px;animation:fadeUp 0.5s ease-out 0.2s both" });
+
+    function createSendOption(icon, label, desc, action) {
+      var button = h("button", {
+        style: "background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:all 0.15s;width:100%;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.03)",
+        onClick: action
+      });
+      button.onmouseenter = function() { button.style.borderColor = "#aaa"; button.style.boxShadow = "0 4px 12px rgba(0,0,0,0.06)"; };
+      button.onmouseleave = function() { button.style.borderColor = ""; button.style.boxShadow = "0 1px 2px rgba(0,0,0,0.03)"; };
+      button.appendChild(h("span", { style: "font-size:18px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--input);border-radius:10px;flex-shrink:0;color:var(--text2)" }, icon));
+      var textWrap = h("div", { style: "text-align:left;flex:1" });
+      textWrap.appendChild(h("p", { style: "font-size:14px;font-weight:600;margin:0" }, label));
+      textWrap.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin:2px 0 0" }, desc));
+      button.appendChild(textWrap);
+      button.appendChild(h("span", { style: "color:var(--text4);font-size:14px" }, "→"));
+      optionsWrap.appendChild(button);
+    }
+
+    createSendOption("✉", "Send via Email", "Opens your email with a ready message", function() {
+      window.location.href = "mailto:?subject=" + encodeURIComponent(emailSubject) + "&body=" + encodeURIComponent(emailBody);
+    });
+    createSendOption("◈", "Send via Text", "Opens your messaging app", function() {
+      window.location.href = "sms:?&body=" + encodeURIComponent(smsBody);
+    });
+    createSendOption(state.copied ? "✓" : "⟁", state.copied ? "Link Copied!" : "Copy Link", "Paste it anywhere you want", function() {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareUrl).then(function() {
+          state.copied = true;
+          render();
+          setTimeout(function() { state.copied = false; render(); }, 3000);
+        });
+      }
+    });
+
+    // Native share (mobile)
+    if (typeof navigator !== "undefined" && navigator.share) {
+      var nativeShare = h("button", {
+        style: "background:var(--accent);border:none;border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;width:100%;cursor:pointer",
+        onClick: function() { navigator.share({ title: fromName + " sent you a card on KeeprCards", text: fromName + " made you a personal greeting card!", url: shareUrl }).catch(function() {}); }
+      });
+      nativeShare.appendChild(h("span", { style: "font-size:18px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.15);border-radius:10px;flex-shrink:0;color:#fff" }, "⬡"));
+      var nativeText = h("div", { style: "text-align:left;flex:1" });
+      nativeText.appendChild(h("p", { style: "color:#fff;font-size:14px;font-weight:600;margin:0" }, "Share"));
+      nativeText.appendChild(h("p", { style: "color:rgba(255,255,255,0.6);font-size:11px;margin:2px 0 0" }, "Use your device share menu"));
+      nativeShare.appendChild(nativeText);
+      optionsWrap.appendChild(nativeShare);
+    }
+
+    // QR placeholder
+    var qrPlaceholder = h("div", { style: "background:var(--input);border:1px dashed var(--border);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:14px;opacity:0.4" });
+    qrPlaceholder.appendChild(h("span", { style: "font-size:14px;color:var(--text3)" }, "▣"));
+    qrPlaceholder.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin:0" }, "QR Code coming soon"));
+    optionsWrap.appendChild(qrPlaceholder);
+
+    screen.appendChild(optionsWrap);
+    screen.appendChild(h("button", { style: "background:none;border:none;color:var(--text3);font-size:13px;margin-top:24px;cursor:pointer", onClick: function() { setState({ screen: "preview" }); } }, "← Back to Preview"));
+    app.appendChild(screen);
+    return;
+  }
+}
+
+
+// ── INIT ──
+window.addEventListener("resize", function() { render(); });
+render();
+
+</script>
+</body>
+</html>
