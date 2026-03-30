@@ -1,7 +1,7 @@
 {
-  "name": "SendrCards — Say It With a Card",
-  "short_name": "SendrCards",
-  "description": "Create and send beautiful digital greeting cards for free. Birthdays, holidays, long distance love, or just because you're thinking of someone.",
+  "name": "Sendr — Say It With a Card",
+  "short_name": "Sendr",
+  "description": "Create and send beautiful digital greeting cards for free. Design the front, write your message on the back, and send it to anyone instantly.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f7f6f3",

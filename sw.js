@@ -1,4 +1,4 @@
-var CACHE_NAME = 'sendrcards-v1';
+var CACHE_NAME = 'sendr-v2';
 var ASSETS = [
   '/',
   '/index.html',
