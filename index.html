@@ -282,50 +282,107 @@ var EMOJI_CATEGORIES = [
   { label: "Gestures", emojis: ["👏","🙌","🤝","✌️","🤞","👊","💪","🫂","👋","🫡","🤙","✊"] }
 ];
 
+var PX = "https://images.pexels.com/photos/";
+var PXS = "/pexels-photo-";
+var PXE = ".jpeg?auto=compress&cs=tinysrgb&w=400&h=530";
+function px(id) { return PX + id + PXS + id + PXE; }
+
 var CARD_DESIGNS = [
   { label: "Birthday", items: [
     { id: "bd1", label: "Party Time", bg: "g2", emoji: "🎂", text: "Happy Birthday!" },
     { id: "bd2", label: "Celebrate", bg: "g8", emoji: "🎉", text: "It's Your Day!" },
-    { id: "bd3", label: "Candles", bg: "g9", emoji: "🎈", text: "Make a Wish" },
+    { id: "bd3", label: "Make a Wish", bg: "g9", emoji: "🎈", text: "Make a Wish" },
     { id: "bd4", label: "Confetti", bg: "g5", emoji: "🥳", text: "Happy Bday!" },
-    { id: "bd5", label: "Cake & Candles", bg: "g2", emoji: "🎂", text: "Happy Birthday!", photo: "https://images.pexels.com/photos/369267/pexels-photo-369267.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" },
-    { id: "bd6", label: "Pink Cake", bg: "g11", emoji: "🎀", text: "Make a Wish!", photo: "https://images.pexels.com/photos/851204/pexels-photo-851204.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" },
-    { id: "bd7", label: "Sparklers", bg: "g9", emoji: "✨", text: "It's Your Day!", photo: "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" }
+    { id: "bd5", label: "Colorful Cake", bg: "g2", emoji: "🎂", text: "Happy Birthday!", photo: px(369267) },
+    { id: "bd6", label: "Pink Cake", bg: "g11", emoji: "🎀", text: "Make a Wish!", photo: px(851204) },
+    { id: "bd7", label: "Confetti Pop", bg: "g9", emoji: "✨", text: "It's Your Day!", photo: px(1105666) },
+    { id: "bd8", label: "Cake Closeup", bg: "g8", emoji: "🎂", text: "Happy Birthday!", photo: px(1729797) },
+    { id: "bd9", label: "Sprinkles", bg: "g2", emoji: "🧁", text: "Sweet Birthday!", photo: px(2531546) },
+    { id: "bd10", label: "Gift Box", bg: "g5", emoji: "🎁", text: "Surprise!", photo: px(1405528) },
+    { id: "bd11", label: "Party Lights", bg: "g9", emoji: "🎉", text: "Let's Celebrate!", photo: px(1857157) },
+    { id: "bd12", label: "Cupcake", bg: "g11", emoji: "🧁", text: "Happy Bday!", photo: px(1684187) },
+    { id: "bd13", label: "Candle Glow", bg: "g8", emoji: "🕯️", text: "Make a Wish!", photo: px(796606) },
+    { id: "bd14", label: "Balloons", bg: "g6", emoji: "🎈", text: "It's Your Day!", photo: px(226737) }
   ]},
   { label: "Thank You", items: [
     { id: "ty1", label: "Grateful", bg: "g6", emoji: "🙏", text: "Thank You" },
-    { id: "ty2", label: "Flowers", bg: "g11", emoji: "🌸", text: "Thanks!" },
-    { id: "ty3", label: "Heart", bg: "g4", emoji: "💛", text: "Thank You So Much" },
-    { id: "ty4", label: "Peony Bouquet", bg: "g6", emoji: "💐", text: "Thank You!", photo: "https://images.pexels.com/photos/1109561/pexels-photo-1109561.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" },
-    { id: "ty5", label: "Pastel Blooms", bg: "g11", emoji: "🌷", text: "Thanks So Much", photo: "https://images.pexels.com/photos/2879824/pexels-photo-2879824.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" }
+    { id: "ty2", label: "Bloom", bg: "g11", emoji: "🌸", text: "Thanks!" },
+    { id: "ty3", label: "Golden Heart", bg: "g4", emoji: "💛", text: "Thank You So Much" },
+    { id: "ty4", label: "Appreciate", bg: "g10", emoji: "🤗", text: "You're the Best" },
+    { id: "ty5", label: "Peony Bouquet", bg: "g6", emoji: "💐", text: "Thank You!", photo: px(1109561) },
+    { id: "ty6", label: "Pastel Blooms", bg: "g11", emoji: "🌷", text: "Thanks So Much", photo: px(2879824) },
+    { id: "ty7", label: "Wildflowers", bg: "g4", emoji: "🌻", text: "Thank You!", photo: px(931177) },
+    { id: "ty8", label: "Sunflowers", bg: "g8", emoji: "🌻", text: "So Grateful", photo: px(931154) },
+    { id: "ty9", label: "Garden", bg: "g10", emoji: "🌿", text: "Thanks!", photo: px(736230) },
+    { id: "ty10", label: "Spring", bg: "g6", emoji: "🌼", text: "Appreciate You", photo: px(1458282) },
+    { id: "ty11", label: "Soft Petals", bg: "g11", emoji: "🌺", text: "Thank You!", photo: px(371285) },
+    { id: "ty12", label: "Lavender", bg: "g1", emoji: "💜", text: "Many Thanks", photo: px(2255935) },
+    { id: "ty13", label: "Pink Roses", bg: "g2", emoji: "🌹", text: "Thanks!", photo: px(1302307) },
+    { id: "ty14", label: "Fresh Daisies", bg: "g6", emoji: "🌼", text: "You're Amazing", photo: px(1030973) }
   ]},
   { label: "Love", items: [
     { id: "lv1", label: "Hearts", bg: "g2", emoji: "❤️", text: "I Love You" },
     { id: "lv2", label: "Forever", bg: "g9", emoji: "💕", text: "You & Me" },
     { id: "lv3", label: "Kiss", bg: "g11", emoji: "💋", text: "XOXO" },
-    { id: "lv4", label: "Red Roses", bg: "g2", emoji: "🌹", text: "I Love You", photo: "https://images.pexels.com/photos/1024960/pexels-photo-1024960.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" },
-    { id: "lv5", label: "Heart Bokeh", bg: "g9", emoji: "💖", text: "You & Me", photo: "https://images.pexels.com/photos/887349/pexels-photo-887349.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" }
+    { id: "lv4", label: "Soulmate", bg: "g5", emoji: "💗", text: "Always Yours" },
+    { id: "lv5", label: "Red Roses", bg: "g2", emoji: "🌹", text: "I Love You", photo: px(1024960) },
+    { id: "lv6", label: "Heart Bokeh", bg: "g9", emoji: "💖", text: "You & Me", photo: px(887349) },
+    { id: "lv7", label: "Rose Petals", bg: "g2", emoji: "🌹", text: "XOXO", photo: px(850359) },
+    { id: "lv8", label: "Red Heart", bg: "g5", emoji: "❤️", text: "Love You", photo: px(169198) },
+    { id: "lv9", label: "Love Letter", bg: "g9", emoji: "💌", text: "Be Mine", photo: px(1028600) },
+    { id: "lv10", label: "Pink Roses", bg: "g11", emoji: "🌷", text: "Always", photo: px(1074314) },
+    { id: "lv11", label: "Heart Candy", bg: "g6", emoji: "🍬", text: "Sweet Love", photo: px(948185) },
+    { id: "lv12", label: "Rose Close", bg: "g2", emoji: "🌹", text: "Yours Forever", photo: px(1084425) },
+    { id: "lv13", label: "Sunset", bg: "g3", emoji: "🌅", text: "You & Me", photo: px(1024961) },
+    { id: "lv14", label: "Flowers", bg: "g11", emoji: "💐", text: "With Love", photo: px(1406766) }
   ]},
   { label: "Wedding", items: [
     { id: "wd1", label: "Rings", bg: "g6", emoji: "💍", text: "Congratulations!" },
     { id: "wd2", label: "Toast", bg: "g8", emoji: "🥂", text: "Cheers to You!" },
-    { id: "wd3", label: "Love Birds", bg: "g11", emoji: "🕊️", text: "Best Wishes" },
-    { id: "wd4", label: "Rings & Roses", bg: "g6", emoji: "💍", text: "Congratulations!", photo: "https://images.pexels.com/photos/3023279/pexels-photo-3023279.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" },
-    { id: "wd5", label: "Champagne", bg: "g8", emoji: "🥂", text: "Cheers!", photo: "https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" }
+    { id: "wd3", label: "Doves", bg: "g11", emoji: "🕊️", text: "Best Wishes" },
+    { id: "wd4", label: "Forever", bg: "g9", emoji: "💒", text: "Happily Ever After" },
+    { id: "wd5", label: "Champagne", bg: "g8", emoji: "🥂", text: "Cheers!", photo: px(1024993) },
+    { id: "wd6", label: "Wedding Cake", bg: "g6", emoji: "🎂", text: "Congratulations!", photo: px(265804) },
+    { id: "wd7", label: "Gold Rings", bg: "g8", emoji: "💍", text: "Best Wishes!", photo: px(169193) },
+    { id: "wd8", label: "White Flowers", bg: "g11", emoji: "💐", text: "Happily Ever After", photo: px(1045541) },
+    { id: "wd9", label: "Table Setting", bg: "g6", emoji: "✨", text: "What a Day!", photo: px(752842) },
+    { id: "wd10", label: "Elegant", bg: "g9", emoji: "🥂", text: "Cheers!", photo: px(2092233) },
+    { id: "wd11", label: "Rose Gold", bg: "g11", emoji: "💍", text: "Forever Yours", photo: px(948187) },
+    { id: "wd12", label: "Bouquet", bg: "g2", emoji: "💐", text: "Beautiful Day!", photo: px(313707) },
+    { id: "wd13", label: "Venue", bg: "g6", emoji: "💒", text: "Congratulations!", photo: px(1128782) },
+    { id: "wd14", label: "Floral Arch", bg: "g11", emoji: "🌸", text: "Best Wishes!", photo: px(1045543) }
   ]},
   { label: "Congrats", items: [
     { id: "cg1", label: "Trophy", bg: "g10", emoji: "🏆", text: "Congrats!" },
     { id: "cg2", label: "Star", bg: "g8", emoji: "⭐", text: "You Did It!" },
     { id: "cg3", label: "Graduate", bg: "g7", emoji: "🎓", text: "Congratulations!" },
-    { id: "cg4", label: "Graduation", bg: "g7", emoji: "🎓", text: "You Did It!", photo: "https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" },
-    { id: "cg5", label: "Confetti", bg: "g8", emoji: "🎊", text: "Congrats!", photo: "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" }
+    { id: "cg4", label: "Champion", bg: "g3", emoji: "🥇", text: "You're #1!" },
+    { id: "cg5", label: "Grad Caps", bg: "g7", emoji: "🎓", text: "You Did It!", photo: px(267885) },
+    { id: "cg6", label: "Confetti", bg: "g8", emoji: "🎊", text: "Congrats!", photo: px(1105666) },
+    { id: "cg7", label: "Sparklers", bg: "g9", emoji: "🎇", text: "Celebrate!", photo: px(1024967) },
+    { id: "cg8", label: "Party", bg: "g2", emoji: "🎉", text: "Amazing!", photo: px(796606) },
+    { id: "cg9", label: "Fireworks", bg: "g1", emoji: "🎆", text: "Way to Go!", photo: px(716276) },
+    { id: "cg10", label: "Cheers", bg: "g8", emoji: "🥂", text: "Proud of You!", photo: px(1058279) },
+    { id: "cg11", label: "Balloons", bg: "g6", emoji: "🎈", text: "Congrats!", photo: px(2306281) },
+    { id: "cg12", label: "Gold Star", bg: "g8", emoji: "⭐", text: "Nailed It!", photo: px(1387577) },
+    { id: "cg13", label: "Streamers", bg: "g9", emoji: "🎊", text: "So Proud!", photo: px(1619488) },
+    { id: "cg14", label: "Celebrate", bg: "g10", emoji: "✨", text: "Well Done!", photo: px(3401403) }
   ]},
   { label: "Miss You", items: [
     { id: "my1", label: "Moon", bg: "g1", emoji: "🌙", text: "Miss You" },
     { id: "my2", label: "Thinking", bg: "g7", emoji: "💭", text: "Thinking of You" },
     { id: "my3", label: "Stars", bg: "g9", emoji: "✨", text: "Wish You Were Here" },
-    { id: "my4", label: "Starry Night", bg: "g1", emoji: "🌙", text: "Missing You", photo: "https://images.pexels.com/photos/1237119/pexels-photo-1237119.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" },
-    { id: "my5", label: "Moonlight", bg: "g7", emoji: "🌕", text: "Wish You Were Here", photo: "https://images.pexels.com/photos/1252890/pexels-photo-1252890.jpeg?auto=compress&cs=tinysrgb&w=400&h=530" }
+    { id: "my4", label: "Nostalgia", bg: "g5", emoji: "💙", text: "Missing You" },
+    { id: "my5", label: "Starry Night", bg: "g1", emoji: "🌙", text: "Missing You", photo: px(1237119) },
+    { id: "my6", label: "Moonlight", bg: "g7", emoji: "🌕", text: "Thinking of You", photo: px(1252890) },
+    { id: "my7", label: "Ocean Waves", bg: "g4", emoji: "🌊", text: "Wish You Were Here", photo: px(1529360) },
+    { id: "my8", label: "Sunset Beach", bg: "g3", emoji: "🌅", text: "Missing You", photo: px(1535162) },
+    { id: "my9", label: "Foggy Path", bg: "g7", emoji: "🌿", text: "Thinking of You", photo: px(355465) },
+    { id: "my10", label: "Rainy Window", bg: "g1", emoji: "🌧️", text: "Miss You", photo: px(1257860) },
+    { id: "my11", label: "Cloudy Sky", bg: "g7", emoji: "☁️", text: "Far Away", photo: px(924824) },
+    { id: "my12", label: "Autumn Leaves", bg: "g3", emoji: "🍂", text: "Remember When", photo: px(289998) },
+    { id: "my13", label: "Empty Bench", bg: "g7", emoji: "💭", text: "Wish You Were Here", photo: px(1434608) },
+    { id: "my14", label: "Dusk", bg: "g9", emoji: "🌆", text: "See You Soon", photo: px(1484771) }
   ]}
 ];
 var ALL_DESIGNS = CARD_DESIGNS.flatMap(function(c) { return c.items; });
