@@ -5263,6 +5263,15 @@ function renderArtFront(card, d, scale) {
     card.appendChild(h("p", { style: "position:absolute;left:7%;right:7%;" + posCss + "margin:0;z-index:7;text-align:center;white-space:pre-line;text-wrap:balance;overflow-wrap:break-word;line-height:" + (d.lh || (d.caps ? 1.3 : 0.95)) + ";letter-spacing:" + (d.track != null ? d.track + "em" : "-0.01em") + ";" + (d.caps ? "text-transform:uppercase;" : "") +
       "font-family:" + fontFamilyFor(fontId) + ";font-weight:" + (FONT_WEIGHT[fontId] || 600) + ";font-style:" + (d.italic && fontId === d.font ? "italic" : "normal") + ";" +
       "font-size:" + (d.size * scale * (state.frontFontSize || 1)) + "px;color:" + (state.frontInk || d.ink), "data-edit": "headline" }, text));
+    // Italic faces draw "&" as a curly "Et". Set it upright so it reads as a traditional ampersand.
+    var headEl = card.lastChild;
+    if (d.italic && fontId === d.font && text.indexOf("&") > -1) {
+      headEl.textContent = "";
+      text.split("&").forEach(function(part, i) {
+        if (i) headEl.appendChild(h("span", { style: "font-style:normal" }, "&"));
+        headEl.appendChild(document.createTextNode(part));
+      });
+    }
   }
 }
 
