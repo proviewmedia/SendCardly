@@ -1133,6 +1133,176 @@ ART_DESIGNS.push(
   { id: "i-lv5", occasion: "love", label: "Circle photo", art: "heartsBorder", slot: { x: 0.17, y: 0.11, w: 0.66, h: 0.495, rot: 0, frame: "circle" }, headline: "My\nfavorite", font: "fraunces", italic: true, ink: "#8E1B2C", size: 52, pos: "bottom" },
   { id: "i-lv6", occasion: "love", label: "XOXO", art: "xoxo", headline: "xo\nxo", font: "caprasimo", ink: "#F49AB0", size: 140, pos: "center", lh: 0.8 }
 );
+// ── Batch 2: just because, congrats, miss you ──
+function leaf(x, y, rot, len, fill) {
+  return riso('<path transform="translate(' + x + ',' + y + ') rotate(' + rot + ')" d="M0,0 Q' + (len * 0.45) + ',-' + (len * 0.32) + ' ' + len + ',0 Q' + (len * 0.45) + ',' + (len * 0.32) + ' 0,0 Z"/>', fill || "#7FA06B", 3, 3);
+}
+function star4(x, y, s, fill) {
+  return '<path transform="translate(' + x + ',' + y + ') scale(' + s + ')" d="M0,-10 Q1.5,-1.5 10,0 Q1.5,1.5 0,10 Q-1.5,1.5 -10,0 Q-1.5,-1.5 0,-10 Z" fill="' + fill + '"/>';
+}
+ART.plant = function() {
+  return svgCard("#F4EADB", wob(
+    '<g fill="none" stroke="#3F6B4A" stroke-width="3.5" stroke-linecap="round"><path d="M180,340 Q170,280 120,250"/><path d="M180,340 Q178,270 184,220"/><path d="M180,340 Q200,290 246,262"/><path d="M180,340 Q160,310 130,310"/><path d="M180,340 Q206,316 238,316"/></g>' +
+    leaf(120, 250, -150, 64, "#5E8C5A") + leaf(184, 220, -95, 70, "#7FA06B") + leaf(246, 262, -30, 64, "#5E8C5A") + leaf(130, 310, 175, 50, "#7FA06B") + leaf(238, 316, 5, 50, "#7FA06B") +
+    riso('<path d="M122,340 L238,340 L224,436 Q222,444 212,444 L148,444 Q138,444 136,436 Z"/>', "#D9724A", 5, 4) +
+    riso('<rect x="114" y="326" width="132" height="22" rx="4"/>', "#E8875E", 3, 2)
+  ));
+};
+ART.rainbow = function() {
+  var arcs = "", cols = ["#E8502F", "#F2B233", "#7FA06B", "#5DA9A1", "#2C56C9"];
+  for (var i = 0; i < 5; i++) {
+    var r = 120 - i * 18;
+    arcs += riso('<path d="M' + (180 - r) + ',300 A' + r + ',' + r + ' 0 0,1 ' + (180 + r) + ',300 L' + (180 + r - 16) + ',300 A' + (r - 16) + ',' + (r - 16) + ' 0 0,0 ' + (180 - r + 16) + ',300 Z"/>', cols[i], 3, 3);
+  }
+  function cloud(x, y, s) {
+    return riso('<path transform="translate(' + x + ',' + y + ') scale(' + s + ')" d="M-40,10 C-56,10 -56,-14 -38,-14 C-36,-34 -10,-38 -2,-22 C6,-40 36,-36 34,-14 C52,-16 54,10 38,10 Z"/>', "#FFF6E6", 3, 3);
+  }
+  return svgCard("#DCE8F0", wob(arcs + cloud(78, 296, 1) + cloud(284, 298, 1.05) + star4(70, 140, 1.1, ART_INK) + star4(300, 120, 0.8, ART_INK)));
+};
+ART.cat = function() {
+  return svgCard("#F8E7C6", wob(
+    riso('<ellipse cx="180" cy="400" rx="130" ry="18"/>', "#E9C9A0", 2, 2) +
+    riso('<path d="M84,392 C80,320 140,288 196,296 C256,304 282,350 270,392 Z"/>', "#E8875E", 5, 4) +
+    riso('<path d="M262,388 C300,388 310,352 286,340 C274,334 262,346 270,356"/>', "none", 0, 0) +
+    riso('<path d="M98,360 C92,322 112,296 142,296 L132,266 L156,290 L176,286 L184,258 L196,292 C214,304 214,350 190,368 Z"/>', "#E8875E", 4, 3) +
+    '<g fill="none" stroke="' + ART_INK + '" stroke-width="2.6" stroke-linecap="round"><path d="M134,330 Q142,336 150,330"/><path d="M164,330 Q172,336 180,330"/><path d="M152,344 L158,348 L164,344"/><path d="M120,346 L96,342 M120,352 L98,356 M194,346 L216,342 M194,352 L214,358"/><path d="M200,330 Q224,326 240,340"/></g>' +
+    '<g fill="#F49AB0"><circle cx="128" cy="342" r="5"/><circle cx="186" cy="342" r="5"/></g>' +
+    '<text x="236" y="250" font-family="Caveat, cursive" font-size="34" fill="' + ART_INK + '">z</text><text x="256" y="222" font-family="Caveat, cursive" font-size="26" fill="' + ART_INK + '">z</text>'
+  ));
+};
+ART.postcardBg = function() {
+  return svgCard("#EFE2C6", wob(
+    star4(322, 330, 0.9, ART_INK) + star4(304, 352, 0.5, ART_INK) + star4(40, 336, 0.6, ART_INK)
+  ));
+};
+ART.coffeeCup = function() {
+  return svgCard("#E3EAD8", wob('<g transform="translate(0,24)">' +
+    riso('<path d="M124,236 L236,236 L222,436 Q220,446 208,446 L152,446 Q140,446 138,436 Z"/>', "#FFF6E6", 5, 4) +
+    riso('<path d="M130,300 L230,300 L224,380 L136,380 Z"/>', "#B07A4F", 3, 2) +
+    riso(heartPath(180, 336, 1, 0), "#FFF6E6", 2, 2) +
+    riso('<rect x="114" y="214" width="132" height="26" rx="6"/>', "#7A4A2A", 3, 2) +
+    riso('<path d="M126,214 Q130,194 180,192 Q230,194 234,214 Z"/>', "#7A4A2A", 3, 2) +
+    '<g fill="none" stroke="' + ART_INK + '" stroke-width="2.5" stroke-linecap="round"><path d="M164,178 C158,166 170,158 164,146 M196,178 C190,166 202,158 196,146"/></g></g>'
+  ));
+};
+ART.coupe = function() {
+  var bub = [[160, 196, 5], [196, 178, 4], [176, 160, 6], [214, 146, 4], [150, 132, 4], [190, 118, 5]], b = "";
+  bub.forEach(function(x) { b += '<circle cx="' + x[0] + '" cy="' + (x[1] + 60) + '" r="' + x[2] + '" fill="none" stroke="#F8E7C6" stroke-width="2.4"/>'; });
+  return svgCard("#5A1E2A", wob(b +
+    riso('<path d="M96,282 L264,282 Q256,342 180,346 Q104,342 96,282 Z"/>', "#F2B233", 5, 4) +
+    '<path d="M98,282 Q180,300 262,282" fill="none" stroke="#FFF6E6" stroke-width="3"/>' +
+    riso('<path d="M174,344 L186,344 L186,428 L174,428 Z"/>', "#F8E7C6", 2, 2) +
+    riso('<path d="M128,440 Q180,416 232,440 Q180,452 128,440 Z"/>', "#F8E7C6", 3, 3) +
+    star4(70, 300, 1, "#F2B233") + star4(296, 250, 0.8, "#F49AB0") + star4(286, 400, 0.6, "#F2B233")
+  ), 0.3);
+};
+ART.trophy = function() {
+  return svgCard("#DCE8F0", confetti(31, 20, ["#E8502F", "#F2B233", "#5DA9A1", "#F49AB0"], [20, 170, 340, 300]) + wob(
+    '<g fill="none" stroke="' + ART_INK + '" stroke-width="3.5" stroke-linecap="round"><path d="M126,226 C86,226 86,290 136,292"/><path d="M234,226 C274,226 274,290 224,292"/></g>' +
+    riso('<path d="M120,214 L240,214 L232,282 Q220,330 180,334 Q140,330 128,282 Z"/>', "#F2B233", 5, 4) +
+    riso('<rect x="168" y="332" width="24" height="44"/>', "#F2B233", 3, 2) +
+    riso('<path d="M130,376 L230,376 L240,420 L120,420 Z"/>', "#7A4A2A", 4, 3) +
+    riso(star4(180, 262, 2.2, "none").replace(' fill="none"', ''), "#FFF6E6", 2, 2)
+  ));
+};
+ART.popper = function() {
+  var burst = "", cols = ["#E8502F", "#F2B233", "#5DA9A1", "#2C56C9", "#F49AB0"];
+  for (var i = 0; i < 26; i++) {
+    var a = (-150 + i * 6.5) * Math.PI / 180, d = 70 + (i * 37 % 90);
+    var x = 150 + Math.cos(a) * d, y = 330 + Math.sin(a) * d;
+    burst += (i % 3 === 0) ? '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="5" fill="' + cols[i % 5] + '"/>' : '<rect x="' + (x - 7).toFixed(1) + '" y="' + (y - 2.5).toFixed(1) + '" width="14" height="5" rx="2.5" fill="' + cols[i % 5] + '" transform="rotate(' + (i * 47 % 180) + ' ' + x.toFixed(1) + ' ' + y.toFixed(1) + ')"/>';
+  }
+  burst += '<g fill="none" stroke="' + ART_INK + '" stroke-width="2.4" stroke-linecap="round"><path d="M176,300 Q200,250 196,220"/><path d="M184,312 Q240,290 262,250"/><path d="M168,296 Q160,250 130,226"/></g>';
+  return svgCard("#F4EADB", wob(burst +
+    '<g transform="rotate(-35 150 360)">' + riso('<path d="M126,330 L174,330 L156,450 L144,450 Z"/>', "#2C56C9", 4, 3) +
+    '<g stroke="#FFF6E6" stroke-width="5" stroke-linecap="round"><path d="M132,360 L168,356 M138,396 L162,392"/></g>' +
+    riso('<ellipse cx="150" cy="330" rx="26" ry="8"/>', "#F2B233", 2, 2) + '</g>'
+  ));
+};
+ART.gradCap = function() {
+  return svgCard("#1F2F4A", confetti(41, 16, ["#F2B233", "#F49AB0", "#5DA9A1"], [20, 190, 340, 460]) + wob(
+    riso('<path d="M130,306 L230,306 L230,360 Q180,382 130,360 Z"/>', "#2B1B12", 3, 3).replace(/stroke="#2B1B12"/, 'stroke="#F8E7C6"') +
+    riso('<path d="M180,236 L300,284 L180,332 L60,284 Z"/>', "#2B1B12", 4, 3).replace(/stroke="#2B1B12"/, 'stroke="#F8E7C6"') +
+    '<path d="M180,284 L264,300 L266,362" fill="none" stroke="#F2B233" stroke-width="4" stroke-linecap="round"/>' +
+    riso('<path d="M258,358 L274,358 L278,392 L254,392 Z"/>', "#F2B233", 2, 2) +
+    '<circle cx="180" cy="284" r="6" fill="#F2B233"/>'
+  ), 0.28);
+};
+ART.burstBg = function() {
+  var s = "";
+  [[44, 60, 1.6], [320, 70, 1.2], [36, 280, 1], [326, 300, 1.4], [70, 420, 0.8], [300, 430, 0.9]].forEach(function(x, i) {
+    s += star4(x[0], x[1], x[2], i % 2 ? "#FFF6E6" : "#E8502F");
+  });
+  return svgCard("#F2C94C", wob(s));
+};
+ART.plane = function() {
+  return svgCard("#DCE8F0", wob(
+    '<path d="M40,420 C80,330 20,250 110,240 C200,230 150,330 220,320 C260,314 270,270 270,250" fill="none" stroke="' + ART_INK + '" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="2 10"/>' +
+    '<g transform="translate(286,222) rotate(-30)">' +
+    riso('<path d="M-46,10 L50,-22 L-6,30 Z"/>', "#FFF6E6", 3, 3) +
+    riso('<path d="M-6,30 L50,-22 L4,42 Z"/>', "#E8502F", 2, 2) + '</g>' +
+    riso(heartPath(78, 300, 0.7, -12), "#E8502F", 2, 2) + riso(heartPath(190, 380, 0.5, 10), "#F49AB0", 2, 2)
+  ));
+};
+ART.moon = function() {
+  var stars = "";
+  [[70, 90, 1], [290, 70, 0.7], [310, 200, 1.1], [60, 230, 0.6], [240, 130, 0.5], [100, 150, 0.5]].forEach(function(x) { stars += star4(x[0], x[1], x[2], "#F8E7C6"); });
+  return svgCard("#1C2747", wob(stars +
+    riso('<path d="M206,150 A92,92 0 1,0 206,326 A72,72 0 1,1 206,150 Z"/>', "#F2B233", 5, 4) +
+    '<g fill="none" stroke="' + ART_INK + '" stroke-width="2.6" stroke-linecap="round"><path d="M150,226 Q156,232 162,226"/><path d="M152,256 Q160,264 170,258"/></g>' +
+    '<circle cx="140" cy="244" r="6" fill="#F49AB0"/>'
+  ), 0.3);
+};
+ART.houses = function() {
+  function house(x, c, roof) {
+    return riso('<rect x="' + (x - 44) + '" y="300" width="88" height="84"/>', c, 4, 3) +
+      riso('<path d="M' + (x - 56) + ',304 L' + x + ',250 L' + (x + 56) + ',304 Z"/>', roof, 3, 3) +
+      riso('<rect x="' + (x - 12) + '" y="340" width="24" height="44"/>', "#7A4A2A", 2, 2) +
+      riso('<rect x="' + (x + 16) + '" y="314" width="18" height="18"/>', "#F2B233", 2, 2);
+  }
+  return svgCard("#F4EADB", wob(
+    '<path d="M30,384 L330,384" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
+    '<path d="M100,246 C120,180 240,180 260,246" fill="none" stroke="#E8502F" stroke-width="3" stroke-dasharray="3 9" stroke-linecap="round"/>' +
+    riso(heartPath(180, 196, 0.9, 0), "#E8502F", 2, 2) +
+    house(88, "#F49AB0", "#2C56C9") + house(272, "#5DA9A1", "#E8502F")
+  ));
+};
+ART.phone = function() {
+  var holes = "";
+  for (var t = 0; t < 360; t += 36) holes += '<circle cx="' + (180 + Math.cos(t * Math.PI / 180) * 22).toFixed(1) + '" cy="' + (378 + Math.sin(t * Math.PI / 180) * 22).toFixed(1) + '" r="4.2" fill="#F8D8D0" stroke="' + ART_INK + '" stroke-width="1.6"/>';
+  return svgCard("#F8D8D0", wob(
+    '<path d="M262,396 C300,396 296,420 284,428 C272,436 300,446 290,454 C280,462 306,470 300,480" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
+    riso('<path d="M98,432 Q100,336 180,330 Q260,336 262,432 Z"/>', "#E8502F", 5, 4) +
+    riso('<path d="M82,322 Q82,288 110,288 L250,288 Q278,288 278,322 L254,332 Q252,312 236,312 L124,312 Q108,312 106,332 Z"/>', "#D9472B", 4, 3) +
+    riso('<circle cx="180" cy="378" r="36"/>', "#FFF6E6", 2, 2) + holes +
+    '<circle cx="180" cy="378" r="9" fill="#E8502F" stroke="' + ART_INK + '" stroke-width="1.8"/>'
+  ));
+};
+ART.stampBg = function() {
+  var x0 = 64, y0 = 64, x1 = 296, y1 = 348, holes = "";
+  for (var x = x0; x <= x1; x += 14.5) holes += '<circle cx="' + x + '" cy="' + y0 + '" r="6"/><circle cx="' + x + '" cy="' + y1 + '" r="6"/>';
+  for (var y = y0 + 14.2; y < y1; y += 14.2) holes += '<circle cx="' + x0 + '" cy="' + y + '" r="6"/><circle cx="' + x1 + '" cy="' + y + '" r="6"/>';
+  return svgCard("#DCE8F0", '<g transform="rotate(-3 180 206)"><g transform="translate(5,4)"><rect x="' + x0 + '" y="' + y0 + '" width="' + (x1 - x0) + '" height="' + (y1 - y0) + '" fill="#2C56C9" opacity=".25"/></g><rect x="' + x0 + '" y="' + y0 + '" width="' + (x1 - x0) + '" height="' + (y1 - y0) + '" fill="#FFF8EC"/><g fill="#DCE8F0">' + holes + '</g></g>' +
+    '<g fill="none" stroke="' + ART_INK + '" stroke-width="2.4" opacity=".6"><circle cx="292" cy="92" r="32" stroke-dasharray="5 5"/><path d="M238,84 Q250,76 262,84 T286,84 T310,84 T334,84 M234,102 Q246,94 258,102 T282,102 T306,102 T330,102"/></g>');
+};
+
+ART_DESIGNS.push(
+  { id: "i-jb2", occasion: "just", label: "Houseplant", art: "plant", headline: "Growing\nfond of you", font: "fraunces", ink: "#1F3B2C", size: 46, pos: "top" },
+  { id: "i-jb3", occasion: "just", label: "Rainbow", art: "rainbow", headline: "Just\nbecause", font: "caprasimo", ink: "#E8502F", size: 60, pos: "bottom" },
+  { id: "i-jb4", occasion: "just", label: "Sleepy cat", art: "cat", headline: "Thinking\nof you", font: "caveat", ink: "#2B1B12", size: 64, pos: "top" },
+  { id: "i-jb5", occasion: "just", label: "Postcard photo", art: "postcardBg", slot: { x: 0.11, y: 0.08, w: 0.78, h: 0.54, rot: -2, frame: "print" }, headline: "Saw this and\nthought of you", font: "instrument", italic: true, ink: "#2B1B12", size: 42, pos: "bottom" },
+  { id: "i-jb6", occasion: "just", label: "Coffee soon", art: "coffeeCup", headline: "Coffee\nsoon?", font: "caprasimo", ink: "#7A4A2A", size: 58, pos: "top" },
+  { id: "i-cg2", occasion: "congrats", label: "Cheers", art: "coupe", headline: "Cheers!", font: "caprasimo", ink: "#F8E7C6", size: 72, pos: "top" },
+  { id: "i-cg3", occasion: "congrats", label: "Trophy", art: "trophy", headline: "You did\nit!", font: "caprasimo", ink: "#2C56C9", size: 60, pos: "top" },
+  { id: "i-cg4", occasion: "congrats", label: "Popper", art: "popper", headline: "Woohoo!", font: "caprasimo", ink: "#E8502F", size: 66, pos: "top" },
+  { id: "i-cg5", occasion: "congrats", label: "Grad cap", art: "gradCap", headline: "Congrats,\ngrad!", font: "fraunces", italic: true, ink: "#F8E7C6", size: 56, pos: "top" },
+  { id: "i-cg6", occasion: "congrats", label: "Star photo", art: "burstBg", slot: { x: 0.16, y: 0.09, w: 0.68, h: 0.58, rot: 3, frame: "polaroid" }, headline: "So proud\nof you", font: "caprasimo", ink: "#2B1B12", size: 46, pos: "bottom" },
+  { id: "i-my2", occasion: "miss", label: "Paper plane", art: "plane", headline: "Sending\nlove", font: "caveat", ink: "#1F2F4A", size: 72, pos: "top" },
+  { id: "i-my3", occasion: "miss", label: "Moon", art: "moon", headline: "Miss you to\nthe moon", font: "fraunces", italic: true, ink: "#F8E7C6", size: 44, pos: "bottom" },
+  { id: "i-my4", occasion: "miss", label: "Two houses", art: "houses", headline: "Far, but\nclose", font: "instrument", italic: true, ink: "#2B1B12", size: 58, pos: "top" },
+  { id: "i-my5", occasion: "miss", label: "Call me", art: "phone", headline: "Call me\nsoon", font: "caprasimo", ink: "#8E1B2C", size: 56, pos: "top" },
+  { id: "i-my6", occasion: "miss", label: "Stamp photo", art: "stampBg", slot: { x: 0.24, y: 0.18, w: 0.52, h: 0.48, rot: -3, frame: "bare" }, headline: "Wish you\nwere here", font: "caveat", ink: "#1F2F4A", size: 54, pos: "bottom" }
+);
 ALL_DESIGNS = ALL_DESIGNS.concat(ART_DESIGNS);
 
 function findDesign(id) {
@@ -1541,7 +1711,8 @@ function renderArtFront(card, d, scale) {
   if (d.slot) {
     var s = d.slot, polaroid = s.frame === "polaroid";
     var radius = s.frame === "arch" ? "50% 50% " + (4 * scale) + "px " + (4 * scale) + "px / 40% 40% " + (4 * scale) + "px " + (4 * scale) + "px" : s.frame === "circle" ? "50%" : "0";
-    var frame = h("div", { style: "position:absolute;left:" + (s.x * 100) + "%;top:" + (s.y * 100) + "%;width:" + (s.w * 100) + "%;height:" + (s.h * 100) + "%;transform:rotate(" + s.rot + "deg);background:#fff;box-sizing:border-box;padding:" + (polaroid ? (10 * scale) + "px " + (10 * scale) + "px " + (34 * scale) + "px" : (8 * scale) + "px") + ";box-shadow:0 " + (6 * scale) + "px " + (18 * scale) + "px rgba(43,27,18,0.18);z-index:4;border-radius:" + radius }); 
+    var frame = h("div", { style: "position:absolute;left:" + (s.x * 100) + "%;top:" + (s.y * 100) + "%;width:" + (s.w * 100) + "%;height:" + (s.h * 100) + "%;transform:rotate(" + s.rot + "deg);background:#fff;box-sizing:border-box;padding:" + (polaroid ? (10 * scale) + "px " + (10 * scale) + "px " + (34 * scale) + "px" : (8 * scale) + "px") + ";box-shadow:0 " + (6 * scale) + "px " + (18 * scale) + "px rgba(43,27,18,0.18);z-index:4;border-radius:" + radius });
+    if (s.frame === "bare") { frame.style.background = "transparent"; frame.style.padding = "0"; frame.style.boxShadow = "none"; }
     var win = h("div", { style: "width:100%;height:100%;overflow:hidden;position:relative;background:#E9E1D6;border-radius:" + radius });
     if (state.frontPhoto) {
       var crop = state.frontPhotoCrop || [50, 50, 1];
