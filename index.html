@@ -403,15 +403,19 @@ body.st-lock { overflow: hidden; }
 .op-flap-in { transform: rotateX(180deg); }
 .op-seal { position: absolute; left: 50%; top: 100%; transform: translate(-50%, -78%) rotate(-4deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; filter: drop-shadow(0 1px 2px rgba(0,0,0,.18)); }
 
-.op-book { position: relative; perspective: 1600px; animation: opRise .5s cubic-bezier(.2,.8,.2,1) both; }
-.op-book > * { position: absolute !important; inset: 0; }
-.op-book > .op-inside { z-index: 1; }
-.op-book > .op-cover { z-index: 2; }
-.op-cover { background: none; border: none; padding: 0; cursor: pointer; transform-origin: left center; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.4,0,.2,1); }
+.op-spread { position: absolute; left: 0; perspective: 2000px; transition: transform .9s cubic-bezier(.4,0,.2,1); }
+.op-riser { position: absolute; inset: 0; }
+.op-riser.op-rise { animation: opRise .5s cubic-bezier(.2,.8,.2,1) both; }
+.op-spread.no-anim, .op-spread.no-anim .op-cover { transition: none; }
+.op-page { position: absolute; top: 0; z-index: 1; }
+.op-page > div { box-shadow: 0 14px 34px rgba(34,18,10,0.16) !important; }
+.op-cover { position: absolute; top: 0; z-index: 2; cursor: pointer; transform-origin: left center; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.4,0,.2,1); }
 .op-cover:focus-visible { outline: 2px solid var(--tomato); outline-offset: 6px; border-radius: 12px; }
-.op-cover .op-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: translateZ(1px); }
-.op-cover-back { position: absolute; inset: 0; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: inset -12px 0 24px rgba(34,18,10,0.08); }
-.op-book.open .op-cover { transform: rotateY(-165deg); }
+.op-cover .op-face { position: absolute !important; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: translateZ(1px); }
+.op-cover-back { position: absolute; inset: 0; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; background-clip: padding-box; box-shadow: inset -18px 0 28px -14px rgba(34,18,10,0.18), 0 14px 34px rgba(34,18,10,0.16); }
+.op-spread.open .op-cover { transform: rotateY(-180deg); }
+.op-page > div, .op-cover .op-face { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+.op-cover-back { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
 .op-settle { animation: opRise .4s ease both; }
 @keyframes opRise { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: none; } }
 
@@ -445,7 +449,8 @@ body.st-lock { overflow: hidden; }
   .sd-names { grid-template-columns: 1fr 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .op-arrive, .op-book, .op-settle { animation: none; }
+  .op-arrive, .op-riser, .op-settle { animation: none !important; }
+  .op-spread, .op-cover { transition: none !important; }
   .op-flap, .op-card-in, .op-scene-wrap, .op-cover { transition: none; }
 }
 
@@ -3363,51 +3368,66 @@ function renderOpening(app, isPreview) {
     });
   }
 
-  function showCard() {
-    state.opPhase = "card";
+  // A real fold: the inside page sits right of the spine, the cover is hinged on the
+  // spine and swings open to the left, showing its blank inside face. The card stays open.
+  function showCard(startOpen) {
+    state.opPhase = startOpen ? "inside" : "card";
     stage.innerHTML = "";
-    var book = h("div", { className: "op-book", style: "width:" + (360 * s) + "px;height:" + (480 * s) + "px" });
-    var inside = renderCardSide("back", s, false);
-    inside.classList.add("op-inside");
-    book.appendChild(inside);
-    var cover = h("div", { className: "op-cover", role: "button", tabindex: "0", "aria-label": "Open the card", onClick: openBook });
-    cover.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openBook(); } });
+    var cw = 360 * s, ch = 480 * s;
+    var fits = cw * 2 + 48 <= W;
+    var k = fits ? 1 : Math.min(1, (W * 0.8) / cw);
+    var spineClosed = W / 2 - cw / 2;
+    var spineOpen = fits ? W / 2 : W * 0.16;
+    var top = Math.max(8, (H - ch) / 2);
+    var book = h("div", { className: "op-spread", style: "width:" + (cw * 2) + "px;height:" + ch + "px;top:" + top + "px;transform-origin:" + cw + "px 50%" });
+    function place(open) {
+      book.style.transform = open
+        ? "translateX(" + (spineOpen - cw) + "px) scale(" + k + ")"
+        : "translateX(" + (spineClosed - cw) + "px)";
+    }
+    var page = h("div", { className: "op-page", style: "left:" + cw + "px" });
+    page.appendChild(renderCardSide("back", s, false));
+    book.appendChild(page);
+    var cover = h("div", { className: "op-cover", style: "left:" + cw + "px;width:" + cw + "px;height:" + ch + "px", role: "button", tabindex: "0", "aria-label": "Open the card" });
     var face = renderCardSide("front", s, false);
     face.classList.add("op-face");
     cover.appendChild(face);
     cover.appendChild(h("div", { className: "op-cover-back", style: "border-radius:" + (20 * s) + "px;" + getBgStyle(state.backBg) }));
     book.appendChild(cover);
-    stage.appendChild(book);
-    var b = h("button", { className: "mk-pill mk-pill-ink", onClick: openBook }, "Open the card");
-    setFoot([b]);
+    var riser = h("div", { className: "op-riser" + (startOpen ? "" : " op-rise") });
+    riser.appendChild(book);
+    stage.appendChild(riser);
 
-    function openBook() {
-      if (book.classList.contains("open")) return;
-      book.classList.add("open");
-      setFoot([]);
-      opLater(showInside, prefersReducedMotion() ? 0 : 950);
+    function setOpen(open, animate) {
+      book.classList.toggle("no-anim", !animate);
+      book.classList.toggle("open", open);
+      place(open);
+      state.opPhase = open ? "inside" : "card";
+      cover.setAttribute("aria-label", open ? "Close the card" : "Open the card");
+      if (open) {
+        var closeBtn = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm", onClick: function() { setOpen(false, true); } }, "Close card");
+        var replay = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm", onClick: showArrive }, "Replay");
+        replay.insertBefore(icon("rotate", 15), replay.firstChild);
+        var last;
+        if (isPreview) {
+          last = h("button", { className: "mk-pill mk-pill-tomato mk-pill-sm", onClick: function() { go("#/send"); } }, "Send it");
+          last.appendChild(icon("send", 15));
+        } else {
+          last = h("button", { className: "mk-pill mk-pill-tomato mk-pill-sm", onClick: makeOneBack }, "Make one back");
+          last.appendChild(icon("arrowRight", 15));
+        }
+        setFoot([closeBtn, replay, last]);
+      } else {
+        setFoot([h("button", { className: "mk-pill mk-pill-ink", onClick: function() { setOpen(true, true); } }, "Open the card")]);
+      }
     }
+    function toggle() { setOpen(!book.classList.contains("open"), true); }
+    cover.addEventListener("click", toggle);
+    cover.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+    setOpen(!!startOpen, false);
+    requestAnimationFrame(function() { requestAnimationFrame(function() { book.classList.remove("no-anim"); }); });
   }
-
-  function showInside() {
-    state.opPhase = "inside";
-    stage.innerHTML = "";
-    var c = renderCardSide("back", s, false);
-    c.classList.add("op-settle");
-    stage.appendChild(c);
-    var front = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm", onClick: showCard }, "See the front");
-    var replay = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm", onClick: showArrive }, "Replay");
-    replay.insertBefore(icon("rotate", 15), replay.firstChild);
-    if (isPreview) {
-      var send = h("button", { className: "mk-pill mk-pill-tomato mk-pill-sm", onClick: function() { go("#/send"); } }, "Send it");
-      send.appendChild(icon("send", 15));
-      setFoot([front, replay, send]);
-    } else {
-      var back = h("button", { className: "mk-pill mk-pill-tomato mk-pill-sm", onClick: makeOneBack }, "Make one back");
-      back.appendChild(icon("arrowRight", 15));
-      setFoot([front, replay, back]);
-    }
-  }
+  function showInside() { showCard(true); }
 
   function makeOneBack() {
     var occ = state.frontDesign && state.frontDesign.occasion;
