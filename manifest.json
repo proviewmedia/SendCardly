@@ -1,11 +1,11 @@
 {
-  "name": "Sendr — Say It With a Card",
+  "name": "Sendr: Say It With a Card",
   "short_name": "Sendr",
-  "description": "Create and send beautiful digital greeting cards for free. Design the front, write your message on the back, and send it to anyone instantly.",
+  "description": "Free illustrated greeting cards. Pick a design, write your note and send it by text, email or link.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f7f6f3",
-  "theme_color": "#f7f6f3",
+  "background_color": "#F1EBE1",
+  "theme_color": "#F1EBE1",
   "orientation": "portrait",
   "scope": "/",
   "icons": [

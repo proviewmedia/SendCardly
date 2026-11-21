@@ -1,4 +1,4 @@
-var CACHE_NAME = 'sendr-v2';
+var CACHE_NAME = 'sendr-v3';
 var ASSETS = [
   '/',
   '/index.html',
@@ -6,7 +6,7 @@ var ASSETS = [
   '/icon-192.png',
   '/icon-512.png',
   '/favicon.svg',
-  'https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Caveat:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Josefin+Sans:wght@300;400;600;700&family=Lora:wght@400;500;600;700&family=Mali:wght@300;400;600;700&family=Manrope:wght@300;400;600;700;800&family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:wght@400;700;900&family=Righteous&family=Syne:wght@400;500;600;700;800&display=swap'
+  'https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Caprasimo&family=Abril+Fatface&family=Caveat:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Josefin+Sans:wght@300;400;600;700&family=Lora:wght@400;500;600;700&family=Mali:wght@300;400;600;700&family=Manrope:wght@300;400;600;700;800&family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:wght@400;700;900&family=Righteous&family=Syne:wght@400;500;600;700;800&display=swap'
 ];
 
 // Install: cache all assets
