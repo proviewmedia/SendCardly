@@ -116,6 +116,13 @@ if (window.location.search.indexOf('card=') > -1) {
   --accent: #1a1a1a;
   --accentLight: #f0efed;
   --input: #f7f6f3;
+  --cream: #F1EBE1;
+  --paper: #FBF8F3;
+  --ink: #22120A;
+  --ink-2: #6B5A50;
+  --line: #E3D9CC;
+  --tomato: #E8502F;
+  --espresso: #2A160C;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -148,6 +155,122 @@ input, textarea { font-family: 'Outfit', sans-serif; }
 #tabContentArea::-webkit-scrollbar { display: none; }
 ::-webkit-scrollbar { width: 0px; height: 0px; }
 textarea:focus, input:focus { outline: none; border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(26,26,26,0.06) !important; }
+
+/* ═══ Home page (Givingli-inspired: cream, espresso, one signal color, huge grotesk) ═══ */
+.mk { background: var(--cream); color: var(--ink); font-family: 'Instrument Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+.mk a { color: inherit; text-decoration: none; }
+.mk-eyebrow { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
+.mk-pill { display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 999px; font-family: 'Instrument Sans', sans-serif; font-weight: 500; font-size: 16px; padding: 14px 26px; cursor: pointer; transition: transform .15s ease, background-color .15s ease; }
+.mk-pill:hover { transform: translateY(-1px); }
+.mk-pill:focus-visible { outline: 2px solid var(--tomato); outline-offset: 3px; }
+.mk-pill-ink { background: var(--ink); color: var(--paper); }
+.mk-pill-ink:hover { background: #3A2418; }
+.mk-pill-paper { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.mk-pill-tomato { background: var(--tomato); color: #fff; }
+.mk-pill-tomato:hover { background: #D6431F; }
+.mk-pill-sm { padding: 10px 18px; font-size: 14px; }
+
+.mk-bar { background: var(--espresso); color: #F1EBE1; font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 48px; }
+.mk-bar b { font-family: 'DM Mono', monospace; font-weight: 500; font-size: 10px; letter-spacing: .12em; background: var(--tomato); color: #fff; border-radius: 999px; padding: 3px 8px; margin-right: 10px; }
+.mk-bar button { background: none; border: none; color: inherit; font: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+
+.mk-nav { position: sticky; top: 0; z-index: 50; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 16px 48px; background: rgba(241,235,225,0.92); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.mk-logo { display: inline-flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 600; letter-spacing: -0.03em; background: none; border: none; color: var(--ink); cursor: pointer; font-family: inherit; justify-self: start; }
+.mk-logo i { width: 28px; height: 28px; border-radius: 50%; background: var(--tomato); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+.mk-links { display: flex; gap: 4px; background: var(--paper); border-radius: 999px; padding: 4px; box-shadow: inset 0 0 0 1px var(--line); }
+.mk-links button { background: none; border: none; font-family: inherit; font-size: 14px; color: var(--ink); padding: 8px 16px; border-radius: 999px; cursor: pointer; }
+.mk-links button:hover { background: var(--cream); }
+.mk-nav-cta { justify-self: end; }
+
+.mk-hero { position: relative; text-align: center; padding: 72px 24px 120px; max-width: 1440px; margin: 0 auto; }
+.mk-h1 { font-weight: 500; font-size: clamp(54px, 9.4vw, 136px); line-height: 0.94; letter-spacing: -0.05em; margin: 0 auto; max-width: 6.4em; position: relative; z-index: 2; }
+.mk-h1 em { font-style: normal; color: var(--tomato); }
+.mk-sub { font-size: clamp(17px, 1.5vw, 20px); line-height: 1.5; color: var(--ink-2); max-width: 30em; margin: 28px auto 0; position: relative; z-index: 2; }
+.mk-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 36px; position: relative; z-index: 2; }
+.mk-float { position: absolute; z-index: 1; transition: transform .35s cubic-bezier(.2,.7,.2,1); cursor: pointer; }
+.mk-float:hover { transform: rotate(0deg) translateY(-6px) !important; }
+.mk-float .mk-tag { position: absolute; font-size: 14px; color: var(--ink); white-space: nowrap; }
+.mk-fan { display: none; }
+
+.mk-sec { padding: 120px 48px; }
+.mk-sec-white { background: #fff; }
+.mk-head { text-align: center; max-width: 900px; margin: 0 auto 64px; }
+.mk-h2 { font-weight: 500; font-size: clamp(44px, 6.6vw, 96px); line-height: 0.98; letter-spacing: -0.045em; margin: 14px 0 0; }
+.mk-rule { width: 40px; height: 1px; background: var(--line); margin: 28px auto 0; }
+.mk-lede { font-size: 18px; color: var(--ink-2); margin-top: 20px; line-height: 1.5; }
+
+.mk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1280px; margin: 0 auto; }
+.mk-tile { position: relative; aspect-ratio: 4 / 5; border-radius: 16px; overflow: hidden; cursor: pointer; border: none; padding: 0; text-align: left; font-family: inherit; color: var(--ink); }
+.mk-tile:focus-visible { outline: 2px solid var(--tomato); outline-offset: 3px; }
+.mk-tile-t { position: absolute; top: 22px; left: 24px; font-size: clamp(22px, 2.2vw, 30px); font-weight: 500; letter-spacing: -0.03em; z-index: 2; }
+.mk-tile-b { position: absolute; bottom: 22px; left: 24px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; }
+.mk-tile-card { position: absolute; left: 50%; top: 54%; transform: translate(-50%, -50%) rotate(var(--r, -4deg)); transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+.mk-tile:hover .mk-tile-card { transform: translate(-50%, -54%) rotate(0deg) scale(1.03); }
+
+.mk-tomato { background: var(--tomato); color: var(--ink); }
+.mk-tomato .mk-h2, .mk-tomato .mk-eyebrow { color: #FFF4EE; }
+.mk-tomato .mk-h2 { max-width: 7.5em; margin-left: auto; margin-right: auto; }
+.mk-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 1280px; margin: 0 auto; }
+.mk-step { display: flex; flex-direction: column; }
+.mk-step-n { font-family: 'DM Mono', monospace; font-size: clamp(64px, 7vw, 104px); line-height: 1; color: #FFF4EE; letter-spacing: -0.04em; }
+.mk-step-vis { height: 300px; display: flex; align-items: center; justify-content: center; margin: 24px 0 28px; }
+.mk-step h3 { font-size: 30px; font-weight: 500; letter-spacing: -0.03em; margin: 0 0 10px; color: #FFF4EE; }
+.mk-step p { font-size: 17px; line-height: 1.5; max-width: 22em; }
+.mk-sendlist { background: var(--paper); border-radius: 16px; padding: 18px; width: 250px; box-shadow: 0 18px 40px rgba(34,18,10,0.18); transform: rotate(3deg); display: flex; flex-direction: column; gap: 8px; }
+.mk-sendlist div { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--cream); font-size: 15px; font-weight: 500; }
+.mk-sendlist div:first-child { background: var(--ink); color: var(--paper); }
+
+.mk-dark { background: var(--espresso); color: #F1EBE1; }
+.mk-split { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; max-width: 1180px; margin: 0 auto; }
+.mk-dark .mk-h2 { text-align: left; }
+.mk-dark .mk-lede { color: rgba(241,235,225,0.72); max-width: 26em; }
+.mk-photo-stage { position: relative; height: 520px; }
+.mk-photo-stage > div { position: absolute; }
+
+.mk-facts { display: grid; grid-template-columns: repeat(4, 1fr); max-width: 1280px; margin: 0 auto; border-top: 1px solid var(--line); }
+.mk-fact { padding: 32px 28px 8px 0; }
+.mk-fact + .mk-fact { padding-left: 28px; border-left: 1px solid var(--line); }
+.mk-fact .mk-eyebrow { color: var(--ink-2); }
+.mk-fact h3 { font-size: 26px; font-weight: 500; letter-spacing: -0.03em; margin: 40px 0 8px; }
+.mk-fact p { color: var(--ink-2); font-size: 16px; line-height: 1.5; }
+
+.mk-final { background: var(--ink); color: #F1EBE1; text-align: center; padding: 140px 24px; }
+.mk-final .mk-h2 { max-width: 11em; margin: 14px auto 40px; }
+
+.mk-foot { padding: 56px 48px 40px; display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; color: var(--ink-2); font-size: 14px; }
+.mk-foot-word { font-size: clamp(64px, 12vw, 180px); font-weight: 500; letter-spacing: -0.06em; line-height: .8; color: var(--ink); }
+
+@media (max-width: 1100px) {
+  .mk-float { display: none; }
+  .mk-hero { padding-bottom: 56px; }
+  .mk-fan { display: flex; justify-content: center; margin-top: 56px; height: 300px; position: relative; }
+  .mk-fan > div { position: absolute; top: 0; }
+  .mk-grid { grid-template-columns: repeat(2, 1fr); }
+  .mk-steps { grid-template-columns: 1fr; gap: 64px; }
+  .mk-split { grid-template-columns: 1fr; }
+  .mk-facts { grid-template-columns: repeat(2, 1fr); }
+  .mk-fact:nth-child(3) { padding-left: 0; border-left: none; }
+}
+@media (max-width: 760px) {
+  .mk-bar { padding: 9px 16px; }
+  .mk-bar span:last-child { display: none; }
+  .mk-nav { padding: 12px 16px; grid-template-columns: 1fr auto; }
+  .mk-links { display: none; }
+  .mk-hero { padding: 48px 16px 40px; }
+  .mk-sec { padding: 80px 16px; }
+  .mk-grid { gap: 12px; }
+  .mk-tile { border-radius: 12px; }
+  .mk-tile-t { top: 14px; left: 14px; }
+  .mk-tile-b { bottom: 14px; left: 14px; font-size: 10px; }
+  .mk-tile-card { transform: translate(-50%, -50%) rotate(var(--r, -4deg)) scale(0.62); }
+  .mk-tile:hover .mk-tile-card { transform: translate(-50%, -50%) rotate(var(--r, -4deg)) scale(0.62); }
+  .mk-photo-stage { height: 420px; transform: scale(.8); transform-origin: top center; margin-bottom: -84px; }
+  .mk-facts { grid-template-columns: 1fr; }
+  .mk-fact, .mk-fact + .mk-fact { padding: 28px 0 8px; border-left: none; border-top: 1px solid var(--line); }
+  .mk-fact h3 { margin-top: 16px; }
+  .mk-final { padding: 96px 16px; }
+  .mk-foot { padding: 40px 16px 32px; }
+}
 </style>
 </head>
 <body>
@@ -402,172 +525,164 @@ var ALL_DESIGNS = CARD_DESIGNS.flatMap(function(c) { return c.items; });
 ALL_DESIGNS.forEach(function(d) { d.legacy = true; });
 
 // ═══ ILLUSTRATED DESIGNS ═══
-// Art direction: modern stationery (Givingli's artist cards are the reference).
-// Flat matte paper with fiber texture, one motif with lots of breathing room,
-// brush ink line, small tracked lettering or type as the artwork.
-// Each art function returns an SVG scene (viewBox 360x480). The headline is real
+// Each art design draws an SVG scene (viewBox 360x480). The headline is real
 // DOM text on top, so people can edit it. Art strings are static code, never
 // built from user input.
-var INK = "#1E1712";
+var ART_INK = "#2B1B12";
 
-function paperCard(color, body, tex) {
+function svgCard(paper, body, grain) {
   return '<svg viewBox="0 0 360 480" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;display:block" aria-hidden="true">' +
-    '<rect width="360" height="480" fill="' + color + '"/>' + body +
-    '<rect width="360" height="480" fill="#fff" filter="url(#sg-paper)" opacity="' + (tex == null ? 0.4 : tex) + '" style="mix-blend-mode:multiply"/>' +
-    '<rect width="360" height="480" fill="#fff" filter="url(#sg-grain)" opacity="0.1" style="mix-blend-mode:multiply"/></svg>';
+    '<rect width="360" height="480" fill="' + paper + '"/>' + body +
+    '<rect width="360" height="480" fill="#fff" filter="url(#sg-grain)" opacity="' + (grain || 0.22) + '" style="mix-blend-mode:multiply"/></svg>';
 }
-function ink(d, w, color) {
-  return '<path d="' + d + '" fill="none" stroke="' + (color || INK) + '" stroke-width="' + (w || 3) + '" stroke-linecap="round" stroke-linejoin="round"/>';
-}
-function shape(d, fill, stroke, w) {
-  return '<path d="' + d + '" fill="' + fill + '"' + (stroke ? ' stroke="' + stroke + '" stroke-width="' + (w || 3) + '" stroke-linejoin="round"' : '') + '/>';
+// Riso look: flat color fill nudged off the ink outline.
+function riso(shape, fill, dx, dy) {
+  return '<g transform="translate(' + (dx == null ? 4 : dx) + ',' + (dy == null ? 3 : dy) + ')" fill="' + fill + '" stroke="none">' + shape + '</g>' +
+    '<g fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' + shape + '</g>';
 }
 function wob(inner) { return '<g filter="url(#sg-wob)">' + inner + '</g>'; }
-function heart(cx, cy, s, rot, fill) {
-  return '<path transform="translate(' + cx + ',' + cy + ') rotate(' + (rot || 0) + ') scale(' + s + ')" d="M0,14 C-22,-2 -18,-24 0,-12 C18,-24 22,-2 0,14 Z" fill="' + fill + '"/>';
+function heartPath(cx, cy, s, rot) {
+  return '<path transform="translate(' + cx + ',' + cy + ') rotate(' + (rot || 0) + ') scale(' + s + ')" d="M0,14 C-22,-2 -18,-24 0,-12 C18,-24 22,-2 0,14 Z"/>';
 }
-function ring(cx, cy, r0, r1, step, from) {
-  var s = "";
-  for (var a = from || 0; a < 360 + (from || 0); a += step) {
-    var t = a * Math.PI / 180;
-    s += 'M' + (cx + Math.cos(t) * r0).toFixed(1) + ',' + (cy + Math.sin(t) * r0).toFixed(1) + ' L' + (cx + Math.cos(t) * r1).toFixed(1) + ',' + (cy + Math.sin(t) * r1).toFixed(1) + ' ';
+function confetti(seed, n, colors, box) {
+  var out = "", x = seed;
+  function rnd() { x = (x * 9301 + 49297) % 233280; return x / 233280; }
+  for (var i = 0; i < n; i++) {
+    var cx = box[0] + rnd() * (box[2] - box[0]), cy = box[1] + rnd() * (box[3] - box[1]);
+    var c = colors[i % colors.length], r = Math.round(rnd() * 180);
+    out += (i % 3 === 0)
+      ? '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="3.2" fill="' + c + '"/>'
+      : '<rect x="' + (cx - 6).toFixed(1) + '" y="' + (cy - 2).toFixed(1) + '" width="12" height="4.5" rx="2" fill="' + c + '" transform="rotate(' + r + ' ' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ')"/>';
   }
-  return s;
-}
-function sparkle(x, y, s, color) {
-  return '<path transform="translate(' + x + ',' + y + ') scale(' + s + ')" d="M0,-10 Q1.2,-1.2 10,0 Q1.2,1.2 0,10 Q-1.2,1.2 -10,0 Q-1.2,-1.2 0,-10 Z" fill="' + (color || INK) + '"/>';
+  return out;
 }
 
 var ART = {
-  partyHat: function() {
-    var tri = "M180,136 L254,352 Q180,378 106,352 Z", stripes = "";
-    for (var i = -7; i < 8; i++) stripes += '<path d="M' + (40 + i * 36) + ',430 L' + (190 + i * 36) + ',110 L' + (208 + i * 36) + ',110 L' + (58 + i * 36) + ',430 Z" fill="#F4A9BC"/>';
-    return paperCard("#E4563B", '<defs><clipPath id="ac-hat"><path d="' + tri + '"/></clipPath></defs>' + wob(
-      shape(tri, "#F6EBDD") + '<g clip-path="url(#ac-hat)">' + stripes + '</g>' + ink(tri, 3.5) +
-      '<circle cx="180" cy="122" r="17" fill="#F6EBDD"/>' + ink(ring(180, 122, 15, 29, 30, 8), 5, "#F6EBDD") +
-      '<circle cx="70" cy="110" r="4" fill="#F6EBDD"/><circle cx="292" cy="92" r="3" fill="#F6EBDD"/><circle cx="300" cy="236" r="4" fill="#F6EBDD"/><circle cx="58" cy="262" r="3" fill="#F6EBDD"/>'
-    ));
-  },
-  balloon: function() {
-    var b = "M180,108 C238,108 262,156 258,200 C254,252 214,290 180,294 C146,290 106,252 102,200 C98,156 122,108 180,108 Z";
-    return paperCard("#6E7746", wob(
-      ink("M180,302 C158,332 204,352 182,384 C162,412 200,430 184,470", 2.5, "#F3E7D3") +
-      shape(b, "#F2A7C3") + shape("M171,292 L189,292 L185,304 L175,304 Z", "#DF86A8") +
-      ink("M134,178 Q138,146 164,132", 6, "#FBE6EE")
-    ), 0.5);
-  },
-  bdayType: function() {
-    var c = "", xs = [140, 180, 220], cols = ["#F2A7C3", "#8DB7D9", "#EDB834"];
-    for (var i = 0; i < 3; i++) {
-      c += shape("M" + (xs[i] - 8) + ",84 L" + (xs[i] + 8) + ",84 L" + (xs[i] + 8) + ",140 L" + (xs[i] - 8) + ",140 Z", cols[i], INK, 2.5) +
-        ink("M" + xs[i] + ",84 L" + xs[i] + ",76", 2) +
-        shape("M" + xs[i] + ",44 C" + (xs[i] + 12) + ",58 " + (xs[i] + 9) + ",72 " + xs[i] + ",72 C" + (xs[i] - 9) + ",72 " + (xs[i] - 12) + ",58 " + xs[i] + ",44 Z", "#E4563B");
+  cake: function() {
+    var x0 = 92, x1 = 268, y = 318, n = 7, w = (x1 - x0) / n;
+    var icing = "M" + x0 + "," + (y + 4) + " Q" + x0 + "," + (y - 10) + " " + (x0 + 14) + "," + (y - 10) + " L" + (x1 - 14) + "," + (y - 10) + " Q" + x1 + "," + (y - 10) + " " + x1 + "," + (y + 4);
+    for (var i = n; i > 0; i--) {
+      var xa = x0 + i * w, xb = xa - w, dep = y + (i % 2 ? 34 : 18);
+      icing += " Q" + (xa - 1) + "," + dep + " " + ((xa + xb) / 2) + "," + dep + " Q" + (xb + 1) + "," + dep + " " + xb + "," + (y + 4);
     }
-    return paperCard("#F3EADB", wob(c + sparkle(58, 404, 1.1) + sparkle(304, 416, 0.8) + sparkle(290, 380, 0.5) + sparkle(76, 440, 0.6)));
+    icing += " Z";
+    var candles = "", flames = "", cx = [126, 153, 180, 207, 234], cc = ["#E8502F", "#5DA9A1", "#F2B233", "#5DA9A1", "#E8502F"];
+    for (var k = 0; k < cx.length; k++) {
+      candles += riso('<rect x="' + (cx[k] - 5) + '" y="266" width="10" height="44" rx="3"/>', cc[k], 3, 2);
+      flames += riso('<path d="M' + cx[k] + ',236 C' + (cx[k] + 9) + ',248 ' + (cx[k] + 7) + ',258 ' + cx[k] + ',259 C' + (cx[k] - 7) + ',258 ' + (cx[k] - 9) + ',248 ' + cx[k] + ',236 Z"/>', "#F2B233", 2, 2);
+    }
+    return svgCard("#F8E7C6",
+      confetti(7, 26, ["#E8502F", "#F49AB0", "#5DA9A1", "#F2B233"], [20, 200, 340, 260]) +
+      confetti(11, 10, ["#E8502F", "#F49AB0", "#5DA9A1"], [20, 300, 80, 440]) +
+      confetti(19, 10, ["#F2B233", "#F49AB0", "#5DA9A1"], [282, 300, 340, 440]) +
+      wob(
+        riso('<ellipse cx="180" cy="420" rx="128" ry="15"/>', "#FFFFFF", 3, 3) +
+        riso('<rect x="92" y="316" width="176" height="100" rx="10"/>', "#F49AB0", 5, 4) +
+        '<path d="M96,372 Q118,362 140,372 T184,372 T228,372 T266,372" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
+        riso('<path d="' + icing + '"/>', "#FFF6E6", 3, 3) +
+        candles + flames
+      ));
   },
-  cherries: function() {
-    return paperCard("#F3C4CC", wob(
-      ink("M150,258 C150,206 170,170 198,150", 3) + ink("M218,276 C218,226 210,180 198,150", 3) +
-      shape("M198,150 C222,118 266,122 280,138 C252,162 216,164 198,150 Z", "#4E7A3A", INK, 2.5) + ink("M204,148 Q240,138 270,138", 2) +
-      '<circle cx="148" cy="298" r="42" fill="#D42A2F" stroke="' + INK + '" stroke-width="3"/>' +
-      '<circle cx="220" cy="316" r="42" fill="#D42A2F" stroke="' + INK + '" stroke-width="3"/>' +
-      ink("M124,282 Q130,266 144,262", 5, "#F6C9CC") + ink("M196,300 Q202,284 216,280", 5, "#F6C9CC")
+  tulips: function() {
+    function tulip(x, y, c, rot) {
+      return riso('<path transform="translate(' + x + ',' + y + ') rotate(' + rot + ')" d="M-19,0 Q-22,-32 -9,-38 L0,-24 L9,-38 Q22,-32 19,0 Q0,13 -19,0 Z"/>', c, 4, 3);
+    }
+    function stem(x1, y1) { return '<path d="M180,448 Q' + ((180 + x1) / 2) + ',' + ((448 + y1) / 2 + 20) + ' ' + x1 + ',' + y1 + '"/>'; }
+    var stems = '<g fill="none" stroke="#3F6B4A" stroke-width="3.5" stroke-linecap="round">' +
+      stem(126, 262) + stem(166, 236) + stem(206, 244) + stem(240, 274) + stem(148, 292) + stem(214, 296) + '</g>';
+    var leaves = riso('<path d="M150,380 Q104,350 96,300 Q140,322 160,370 Z"/>', "#7FA06B", 4, 3) +
+      riso('<path d="M210,380 Q258,352 266,302 Q222,324 200,370 Z"/>', "#7FA06B", 4, 3);
+    return svgCard("#DDE6D3",
+      '<g transform="translate(0,22)">' + wob(stems + leaves +
+        tulip(126, 262, "#E8502F", -14) + tulip(166, 236, "#F2A0A8", -4) + tulip(206, 244, "#F2B233", 8) +
+        tulip(240, 274, "#F2A0A8", 16) + tulip(148, 292, "#F2B233", -8) + tulip(214, 296, "#E8502F", 6) +
+        riso('<path d="M112,352 L248,352 L196,474 L164,474 Z"/>', "#E2B482", 5, 3) +
+        '<path d="M150,384 Q180,398 210,384" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
+        riso('<path d="M180,392 Q160,372 150,392 Q160,404 180,392 Q200,372 210,392 Q200,404 180,392 Z"/>', "#E8502F", 2, 2)
+      ) + '</g>');
+  },
+  hearts: function() {
+    var list = [[52, 64, 1.5, -18, "#D7263D"], [150, 40, 0.9, 10, "#F49AB0"], [300, 70, 1.9, 14, "#E8502F"], [236, 128, 0.8, -6, "#D7263D"],
+      [40, 170, 0.9, 22, "#F49AB0"], [320, 196, 1.1, -12, "#F49AB0"], [90, 128, 0.7, 8, "#E8502F"],
+      [62, 330, 1.2, -10, "#E8502F"], [312, 320, 1.6, 18, "#D7263D"], [130, 420, 2.1, 8, "#D7263D"], [258, 412, 1.0, -16, "#F49AB0"],
+      [200, 360, 0.7, 12, "#F49AB0"], [40, 436, 0.8, -20, "#F49AB0"], [330, 450, 0.8, 6, "#E8502F"]];
+    var out = "";
+    for (var i = 0; i < list.length; i++) out += riso(heartPath(list[i][0], list[i][1], list[i][2], list[i][3]), list[i][4], 4, 3);
+    return svgCard("#F8D8D0", wob(out));
+  },
+  sun: function() {
+    var rays = "";
+    for (var a = -168; a <= -12; a += 13) {
+      var r = a * Math.PI / 180;
+      rays += '<line x1="' + (180 + Math.cos(r) * 104).toFixed(1) + '" y1="' + (318 + Math.sin(r) * 104).toFixed(1) + '" x2="' + (180 + Math.cos(r) * 134).toFixed(1) + '" y2="' + (318 + Math.sin(r) * 134).toFixed(1) + '"/>';
+    }
+    return svgCard("#F4EADB", wob(
+      '<g stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round">' + rays + '</g>' +
+      riso('<circle cx="180" cy="318" r="88"/>', "#F2B233", 5, 4) +
+      '<g fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"><path d="M148,300 Q156,292 164,300"/><path d="M196,300 Q204,292 212,300"/><path d="M160,326 Q180,344 200,326"/></g>' +
+      '<circle cx="146" cy="318" r="7" fill="#F49AB0"/><circle cx="214" cy="318" r="7" fill="#F49AB0"/>' +
+      riso('<path d="M-10,392 Q70,344 150,384 T370,370 L370,490 L-10,490 Z"/>', "#E9805E", 4, 3) +
+      riso('<path d="M-10,424 Q90,388 190,420 T370,404 L370,490 L-10,490 Z"/>', "#7FA06B", 4, 3) +
+      riso('<path d="M-10,452 Q120,428 230,452 T370,446 L370,490 L-10,490 Z"/>', "#2E5E4E", 4, 3)
     ));
   },
-  loveLots: function() {
-    return paperCard("#2C56C9", wob(
-      heart(56, 62, 1.1, -14, "#E8533A") + heart(304, 70, 0.8, 12, "#F3A6BE") + heart(64, 420, 0.8, 10, "#F3A6BE") + heart(300, 414, 1.2, -10, "#E8533A") +
-      '<circle cx="110" cy="40" r="3" fill="#FBEFE3"/><circle cx="252" cy="440" r="3" fill="#FBEFE3"/><circle cx="330" cy="240" r="3" fill="#FBEFE3"/><circle cx="30" cy="236" r="3" fill="#FBEFE3"/>'
-    ), 0.45);
-  },
-  daisies: function() {
-    function daisy(cx, cy, r) {
-      var p = "";
-      for (var a = 0; a < 360; a += 36) {
-        p += '<ellipse cx="' + cx + '" cy="' + (cy - r * 0.62) + '" rx="' + (r * 0.24) + '" ry="' + (r * 0.5) + '" transform="rotate(' + a + ' ' + cx + ' ' + cy + ')" fill="#FBF7EF" stroke="' + INK + '" stroke-width="2.2"/>';
+  fireworks: function() {
+    function burst(cx, cy, r, n, c) {
+      var s = "";
+      for (var i = 0; i < n; i++) {
+        var a = (i / n) * Math.PI * 2;
+        s += '<line x1="' + (cx + Math.cos(a) * r * 0.32).toFixed(1) + '" y1="' + (cy + Math.sin(a) * r * 0.32).toFixed(1) + '" x2="' + (cx + Math.cos(a) * r).toFixed(1) + '" y2="' + (cy + Math.sin(a) * r).toFixed(1) + '"/>' +
+          '<circle cx="' + (cx + Math.cos(a) * (r + 9)).toFixed(1) + '" cy="' + (cy + Math.sin(a) * (r + 9)).toFixed(1) + '" r="3" fill="' + c + '" stroke="none"/>';
       }
-      return p + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.28) + '" fill="#EDB834" stroke="' + INK + '" stroke-width="2.2"/>';
+      return '<g stroke="' + c + '" stroke-width="4" stroke-linecap="round">' + s + '</g>';
     }
-    return paperCard("#EFE5D3", wob(
-      ink("M128,238 C140,300 166,350 180,392", 2.5) + ink("M184,196 C182,280 182,340 180,392", 2.5) + ink("M238,250 C224,310 196,360 180,392", 2.5) +
-      ink("M180,392 L170,452 M180,392 L188,454 M180,392 L180,456", 2.5) +
-      shape("M156,316 C140,296 140,280 150,276 C160,290 164,304 160,318 Z", "#7E9A63", INK, 2) +
-      shape("M204,326 C222,308 228,292 220,286 C206,298 200,312 204,328 Z", "#7E9A63", INK, 2) +
-      daisy(128, 238, 46) + daisy(238, 250, 42) + daisy(184, 196, 50) +
-      shape("M180,394 C160,376 144,384 150,398 C156,410 172,402 180,394 C188,402 204,410 210,398 C216,384 200,376 180,394 Z", "#E4563B", INK, 2.2) +
-      ink("M176,398 L164,426 M184,398 L196,426", 2.2)
-    ));
+    function star(x, y, s) { return '<path transform="translate(' + x + ',' + y + ') scale(' + s + ')" d="M0,-10 Q1.5,-1.5 10,0 Q1.5,1.5 0,10 Q-1.5,1.5 -10,0 Q-1.5,-1.5 0,-10 Z" fill="#F8E7C6"/>'; }
+    return svgCard("#1C2747", wob(
+      burst(108, 120, 66, 16, "#F2B233") + burst(262, 176, 58, 14, "#F49AB0") + burst(160, 262, 44, 12, "#E8502F") + burst(290, 300, 26, 10, "#F2B233") +
+      star(46, 236, 1) + star(316, 70, 0.8) + star(220, 72, 0.6) + star(60, 330, 0.7) + star(236, 330, 0.9)
+    ), 0.28);
   },
-  twoCups: function() {
-    return paperCard("#BCD6E8", wob(
-      ink("M36,372 L324,372", 3) +
-      shape("M94,272 L172,272 L166,360 Q164,370 154,370 L112,370 Q102,370 100,360 Z", "#F7EFE2", INK, 3) +
-      ink("M98,292 C70,292 70,338 102,336", 3) +
-      shape("M188,272 L266,272 L260,360 Q258,370 248,370 L206,370 Q196,370 194,360 Z", "#E4563B", INK, 3) +
-      ink("M262,292 C292,292 292,338 258,336", 3) +
-      ink("M122,250 C112,234 132,222 122,204 M144,250 C134,234 154,222 144,204", 2.5) +
-      ink("M216,250 C206,234 226,222 216,204 M238,250 C228,234 248,222 238,204", 2.5) +
-      heart(180, 176, 0.75, 0, "#E4563B")
-    ));
+  envelope: function() {
+    return svgCard("#D5E3EC",
+      '<g transform="rotate(-8 180 318)">' + wob(
+        riso('<rect x="64" y="236" width="232" height="152" rx="6"/>', "#FBF6EC", 5, 4) +
+        '<path d="M68,240 L180,326 L292,240" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linejoin="round"/>' +
+        '<path d="M68,384 L150,312 M292,384 L210,312" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
+        riso('<rect x="236" y="250" width="46" height="56" rx="2"/>', "#E8502F", 3, 3) +
+        '<rect x="232" y="246" width="54" height="64" fill="none" stroke="' + ART_INK + '" stroke-width="2" stroke-dasharray="3 4"/>' +
+        heartPath(259, 278, 0.7, 0).replace('<path ', '<path fill="#FBF6EC" ') +
+        '<g fill="none" stroke="#3E5C7A" stroke-width="2.5" stroke-linecap="round"><circle cx="214" cy="272" r="22" stroke-dasharray="5 5"/><path d="M168,262 Q178,256 188,262 T208,262 M164,276 Q174,270 184,276 T204,276 M168,290 Q178,284 188,290 T208,290"/></g>' +
+        '<g stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round" opacity=".55"><path d="M96,350 L176,350 M96,366 L150,366"/></g>'
+      ) + '</g>' +
+      riso(heartPath(80, 160, 0.8, -16), "#E8502F", 3, 2) + riso(heartPath(292, 430, 0.6, 14), "#F49AB0", 3, 2));
   },
-  coupe: function() {
-    var bub = [[160, 176, 5], [196, 160, 4], [176, 140, 6], [214, 124, 4], [150, 112, 4], [190, 94, 5], [228, 82, 3], [168, 70, 3], [124, 150, 3], [240, 160, 3]], b = "";
-    for (var i = 0; i < bub.length; i++) b += '<circle cx="' + bub[i][0] + '" cy="' + bub[i][1] + '" r="' + bub[i][2] + '" fill="none" stroke="#F6EBDD" stroke-width="2"/>';
-    return paperCard("#5A1E2A", wob(
-      b +
-      shape("M100,200 L260,200 Q252,258 180,262 Q108,258 100,200 Z", "#E9B949", "#F6EBDD", 3) +
-      ink("M100,200 Q180,218 260,200", 2.5, "#F6EBDD") +
-      ink("M180,262 L180,360", 3.5, "#F6EBDD") +
-      shape("M134,370 Q180,350 226,370 Q180,380 134,370 Z", "#F6EBDD", "#F6EBDD", 2.5)
-    ), 0.5);
-  },
-  stamp: function() {
-    var x0 = 108, y0 = 146, x1 = 252, y1 = 354, holes = "";
-    for (var x = x0; x <= x1; x += 16) holes += '<circle cx="' + x + '" cy="' + y0 + '" r="6"/><circle cx="' + x + '" cy="' + y1 + '" r="6"/>';
-    for (var y = y0 + 16; y < y1; y += 16) holes += '<circle cx="' + x0 + '" cy="' + y + '" r="6"/><circle cx="' + x1 + '" cy="' + y + '" r="6"/>';
-    return paperCard("#F1DC9A", wob(
-      '<g transform="rotate(-6 180 250)">' +
-        '<rect x="' + x0 + '" y="' + y0 + '" width="' + (x1 - x0) + '" height="' + (y1 - y0) + '" fill="#FBF6EA"/>' +
-        '<g fill="#F1DC9A">' + holes + '</g>' +
-        '<rect x="128" y="166" width="104" height="168" fill="#8FB8D8"/>' +
-        shape("M146,236 C140,222 160,212 170,222 C176,206 202,208 204,224 C220,222 222,242 208,244 L150,244 C140,244 138,236 146,236 Z", "#FBF6EA") +
-        ink("M150,312 C170,296 186,300 196,286", 2, INK).replace('/>', ' stroke-dasharray="4 6"/>') +
-        shape("M196,286 L230,262 L214,296 L208,284 Z", "#E4563B", INK, 2) + ink("M208,284 L230,262", 2) +
-      '</g>' +
-      '<g fill="none" stroke="' + INK + '" stroke-width="2.2" opacity=".7"><circle cx="262" cy="176" r="34" stroke-dasharray="6 5"/><path d="M200,166 Q214,158 228,166 T256,166 T284,166 T312,166 M196,186 Q210,178 224,186 T252,186 T280,186 T308,186"/></g>'
-    ));
-  },
-  anemone: function() {
-    var petals = "", dots = "";
-    for (var a = -90; a < 270; a += 72) {
-      var t = a * Math.PI / 180;
-      petals += '<circle cx="' + (180 + Math.cos(t) * 30).toFixed(1) + '" cy="' + (220 + Math.sin(t) * 30).toFixed(1) + '" r="34" fill="#FAF6EE" stroke="' + INK + '" stroke-width="2"/>';
+  branch: function() {
+    var leaves = "", pts = [[118, 400, -60], [140, 368, 30], [150, 340, -70], [176, 314, 20], [184, 284, -64], [210, 262, 26], [216, 232, -58], [242, 214, 30], [250, 186, -50], [272, 168, 34]];
+    for (var i = 0; i < pts.length; i++) {
+      leaves += riso('<path transform="translate(' + pts[i][0] + ',' + pts[i][1] + ') rotate(' + pts[i][2] + ')" d="M0,0 Q22,-16 52,0 Q22,16 0,0 Z"/>', i % 3 === 0 ? "#8FA67E" : "#B5C3A3", 3, 3);
     }
-    for (var b = 0; b < 360; b += 30) {
-      var u = b * Math.PI / 180;
-      dots += '<circle cx="' + (180 + Math.cos(u) * 22).toFixed(1) + '" cy="' + (220 + Math.sin(u) * 22).toFixed(1) + '" r="2.2" fill="' + INK + '"/>';
+    var sprig = '<path d="M60,470 Q84,420 74,360" fill="none" stroke="#5B6B4E" stroke-width="3" stroke-linecap="round"/>' +
+      riso('<path transform="translate(76,420) rotate(-130)" d="M0,0 Q18,-13 42,0 Q18,13 0,0 Z"/>', "#B5C3A3", 3, 3) +
+      riso('<path transform="translate(80,392) rotate(-40)" d="M0,0 Q18,-13 42,0 Q18,13 0,0 Z"/>', "#8FA67E", 3, 3) +
+      riso('<path transform="translate(75,364) rotate(-100)" d="M0,0 Q18,-13 42,0 Q18,13 0,0 Z"/>', "#B5C3A3", 3, 3);
+    return svgCard("#EDE8DF", wob(
+      sprig + '<path d="M86,452 Q150,360 196,280 T284,150" fill="none" stroke="#5B6B4E" stroke-width="3.5" stroke-linecap="round"/>' + leaves +
+      '<ellipse cx="164" cy="330" rx="6" ry="8" fill="#4A5A3E"/><ellipse cx="228" cy="236" rx="6" ry="8" fill="#4A5A3E"/>'
+    ), 0.2);
+  },
+  wreath: function() {
+    var s = "", berries = "";
+    for (var a = 0; a < 360; a += 10) {
+      var r = a * Math.PI / 180, x = 180 + Math.cos(r) * 124, y = 236 + Math.sin(r) * 124;
+      var r2 = (a + 5) * Math.PI / 180, x2 = 180 + Math.cos(r2) * 108, y2 = 236 + Math.sin(r2) * 108;
+      var rot = a + 90 + (a % 20 ? 30 : -30);
+      s += '<path transform="translate(' + x2.toFixed(1) + ',' + y2.toFixed(1) + ') rotate(' + (a + 95 - 30) + ') scale(1.1)" d="M-15,0 Q0,-9 15,0 Q0,9 -15,0 Z" fill="#3F6E48"/>';
+      s += '<path transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') rotate(' + rot + ') scale(1.35)" d="M-15,0 Q0,-9 15,0 Q0,9 -15,0 Z" fill="' + (a % 20 ? "#6E9B6A" : "#A3C49A") + '"/>';
+      if (a % 40 === 0 && (a < 50 || a > 130)) berries += '<circle cx="' + (x + 7).toFixed(1) + '" cy="' + (y - 5).toFixed(1) + '" r="5.5" fill="#E8502F"/><circle cx="' + (x - 4).toFixed(1) + '" cy="' + (y + 6).toFixed(1) + '" r="4.5" fill="#E8502F"/>';
     }
-    return paperCard("#D8D2C6", wob(
-      ink("M180,470 C176,396 188,330 180,256", 3, "#4C5A44") +
-      shape("M182,384 C200,350 236,340 252,346 C238,374 206,388 182,384 Z", "#8C9A7C", "#4C5A44", 2) +
-      shape("M178,420 C160,392 128,386 114,392 C128,418 156,428 178,420 Z", "#8C9A7C", "#4C5A44", 2) +
-      petals + '<circle cx="180" cy="220" r="14" fill="#2A2622"/>' + dots
-    ));
-  },
-  ornament: function() {
-    return paperCard("#22432E", '<defs><clipPath id="ac-orn"><circle cx="180" cy="262" r="78"/></clipPath></defs>' + wob(
-      ink("M180,-4 L180,170", 2, "#F6EBDD") + ink("M172,172 C172,156 188,156 188,172", 2.5, "#F6EBDD") +
-      '<circle cx="180" cy="262" r="78" fill="#E4563B"/>' +
-      '<g clip-path="url(#ac-orn)">' + ink("M96,242 Q138,222 180,242 T264,242", 7, "#F6EBDD") + ink("M96,282 Q138,302 180,282 T264,282", 7, "#F6EBDD") +
-      '</g>' +
-      shape("M164,170 L196,170 L198,190 L162,190 Z", "#E9B949") +
-      ink("M128,226 Q138,206 156,198", 5, "#F49A84")
-    ), 0.5);
-  },
-  snapshot: function() {
-    return paperCard("#F3EADB", wob(
-      sparkle(46, 60, 0.9) + sparkle(318, 380, 0.7) + sparkle(36, 380, 0.6) + sparkle(304, 404, 0.4)
-    ));
+    var bow = riso('<path d="M180,344 Q150,320 138,340 Q150,362 180,344 Q210,320 222,340 Q210,362 180,344 Z M174,348 L160,386 M186,348 L200,386"/>', "#E8502F", 3, 2)
+      .replace(/stroke="#2B1B12"/g, 'stroke="#F8E7C6"');
+    return svgCard("#1F3D2F", wob(s + berries + '<g transform="translate(0,22) scale(1.15)" transform-origin="180 344">' + bow + '</g>'), 0.3);
   }
 };
 
@@ -576,7 +691,8 @@ var ART = {
 var ART_OVER = {
   tape: function() {
     return '<svg viewBox="0 0 360 480" width="100%" height="100%" style="position:absolute;inset:0;pointer-events:none;z-index:6" aria-hidden="true">' +
-      '<rect x="140" y="38" width="84" height="28" fill="#D8C49E" opacity=".75" transform="rotate(-5 182 52)"/></svg>';
+      '<rect x="124" y="92" width="76" height="26" fill="#F2B233" opacity=".78" transform="rotate(-12 162 105)"/>' +
+      '<rect x="196" y="330" width="80" height="26" fill="#F49AB0" opacity=".8" transform="rotate(14 236 343)"/></svg>';
   }
 };
 
@@ -591,22 +707,20 @@ var OCCASIONS = [
   { id: "holiday", label: "Holidays" }
 ];
 
-// Headline fields: font, size (px at scale 1), ink, pos (top|bottom|center),
-// optional italic, caps, track (em), lh (line height).
 var ART_DESIGNS = [
-  { id: "i-bd1", occasion: "birthday", label: "Party hat", art: "partyHat", headline: "It's your day", font: "isans", caps: true, track: 0.24, ink: "#F6EBDD", size: 15, pos: "bottom" },
-  { id: "i-bd2", occasion: "birthday", label: "Big day", art: "bdayType", headline: "Happy\nbirthday", font: "caprasimo", ink: "#E4563B", size: 66, pos: "center", centerY: 0.53, lh: 0.92 },
-  { id: "i-bd3", occasion: "birthday", label: "One balloon", art: "balloon", headline: "Happy birthday", font: "dmmono", caps: true, track: 0.3, ink: "#F3E7D3", size: 13, pos: "top" },
-  { id: "i-bd4", occasion: "birthday", label: "Snapshot", art: "snapshot", over: "tape", slot: { x: 0.15, y: 0.11, w: 0.7, h: 0.6, rot: -3, frame: "print" }, headline: "Happy birthday", font: "caveat", ink: "#E4563B", size: 44, pos: "bottom" },
-  { id: "i-ty1", occasion: "thanks", label: "Daisies", art: "daisies", headline: "Thank you", font: "caveat", ink: INK, size: 56, pos: "top" },
-  { id: "i-lv1", occasion: "love", label: "Cherries", art: "cherries", headline: "You & me", font: "instrument", italic: true, caps: true, track: 0.06, ink: INK, size: 24, pos: "bottom" },
-  { id: "i-lv2", occasion: "love", label: "Love you lots", art: "loveLots", headline: "Love\nyou\nlots", font: "caprasimo", ink: "#FBEFE3", size: 96, pos: "center", lh: 0.86 },
-  { id: "i-jb1", occasion: "just", label: "Coffee for two", art: "twoCups", headline: "Thinking of you", font: "isans", caps: true, track: 0.24, ink: INK, size: 14, pos: "bottom" },
-  { id: "i-cg1", occasion: "congrats", label: "Coupe", art: "coupe", headline: "Cheers to you", font: "dmmono", caps: true, track: 0.3, ink: "#F4B6C8", size: 13, pos: "bottom" },
-  { id: "i-my1", occasion: "miss", label: "Postage", art: "stamp", headline: "Wish you were here", font: "isans", caps: true, track: 0.22, ink: INK, size: 13, pos: "bottom" },
-  { id: "i-sy1", occasion: "sympathy", label: "Anemone", art: "anemone", headline: "Thinking of you", font: "instrument", italic: true, ink: "#3B3A36", size: 32, pos: "top" },
-  { id: "i-hd1", occasion: "holiday", label: "Ornament", art: "ornament", headline: "Merry everything", font: "dmmono", caps: true, track: 0.3, ink: "#F6EBDD", size: 13, pos: "bottom" }
+  { id: "i-bd1", occasion: "birthday", label: "Five candles", art: "cake", headline: "Happy\nbirthday", font: "caprasimo", ink: "#D9472B", size: 54, pos: "top" },
+  { id: "i-bd2", occasion: "birthday", label: "Snapshot", art: "snapshotBg", over: "tape", slot: { x: 0.17, y: 0.2, w: 0.66, h: 0.56, rot: -4, frame: "polaroid" }, headline: "Happy birthday", font: "caveat", ink: "#2B1B12", size: 46, pos: "bottom" },
+  { id: "i-ty1", occasion: "thanks", label: "Tulips", art: "tulips", headline: "Thank\nyou", font: "instrument", italic: true, ink: "#1F3B2C", size: 80, pos: "top" },
+  { id: "i-lv1", occasion: "love", label: "Hearts", art: "hearts", headline: "You\n& me", font: "fraunces", italic: true, ink: "#8E1B2C", size: 72, pos: "center" },
+  { id: "i-jb1", occasion: "just", label: "Sunny", art: "sun", headline: "Thinking\nof you", font: "fraunces", ink: "#2B1B12", size: 50, pos: "top" },
+  { id: "i-cg1", occasion: "congrats", label: "Fireworks", art: "fireworks", headline: "Congrats!", font: "caprasimo", ink: "#F8E7C6", size: 60, pos: "bottom" },
+  { id: "i-my1", occasion: "miss", label: "Airmail", art: "envelope", headline: "Miss\nyou", font: "caveat", ink: "#1F2F4A", size: 92, pos: "top" },
+  { id: "i-sy1", occasion: "sympathy", label: "Olive branch", art: "branch", headline: "Holding you\nclose", font: "instrument", ink: "#3B3A36", size: 50, pos: "top" },
+  { id: "i-hd1", occasion: "holiday", label: "Wreath", art: "wreath", headline: "Happy\nholidays", font: "instrument", italic: true, ink: "#F8E7C6", size: 54, pos: "center", centerY: 0.49 }
 ];
+ART.snapshotBg = function() {
+  return svgCard("#F3E1E6", confetti(3, 34, ["#E8502F", "#F2B233", "#5DA9A1", "#F49AB0"], [14, 14, 346, 466]));
+};
 ALL_DESIGNS = ALL_DESIGNS.concat(ART_DESIGNS);
 
 function findDesign(id) {
@@ -1086,7 +1200,7 @@ function renderCardSide(side, size, interactive) {
 
   var isArt = side === "front" && state.frontDesign && state.frontDesign.art;
   var cardChrome = isArt
-    ? "border-radius:" + (3 * scale) + "px;box-shadow:0 1px 2px rgba(30,23,18,0.08), 0 10px 28px rgba(30,23,18,0.08);"
+    ? "border-radius:" + (20 * scale) + "px;box-shadow:0 8px 32px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06);"
     : "border-radius:" + (20 * scale) + "px;box-shadow:0 8px 32px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06);";
   var card = h("div", { style: "width:" + cardWidth + "px;height:" + cardHeight + "px;" + cardChrome + "overflow:hidden;position:relative;flex-shrink:0;" + getBgStyle(bg) });
   if (interactive) card.id = "cardZone";
@@ -1824,243 +1938,219 @@ function render() {
 
   // ═══ MARKETING PAGE ═══
   if (state.screen === "marketing") {
-    var mobile = isMobile();
-    var ctaAction = function() { setState({ screen: "builder", activeSide: "front", tab: "designs" }); };
-    var screen = h("div", { style: "min-height:100vh;background:var(--bg);overflow-y:auto;overflow-x:hidden" });
+    var ctaAction = function() { setState({ screen: "builder", activeSide: "front", tab: "designs" }); window.scrollTo(0, 0); };
+    var screen = h("div", { className: "mk" });
     if (mobile) renderInstallBanner(screen);
 
-    // --- Helper: render a sample card with temp state ---
     function renderSampleCard(side, size, overrides) {
       var saved = {};
       for (var k in overrides) { saved[k] = state[k]; state[k] = overrides[k]; }
       var cardEl = renderCardSide(side, size, false);
-      for (var k in saved) { state[k] = saved[k]; }
+      for (var k2 in saved) { state[k2] = saved[k2]; }
       return cardEl;
     }
+    function artCard(id, size) {
+      return renderSampleCard("front", size || "small", { frontDesign: findDesign(id), frontText: null, frontPhoto: null, frontHeadFont: null, frontInk: null, frontFontSize: 1, frontStickers: [] });
+    }
+    function startWith(id) {
+      setState({ screen: "builder", activeSide: "front", tab: "designs", frontDesign: findDesign(id), frontText: null, frontPhoto: null, frontHeadFont: null, frontInk: null, frontStickers: [] });
+      window.scrollTo(0, 0);
+    }
+    function goTo(id) { var el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    function pill(kind, label, onClick, withArrow) {
+      var b = h("button", { className: "mk-pill mk-pill-" + kind, onClick: onClick }, label);
+      if (withArrow) b.appendChild(icon("arrowRight", 18));
+      return b;
+    }
+    var backSample = { backBg: ALL_BGS.find(function(b) { return b.id === "s8"; }), backLayout: ALL_LAYOUTS.find(function(l) { return l.id === "centered"; }), backFont: ALL_FONTS.find(function(f) { return f.id === "caveat"; }), backTextColor: TEXT_COLORS.find(function(t) { return t.id === "ink"; }), backFontSize: 1.0, backStickers: [], message: "I know I’m terrible with dates, but I’m not terrible at caring about you. Happy birthday to the person who puts up with my chaos.", recipientName: "Alex", senderName: "Jordan" };
 
-    // Sample states for different card previews
-    var frontSample1 = { frontBg: ALL_BGS.find(function(b) { return b.id === "g2"; }), frontLayout: ALL_LAYOUTS.find(function(l) { return l.id === "centered"; }), frontPhoto: null, frontDesign: ALL_DESIGNS.find(function(d) { return d.id === "bd5"; }), frontStickers: [], frontText: "Happy Birthday!", frontFont: ALL_FONTS.find(function(f) { return f.id === "playfair"; }), frontTextColor: TEXT_COLORS[0], frontFontSize: 1.0 };
-    var frontSample2 = { frontBg: ALL_BGS.find(function(b) { return b.id === "g6"; }), frontLayout: ALL_LAYOUTS.find(function(l) { return l.id === "centered"; }), frontPhoto: null, frontDesign: ALL_DESIGNS.find(function(d) { return d.id === "ty4"; }), frontStickers: [], frontText: "Thank You!", frontFont: ALL_FONTS.find(function(f) { return f.id === "dancing"; }), frontTextColor: TEXT_COLORS[0], frontFontSize: 1.3 };
-    var frontSample3 = { frontBg: ALL_BGS.find(function(b) { return b.id === "g10"; }), frontLayout: ALL_LAYOUTS.find(function(l) { return l.id === "centered"; }), frontPhoto: null, frontDesign: ALL_DESIGNS.find(function(d) { return d.id === "cg1"; }), frontStickers: [], frontText: "Congrats!", frontFont: ALL_FONTS.find(function(f) { return f.id === "abril"; }), frontTextColor: TEXT_COLORS[0], frontFontSize: 1.2 };
-    var frontSample4 = { frontBg: ALL_BGS.find(function(b) { return b.id === "g9"; }), frontLayout: ALL_LAYOUTS.find(function(l) { return l.id === "centered"; }), frontPhoto: null, frontDesign: ALL_DESIGNS.find(function(d) { return d.id === "lv5"; }), frontStickers: [], frontText: "You & Me", frontFont: ALL_FONTS.find(function(f) { return f.id === "caveat"; }), frontTextColor: TEXT_COLORS[0], frontFontSize: 1.4 };
-    var backSample = { backBg: ALL_BGS.find(function(b) { return b.id === "s8"; }), backLayout: ALL_LAYOUTS.find(function(l) { return l.id === "centered"; }), backFont: ALL_FONTS.find(function(f) { return f.id === "caveat"; }), backTextColor: TEXT_COLORS.find(function(t) { return t.id === "ink"; }), backFontSize: 1.0, backStickers: [], message: "I know I\u2019m terrible with dates, but I\u2019m not terrible at caring about you. Happy birthday to the person who puts up with my chaos.", recipientName: "Alex", senderName: "Jordan" };
+    // ── Announcement bar ──
+    var bar = h("div", { className: "mk-bar" });
+    var barL = h("span");
+    barL.appendChild(h("b", null, "FREE"));
+    barL.appendChild(document.createTextNode("Cards for every occasion. No account, no app, no catch."));
+    bar.appendChild(barL);
+    var barR = h("span");
+    var barBtn = h("button", { onClick: ctaAction }, "Start a card");
+    barBtn.appendChild(icon("arrowRight", 14));
+    barR.appendChild(barBtn);
+    bar.appendChild(barR);
+    screen.appendChild(bar);
 
-    // ── 1. STICKY NAVBAR ──
-    var nav = h("div", { style: "position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:" + (mobile ? "14px 20px" : "16px 48px") + ";background:rgba(247,246,243,0.85);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)" });
-    nav.appendChild(h("span", { style: "font-size:22px;font-weight:800;color:transparent;letter-spacing:-1px;background-image:linear-gradient(135deg, #FF6B35, #E8366D, #6C4FE0, #0EA5A5, #D4960A, #FF6B35);background-size:300% auto;background-clip:text;-webkit-background-clip:text;animation:shimmer 5s linear infinite" }, "Sendr"));
-    var navRight = h("div", { style: "display:flex;align-items:center;gap:16px" });
-    navRight.appendChild(h("span", { style: "color:var(--text3);font-size:13px;font-weight:500;" + (mobile ? "display:none" : "") }, "100% Free"));
-    navRight.appendChild(h("button", { style: "background:var(--accent);color:#fff;border:none;border-radius:100px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer", onClick: ctaAction }, "Start Sending"));
-    nav.appendChild(navRight);
+    // ── Nav ──
+    var nav = h("nav", { className: "mk-nav" });
+    var logo = h("button", { className: "mk-logo", onClick: function() { window.scrollTo({ top: 0, behavior: "smooth" }); }, "aria-label": "Sendr home" });
+    var mark = h("i");
+    mark.appendChild(icon("mail", 15, 2.2));
+    logo.appendChild(mark);
+    logo.appendChild(document.createTextNode("Sendr"));
+    nav.appendChild(logo);
+    var links = h("div", { className: "mk-links" });
+    [["Cards", "occasions"], ["How it works", "how"], ["Photo cards", "photo"]].forEach(function(l) {
+      links.appendChild(h("button", { onClick: function() { goTo(l[1]); } }, l[0]));
+    });
+    nav.appendChild(links);
+    var navCta = pill("ink", "Send a card", ctaAction);
+    navCta.className += " mk-pill-sm mk-nav-cta";
+    nav.appendChild(navCta);
     screen.appendChild(nav);
 
-    // ── 2. HERO SECTION ──
-    var heroOuter = h("div", { style: "min-height:100vh;display:flex;align-items:center;justify-content:center;padding:" + (mobile ? "100px 20px 60px" : "80px 64px 60px") + ";background:var(--bg)" });
-    var heroInner = h("div", { style: "display:flex;flex-direction:" + (mobile ? "column" : "row") + ";align-items:center;justify-content:space-between;gap:" + (mobile ? "48px" : "80px") + ";max-width:1200px;width:100%" });
-
-    var heroText = h("div", { style: "flex:1;max-width:" + (mobile ? "100%" : "540px") + ";text-align:" + (mobile ? "center" : "left") });
-    heroText.appendChild(h("h1", { style: "font-size:" + (mobile ? "38px" : "68px") + ";font-weight:800;color:var(--text);letter-spacing:" + (mobile ? "-1.5px" : "-2.5px") + ";line-height:1.08;margin:0 0 24px" }, "A faster way to say you care"));
-    heroText.appendChild(h("p", { style: "color:var(--text2);font-size:" + (mobile ? "16px" : "20px") + ";line-height:1.6;margin:0 0 16px;" + (mobile ? "" : "max-width:460px") }, "Not every moment needs a Hallmark card. Sometimes you just need a quick, beautiful way to say \u201Cthinking of you\u201D \u2014 and actually mean it."));
-    heroText.appendChild(h("p", { style: "color:var(--text3);font-size:" + (mobile ? "14px" : "15px") + ";line-height:1.6;margin:0 0 36px;" + (mobile ? "" : "max-width:400px") }, "Free. No sign-up. Takes 30 seconds."));
-    var heroCta = h("button", { style: "background:var(--accent);color:#fff;border:none;border-radius:100px;padding:" + (mobile ? "16px 36px" : "18px 48px") + ";font-size:" + (mobile ? "16px" : "17px") + ";font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,0.12)", onClick: ctaAction });
-    heroCta.appendChild(document.createTextNode("Send a Card"));
-    heroCta.appendChild(h("span", { style: "font-size:20px" }, "\u2192"));
-    heroText.appendChild(heroCta);
-    heroInner.appendChild(heroText);
-
-    var heroCardWrap = h("div", { style: "flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center" });
-    heroCardWrap.appendChild(h("div", { style: "position:absolute;width:" + (mobile ? "300px" : "420px") + ";height:" + (mobile ? "300px" : "420px") + ";border-radius:50%;background:linear-gradient(135deg, rgba(238,86,34,0.2) 0%, rgba(247,246,244,1) 100%);z-index:0" }));
-    var heroCardFloat = h("div", { style: "position:relative;z-index:1;animation:float 3.5s ease-in-out infinite" });
-    heroCardFloat.appendChild(renderSampleCard("front", mobile ? "small" : "preview", frontSample1));
-    heroCardWrap.appendChild(heroCardFloat);
-    heroInner.appendChild(heroCardWrap);
-
-    heroOuter.appendChild(heroInner);
-    screen.appendChild(heroOuter);
-
-    // ── 3. THE STORY ──
-    var storySection = h("div", { style: "padding:" + (mobile ? "60px 20px" : "100px 64px") + ";background:var(--panel)" });
-    var storyInner = h("div", { style: "max-width:800px;margin:0 auto;text-align:center" });
-    storyInner.appendChild(h("h2", { style: "font-size:" + (mobile ? "26px" : "40px") + ";font-weight:800;color:var(--text);letter-spacing:-1.5px;line-height:1.2;margin:0 0 24px" }, "You thought about them. That\u2019s already enough."));
-    storyInner.appendChild(h("p", { style: "color:var(--text2);font-size:" + (mobile ? "15px" : "18px") + ";line-height:1.7;margin:0 auto 16px;max-width:640px" }, "You don\u2019t need a reason to send someone a card. You don\u2019t need it to be their birthday or a holiday. Sometimes the best messages are the ones that show up on a random Tuesday \u2014 just to say hey, I\u2019m thinking about you."));
-    storyInner.appendChild(h("p", { style: "color:var(--text2);font-size:" + (mobile ? "15px" : "18px") + ";line-height:1.7;margin:0 auto 0;max-width:640px" }, "Sendr makes that effortless. Pick a design or upload a photo for the front, write a quick message on the back, and send it. That\u2019s it. No account, no app, no stamps. Just a little moment of care, delivered instantly."));
-    storySection.appendChild(storyInner);
-    screen.appendChild(storySection);
-
-    // ── 4. USE CASES ──
-    var usesSection = h("div", { style: "padding:" + (mobile ? "40px 20px 60px" : "40px 64px 100px") + ";background:var(--panel)" });
-    var usesInner = h("div", { style: "max-width:1100px;margin:0 auto" });
-    var usesGrid = h("div", { style: "display:grid;grid-template-columns:" + (mobile ? "1fr" : "repeat(3,1fr)") + ";gap:16px" });
-    var useItems = [
-      { emoji: "🎂", title: "The birthday you almost forgot", desc: "It\u2019s 11 PM. You just saw the notification. Open Sendr, pick a birthday design, write two honest sentences, and send it. Done before midnight." },
-      { emoji: "💬", title: "The text that isn\u2019t enough", desc: "You want to say more than \u201Cthanks\u201D or \u201Cmiss you\u201D but not enough for a whole letter. A card is the perfect in-between." },
-      { emoji: "📸", title: "The photo that deserves a frame", desc: "Upload that picture from last weekend and turn it into a card. Better than posting it \u2014 because it\u2019s just for them." },
-      { emoji: "🙏", title: "The thank you that actually lands", desc: "Your coworker covered your shift. Your mom watched the kids. A card with their name on it says more than a thumbs-up emoji." },
-      { emoji: "✈\uFE0F", title: "The friend who\u2019s far away", desc: "Different time zones, different schedules. But a card shows up whenever they open it. No coordination required." },
-      { emoji: "✨", title: "The \u201Cjust because\u201D", desc: "No occasion. No event. Just \u201CI saw this and thought of you.\u201D Those are the ones people remember." }
+    // ── Hero ──
+    var hero = h("section", { className: "mk-hero" });
+    var floats = [
+      { id: "i-bd1", tag: "Birthday", style: "left:4%;top:56px;transform:rotate(-9deg)", tagPos: "left:0;top:-26px" },
+      { id: "i-ty1", tag: "Thank you", style: "left:9%;top:440px;transform:rotate(7deg)", tagPos: "right:-8px;bottom:-28px" },
+      { id: "i-lv1", tag: "Love", style: "right:5%;top:40px;transform:rotate(8deg)", tagPos: "right:0;top:-26px" },
+      { id: "i-bd2", tag: "Your photo", style: "right:9%;top:430px;transform:rotate(-6deg)", tagPos: "left:-6px;bottom:-28px" }
     ];
-    for (var ui = 0; ui < useItems.length; ui++) {
-      (function(item) {
-        var card = h("div", { style: "background:var(--bg);border-radius:20px;padding:" + (mobile ? "24px 20px" : "28px 24px") });
-        card.appendChild(h("span", { style: "font-size:24px;display:block;margin-bottom:12px" }, item.emoji));
-        card.appendChild(h("h3", { style: "font-size:" + (mobile ? "16px" : "17px") + ";font-weight:700;color:var(--text);letter-spacing:-0.3px;margin:0 0 6px" }, item.title));
-        card.appendChild(h("p", { style: "color:var(--text2);font-size:" + (mobile ? "13px" : "14px") + ";line-height:1.6;margin:0" }, item.desc));
-        usesGrid.appendChild(card);
-      })(useItems[ui]);
-    }
-    usesInner.appendChild(usesGrid);
-    usesSection.appendChild(usesInner);
-    screen.appendChild(usesSection);
+    floats.forEach(function(f) {
+      var wrap = h("div", { className: "mk-float", style: f.style, onClick: function() { startWith(f.id); } });
+      wrap.appendChild(h("span", { className: "mk-tag", style: f.tagPos }, f.tag));
+      wrap.appendChild(artCard(f.id, "small"));
+      hero.appendChild(wrap);
+    });
+    var h1 = h("h1", { className: "mk-h1" });
+    h1.appendChild(document.createTextNode("Say it with a card, "));
+    h1.appendChild(h("em", null, "instantly."));
+    hero.appendChild(h1);
+    hero.appendChild(h("p", { className: "mk-sub" }, "Beautiful cards for birthdays, thank yous and every moment in between. Write a note, send it by text or email, and watch it open like the real thing."));
+    var ctas = h("div", { className: "mk-ctas" });
+    ctas.appendChild(pill("tomato", "Send a card", ctaAction, true));
+    ctas.appendChild(pill("paper", "Browse cards", function() { goTo("occasions"); }));
+    hero.appendChild(ctas);
+    var fan = h("div", { className: "mk-fan" });
+    [["i-bd1", -10, -96], ["i-lv1", 0, 0], ["i-ty1", 10, 96]].forEach(function(c, i) {
+      var w = h("div", { style: "transform:translateX(" + c[2] + "px) rotate(" + c[1] + "deg);z-index:" + (i === 1 ? 2 : 1) });
+      w.appendChild(artCard(c[0], "small"));
+      fan.appendChild(w);
+    });
+    hero.appendChild(fan);
+    screen.appendChild(hero);
 
-    // ── 5. HOW IT WORKS ──
-    var howSection = h("div", { style: "padding:" + (mobile ? "60px 20px" : "80px 64px") + ";background:var(--bg)" });
-    var howInner = h("div", { style: "max-width:900px;margin:0 auto;text-align:center" });
-    howInner.appendChild(h("span", { style: "display:inline-block;background:var(--panel);color:var(--text2);font-size:11px;font-weight:700;letter-spacing:2px;padding:6px 16px;border-radius:100px;margin-bottom:20px" }, "HOW IT WORKS"));
-    howInner.appendChild(h("h2", { style: "font-size:" + (mobile ? "26px" : "36px") + ";font-weight:800;color:var(--text);letter-spacing:-1.5px;line-height:1.15;margin:0 0 48px" }, "Pick. Write. Send. That\u2019s it."));
-    var stepsRow = h("div", { style: "display:flex;flex-direction:" + (mobile ? "column" : "row") + ";gap:" + (mobile ? "32px" : "48px") + ";text-align:center" });
-    var steps = [
-      { num: "1", title: "Pick a look", desc: "Choose a pre-made design for any occasion, upload your own photo, or start with a color. Add stickers if you want." },
-      { num: "2", title: "Write your message", desc: "Flip to the back and write something. Could be a paragraph, could be one line. Pick a font that fits the mood." },
-      { num: "3", title: "Send it", desc: "Share via text, email, or copy the link. They get an envelope, tap to open, see your card, flip to read." }
+    // ── Occasions ──
+    var occ = h("section", { className: "mk-sec mk-sec-white", id: "occasions" });
+    var occHead = h("div", { className: "mk-head" });
+    occHead.appendChild(h("div", { className: "mk-eyebrow", style: "color:var(--ink-2)" }, "For every occasion"));
+    occHead.appendChild(h("h2", { className: "mk-h2" }, "There’s a card for that."));
+    occHead.appendChild(h("div", { className: "mk-rule" }));
+    occ.appendChild(occHead);
+    var tiles = [
+      { oc: "birthday", card: "i-bd1", bg: "#F6D9C9", r: -5 },
+      { oc: "thanks", card: "i-ty1", bg: "#DFE5D2", r: 4 },
+      { oc: "love", card: "i-lv1", bg: "#F8DCE0", r: -4 },
+      { oc: "just", card: "i-jb1", bg: "#F1E4C4", r: 5 },
+      { oc: "congrats", card: "i-cg1", bg: "#EFD3D6", r: -3 },
+      { oc: "miss", card: "i-my1", bg: "#D3E1EB", r: 4 },
+      { oc: "sympathy", card: "i-sy1", bg: "#E6E0D5", r: -4 },
+      { oc: "holiday", card: "i-hd1", bg: "#F3D7CB", r: 5 }
     ];
-    for (var sti = 0; sti < steps.length; sti++) {
-      (function(step) {
-        var stepCard = h("div", { style: "flex:1" });
-        stepCard.appendChild(h("div", { style: "width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 14px" }, step.num));
-        stepCard.appendChild(h("h3", { style: "font-size:" + (mobile ? "17px" : "18px") + ";font-weight:700;color:var(--text);margin:0 0 6px" }, step.title));
-        stepCard.appendChild(h("p", { style: "color:var(--text2);font-size:" + (mobile ? "14px" : "15px") + ";line-height:1.6;margin:0" }, step.desc));
-        stepsRow.appendChild(stepCard);
-      })(steps[sti]);
+    var grid = h("div", { className: "mk-grid" });
+    tiles.forEach(function(t) {
+      var label = OCCASIONS.find(function(o) { return o.id === t.oc; }).label;
+      var tile = h("button", { className: "mk-tile", style: "background:" + t.bg, onClick: function() { startWith(t.card); }, "aria-label": "Browse " + label + " cards" });
+      tile.appendChild(h("span", { className: "mk-tile-t" }, label));
+      var c = h("div", { className: "mk-tile-card", style: "--r:" + t.r + "deg" });
+      c.appendChild(artCard(t.card, "small"));
+      tile.appendChild(c);
+      var b = h("span", { className: "mk-tile-b mk-eyebrow" }, "Browse");
+      b.appendChild(icon("arrowRight", 14));
+      tile.appendChild(b);
+      grid.appendChild(tile);
+    });
+    occ.appendChild(grid);
+    screen.appendChild(occ);
+
+    // ── How it works ──
+    var how = h("section", { className: "mk-sec mk-tomato", id: "how" });
+    var howHead = h("div", { className: "mk-head" });
+    howHead.appendChild(h("div", { className: "mk-eyebrow" }, "How it works"));
+    howHead.appendChild(h("h2", { className: "mk-h2" }, "Three steps. About a minute."));
+    how.appendChild(howHead);
+    var steps = h("div", { className: "mk-steps" });
+    function step(n, vis, title, text) {
+      var s = h("div", { className: "mk-step" });
+      s.appendChild(h("div", { className: "mk-step-n" }, n));
+      var v = h("div", { className: "mk-step-vis" });
+      v.appendChild(vis);
+      s.appendChild(v);
+      s.appendChild(h("h3", null, title));
+      s.appendChild(h("p", null, text));
+      return s;
     }
-    howInner.appendChild(stepsRow);
-    howSection.appendChild(howInner);
-    screen.appendChild(howSection);
+    var v1 = h("div", { style: "transform:rotate(-5deg)" });
+    v1.appendChild(artCard("i-lv1", "small"));
+    var v2 = h("div", { style: "transform:rotate(4deg)" });
+    v2.appendChild(renderSampleCard("back", "small", backSample));
+    var v3 = h("div", { className: "mk-sendlist" });
+    [["message", "Send by text"], ["mail", "Send by email"], ["link", "Copy the link"]].forEach(function(r) {
+      var row = h("div");
+      row.appendChild(icon(r[0], 18));
+      row.appendChild(document.createTextNode(r[1]));
+      v3.appendChild(row);
+    });
+    steps.appendChild(step("01", v1, "Pick a card", "Start from an illustrated design or drop in a photo of your own."));
+    steps.appendChild(step("02", v2, "Write your note", "Say what you mean. Starter lines help when the words won’t come."));
+    steps.appendChild(step("03", v3, "Send it", "Text it, email it or share the link. It opens in any browser, no app needed."));
+    how.appendChild(steps);
+    screen.appendChild(how);
 
-    // ── 5b. TESTIMONIALS ──
-    var testimonialsSection = h("div", { style: "padding:" + (mobile ? "60px 20px" : "80px 64px") + ";background:var(--panel)" });
-    var testimonialsInner = h("div", { style: "max-width:1100px;margin:0 auto;text-align:center" });
-    testimonialsInner.appendChild(h("h2", { style: "font-size:" + (mobile ? "24px" : "32px") + ";font-weight:800;color:var(--text);letter-spacing:-1.5px;line-height:1.15;margin:0 0 40px" }, "What people are saying"));
-    var testimonials = [
-      { quote: "My sister lives in Tokyo and I\u2019m in Chicago. I sent her a card at 2 AM when I couldn\u2019t sleep because I missed her. She texted me crying the next morning.", name: "Maya R.", context: "sent a miss you card" },
-      { quote: "I literally made a birthday card for my boyfriend at 11:58 PM. He thought I\u2019d been planning it for days. I will never tell him the truth.", name: "Jordan K.", context: "sent a birthday card" },
-      { quote: "Used this to thank my team after a brutal product launch. Took me 30 seconds per card. Three people said it was the nicest thing a manager had ever done.", name: "Chris T.", context: "sent 12 thank you cards" },
-      { quote: "My dad isn\u2019t great with technology but he figured out how to open it. He called me and said \u2018I didn\u2019t know you could send cards on the phone.\u2019 Made his whole week.", name: "Priya S.", context: "sent a father\u2019s day card" },
-      { quote: "I send one to my best friend every few weeks for absolutely no reason. She has a folder of screenshots. That\u2019s when I knew this thing was special.", name: "Alex M.", context: "sends cards just because" }
-    ];
-    var visibleTestimonials = mobile ? testimonials : testimonials.slice(0, 3);
-    var testimonialsGrid = h("div", { style: "display:flex;flex-direction:" + (mobile ? "column" : "row") + ";gap:20px;justify-content:center" });
-    for (var ti = 0; ti < visibleTestimonials.length; ti++) {
-      (function(t) {
-        var tCard = h("div", { style: "background:var(--bg);border-radius:20px;padding:28px 24px;flex:1;text-align:left" });
-        tCard.appendChild(h("p", { style: "font-style:italic;font-size:15px;color:var(--text2);line-height:1.65;margin:0 0 16px" }, "\u201C" + t.quote + "\u201D"));
-        tCard.appendChild(h("p", { style: "font-weight:700;font-size:14px;color:var(--text);margin:0" }, t.name));
-        tCard.appendChild(h("p", { style: "font-size:12px;color:var(--text3);margin:4px 0 0" }, t.context));
-        testimonialsGrid.appendChild(tCard);
-      })(visibleTestimonials[ti]);
-    }
-    testimonialsInner.appendChild(testimonialsGrid);
-    testimonialsSection.appendChild(testimonialsInner);
-    screen.appendChild(testimonialsSection);
+    // ── Photo cards ──
+    var photo = h("section", { className: "mk-sec mk-dark", id: "photo" });
+    var split = h("div", { className: "mk-split" });
+    var pText = h("div");
+    pText.appendChild(h("div", { className: "mk-eyebrow", style: "color:#F49A84" }, "Photo cards"));
+    pText.appendChild(h("h2", { className: "mk-h2" }, "Your photo, made into a card."));
+    pText.appendChild(h("p", { className: "mk-lede" }, "Pick a favorite from your camera roll. It lands on the front of the card, framed and ready, with room for your note inside."));
+    var pCta = h("div", { style: "margin-top:36px" });
+    pCta.appendChild(pill("tomato", "Make a photo card", function() { startWith("i-bd2"); }, true));
+    pText.appendChild(pCta);
+    split.appendChild(pText);
+    var stage = h("div", { className: "mk-photo-stage" });
+    var pc1 = h("div", { style: "left:4%;top:40px;transform:rotate(-7deg)" });
+    pc1.appendChild(artCard("i-bd2", "preview"));
+    var pc2 = h("div", { style: "right:2%;top:150px;transform:rotate(6deg)" });
+    pc2.appendChild(artCard("i-hd1", "small"));
+    stage.appendChild(pc2);
+    stage.appendChild(pc1);
+    split.appendChild(stage);
+    photo.appendChild(split);
+    screen.appendChild(photo);
 
-    // ── 6. FEATURES (alternating rows) ──
-    var featuresSection = h("div", { style: "padding:" + (mobile ? "40px 20px" : "80px 64px") + ";background:var(--panel)" });
-    var featuresInner = h("div", { style: "max-width:1200px;margin:0 auto" });
+    // ── Facts (honest, verifiable) ──
+    var facts = h("section", { className: "mk-sec" });
+    var fHead = h("div", { className: "mk-head" });
+    fHead.appendChild(h("div", { className: "mk-eyebrow", style: "color:var(--ink-2)" }, "Why Sendr"));
+    fHead.appendChild(h("h2", { className: "mk-h2" }, "All of the feeling. None of the fuss."));
+    facts.appendChild(fHead);
+    var fGrid = h("div", { className: "mk-facts" });
+    [["01", "Free, always", "Every card and every feature costs nothing to send."],
+     ["02", "No account", "No sign-up and no password. Open it, make a card, send it."],
+     ["03", "Opens anywhere", "Your card arrives as a link that works on any phone or computer."],
+     ["04", "Nothing to install", "It runs in the browser. Add it to your home screen if you like."]].forEach(function(f) {
+      var c = h("div", { className: "mk-fact" });
+      c.appendChild(h("div", { className: "mk-eyebrow" }, f[0]));
+      c.appendChild(h("h3", null, f[1]));
+      c.appendChild(h("p", null, f[2]));
+      fGrid.appendChild(c);
+    });
+    facts.appendChild(fGrid);
+    screen.appendChild(facts);
 
-    function buildFeatureRow(tagText, title, desc, bullets, gradientColors, cardSide, cardOverrides, reversed) {
-      var rowDir = mobile ? "column" : (reversed ? "row-reverse" : "row");
-      var row = h("div", { style: "display:flex;flex-direction:" + rowDir + ";align-items:center;gap:" + (mobile ? "32px" : "72px") + ";margin-bottom:" + (mobile ? "56px" : "100px") });
-      var textSide = h("div", { style: "flex:1;text-align:" + (mobile ? "center" : "left") });
-      textSide.appendChild(h("span", { style: "display:inline-block;background:" + gradientColors.tag + ";color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;padding:6px 16px;border-radius:100px;margin-bottom:20px" }, tagText));
-      textSide.appendChild(h("h2", { style: "font-size:" + (mobile ? "26px" : "36px") + ";font-weight:800;color:var(--text);letter-spacing:-1.5px;line-height:1.15;margin:0 0 14px" }, title));
-      textSide.appendChild(h("p", { style: "color:var(--text2);font-size:" + (mobile ? "15px" : "16px") + ";line-height:1.65;margin:0 0 16px;" + (mobile ? "" : "max-width:400px") }, desc));
-      if (bullets) {
-        var bulletList = h("div", { style: "display:flex;flex-direction:column;gap:8px;" + (mobile ? "align-items:center" : "") });
-        for (var bi = 0; bi < bullets.length; bi++) {
-          var bulletRow = h("div", { style: "display:flex;align-items:center;gap:10px" });
-          bulletRow.appendChild(h("span", { style: "width:5px;height:5px;border-radius:50%;background:" + gradientColors.tag + ";flex-shrink:0" }));
-          bulletRow.appendChild(h("span", { style: "color:var(--text3);font-size:" + (mobile ? "13px" : "14px") + ";line-height:1.5" }, bullets[bi]));
-          bulletList.appendChild(bulletRow);
-        }
-        textSide.appendChild(bulletList);
-      }
-      row.appendChild(textSide);
-      var cardSideWrap = h("div", { style: "flex:1;display:flex;align-items:center;justify-content:center" });
-      var gradCard = h("div", { style: "background:linear-gradient(160deg, " + gradientColors.from + ", " + gradientColors.mid + ", #ffffff);border-radius:24px;padding:" + (mobile ? "36px 28px" : "52px 44px") + ";display:flex;align-items:center;justify-content:center;width:100%;max-width:" + (mobile ? "100%" : "460px") + ";position:relative;overflow:visible" });
-      gradCard.appendChild(h("div", { style: "position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(rgba(255,255,255,0.3), transparent);border-radius:24px 24px 0 0;pointer-events:none" }));
-      var cardFloat = h("div", { style: "animation:float 3.5s ease-in-out infinite;animation-delay:" + (reversed ? "0.5s" : "0s") + ";position:relative;z-index:1" });
-      cardFloat.appendChild(renderSampleCard(cardSide, "small", cardOverrides));
-      gradCard.appendChild(cardFloat);
-      cardSideWrap.appendChild(gradCard);
-      row.appendChild(cardSideWrap);
-      return row;
-    }
+    // ── Final CTA ──
+    var fin = h("section", { className: "mk-final" });
+    fin.appendChild(h("div", { className: "mk-eyebrow", style: "color:#F49A84" }, "Go on"));
+    fin.appendChild(h("h2", { className: "mk-h2" }, "They crossed your mind. Let them know."));
+    fin.appendChild(pill("tomato", "Send a card", ctaAction, true));
+    screen.appendChild(fin);
 
-    featuresInner.appendChild(buildFeatureRow(
-      "FRONT",
-      "The front sets the mood",
-      "Pick a pre-made design for birthdays, weddings, thank yous \u2014 or upload your own photo. Add stickers. Choose a gradient. Make it yours in seconds.",
-      ["20 pre-made designs for every occasion", "Full-bleed photo upload", "84 emoji stickers to drag & drop", "28 backgrounds \u2014 gradients, solids, textures"],
-      { tag: "#f97066", from: "#f99079", mid: "#fcc7be" },
-      "front", frontSample1, false
-    ));
-
-    featuresInner.appendChild(buildFeatureRow(
-      "BACK",
-      "The back says what matters",
-      "Flip it over and write something real. It doesn\u2019t have to be long. One honest sentence hits harder than a generic paragraph.",
-      ["12 fonts from handwritten to modern", "Adjustable size, color, and layout", "Your name as the sign-off"],
-      { tag: "#e84593", from: "#f976b5", mid: "#f090be" },
-      "back", backSample, true
-    ));
-
-    featuresInner.appendChild(buildFeatureRow(
-      "SEND",
-      "They open it like a real card",
-      "Your person gets a link. They tap it, see an envelope, open it, see your design, and flip to read your words. Confetti included.",
-      ["Text, email, WhatsApp, or any app", "Envelope reveal animation", "Flip card with confetti", "No app needed to open"],
-      { tag: "#5553e8", from: "#3b38f5", mid: "#7876f5" },
-      "front", frontSample3, false
-    ));
-
-    featuresSection.appendChild(featuresInner);
-    screen.appendChild(featuresSection);
-
-    // ── 7. CARD SHOWCASE ──
-    var showcaseSection = h("div", { style: "padding:" + (mobile ? "40px 20px 60px" : "40px 64px 80px") + ";background:var(--panel)" });
-    var showcaseInner = h("div", { style: "max-width:1100px;margin:0 auto;text-align:center" });
-    showcaseInner.appendChild(h("p", { style: "color:var(--text3);font-size:" + (mobile ? "14px" : "16px") + ";margin:0 0 24px" }, "Made in under 60 seconds"));
-    var cardGrid = h("div", { style: "display:flex;gap:16px;justify-content:center;flex-wrap:wrap" });
-    var showcardSamples = [frontSample1, frontSample2, frontSample3, frontSample4];
-    for (var sci = 0; sci < showcardSamples.length; sci++) {
-      (function(sample, idx) {
-        var wrap = h("div", { style: "animation:float " + (3 + idx * 0.5) + "s ease-in-out infinite;animation-delay:" + (idx * 0.3) + "s" });
-        wrap.appendChild(renderSampleCard("front", "small", sample));
-        cardGrid.appendChild(wrap);
-      })(showcardSamples[sci], sci);
-    }
-    showcaseInner.appendChild(cardGrid);
-    showcaseSection.appendChild(showcaseInner);
-    screen.appendChild(showcaseSection);
-
-    // ── 8. DARK CTA SECTION ──
-    var darkCta = h("div", { style: "padding:" + (mobile ? "20px" : "40px 64px") + ";background:var(--panel)" });
-    var darkCard = h("div", { style: "background:#0a0915;border-radius:24px;padding:" + (mobile ? "60px 24px" : "100px 40px") + ";text-align:center;position:relative;overflow:hidden;max-width:1200px;margin:0 auto" });
-    darkCard.appendChild(h("div", { style: "position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle, rgba(232,54,109,0.15) 0%, rgba(108,79,224,0.1) 40%, transparent 70%);pointer-events:none" }));
-    darkCard.appendChild(h("h2", { style: "font-size:" + (mobile ? "28px" : "44px") + ";font-weight:800;color:#fff;letter-spacing:-2px;line-height:1.1;margin:0 0 16px;position:relative;z-index:1" }, "They crossed your mind. Let them know."));
-    darkCard.appendChild(h("p", { style: "color:rgba(255,255,255,0.55);font-size:" + (mobile ? "15px" : "18px") + ";line-height:1.6;margin:0 0 40px;position:relative;z-index:1;max-width:440px;margin-left:auto;margin-right:auto" }, "It takes 30 seconds. It\u2019s free. And it\u2019ll make their day."));
-    var darkCtaBtn = h("button", { style: "background:linear-gradient(135deg, #FF6B35, #E8366D);color:#fff;border:none;border-radius:100px;padding:" + (mobile ? "16px 40px" : "20px 52px") + ";font-size:" + (mobile ? "16px" : "18px") + ";font-weight:700;cursor:pointer;position:relative;z-index:1;box-shadow:0 4px 24px rgba(232,54,109,0.3);display:inline-flex;align-items:center;gap:10px", onClick: ctaAction });
-    darkCtaBtn.appendChild(document.createTextNode("Send a Card"));
-    darkCtaBtn.appendChild(h("span", { style: "font-size:20px" }, "\u2192"));
-    darkCard.appendChild(darkCtaBtn);
-    darkCta.appendChild(darkCard);
-    screen.appendChild(darkCta);
-
-    // ── 9. FOOTER ──
-    var footer = h("div", { style: "padding:" + (mobile ? "48px 20px" : "60px 40px") + ";text-align:center;background:var(--panel)" });
-    footer.appendChild(h("span", { style: "font-size:20px;font-weight:800;color:transparent;letter-spacing:-1px;background-image:linear-gradient(135deg, #FF6B35, #E8366D, #6C4FE0, #0EA5A5, #D4960A, #FF6B35);background-size:300% auto;background-clip:text;-webkit-background-clip:text;animation:shimmer 5s linear infinite;display:inline-block;margin-bottom:12px" }, "Sendr"));
-    footer.appendChild(h("p", { style: "color:var(--text4);font-size:13px;margin:0" }, "Free forever. Made with care."));
-    footer.appendChild(h("p", { style: "color:var(--text4);font-size:11px;margin-top:8px" }, "Photos by Pexels"));
-    screen.appendChild(footer);
+    // ── Footer ──
+    var foot = h("footer", { className: "mk-foot" });
+    foot.appendChild(h("div", { className: "mk-foot-word" }, "Sendr"));
+    var fr = h("div", { style: "display:flex;flex-direction:column;gap:6px;text-align:right" });
+    fr.appendChild(h("span", null, "Free cards for every occasion. Made with care."));
+    fr.appendChild(h("span", null, "Some photo cards use images from Pexels."));
+    foot.appendChild(fr);
+    screen.appendChild(foot);
 
     app.appendChild(screen);
     return;
