@@ -402,7 +402,7 @@ body.st-lock { overflow: hidden; }
 .op-flap-in { transform: rotateX(180deg); }
 .op-seal { position: absolute; left: 50%; top: 100%; transform: translate(-50%, -78%) rotate(-4deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; filter: drop-shadow(0 1px 2px rgba(0,0,0,.18)); }
 
-.op-spread { position: absolute; left: 0; perspective: 2000px; transition: transform .9s cubic-bezier(.4,0,.2,1); }
+.op-spread { position: absolute; left: 0; perspective: 1100px; perspective-origin: 50% 40%; transition: transform .9s cubic-bezier(.4,0,.2,1); }
 .op-riser { position: absolute; inset: 0; }
 .op-riser.op-rise { animation: opRise .5s cubic-bezier(.2,.8,.2,1) both; }
 .op-spread.no-anim, .op-spread.no-anim .op-cover { transition: none; }
@@ -412,7 +412,13 @@ body.st-lock { overflow: hidden; }
 .op-cover:focus-visible { outline: 2px solid var(--tomato); outline-offset: 6px; border-radius: 12px; }
 .op-cover .op-face { position: absolute !important; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: translateZ(1px); }
 .op-cover-back { position: absolute; inset: 0; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; background-clip: padding-box; box-shadow: inset -18px 0 28px -14px rgba(34,18,10,0.18), 0 14px 34px rgba(34,18,10,0.16); }
-.op-spread.open .op-cover { transform: rotateY(-180deg); }
+.op-spread.open .op-cover { transform: rotateY(-172deg); }
+.op-shade { position: absolute; inset: 0; pointer-events: none; z-index: 20; border-radius: inherit; transition: opacity .9s cubic-bezier(.4,0,.2,1); }
+.op-shade-front { background: linear-gradient(90deg, rgba(34,18,10,0.28), rgba(34,18,10,0.05)); opacity: 0; }
+.op-shade-back { background: linear-gradient(270deg, rgba(34,18,10,0.22), rgba(34,18,10,0) 60%); opacity: 1; }
+.op-spread.open .op-shade-front { opacity: 1; }
+.op-spread.open .op-shade-back { opacity: .45; }
+.op-spread.no-anim .op-shade { transition: none; }
 .op-page > div, .op-cover .op-face { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
 .op-cover-back { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
 .op-settle { animation: opRise .4s ease both; }
@@ -3344,7 +3350,7 @@ function renderOpening(app, isPreview) {
     scene.appendChild(h("div", { className: "op-layer op-pocket", html: '<svg viewBox="0 0 400 290" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 L200,150 L0,290 Z" fill="' + v + '" stroke="' + dd + '" stroke-width="1.5"/><path d="M400,0 L200,150 L400,290 Z" fill="' + v + '" stroke="' + dd + '" stroke-width="1.5"/><path d="M0,290 L200,118 L400,290 Z" fill="' + shadeHex(v, 0.02) + '" stroke="' + dd + '" stroke-width="1.5"/></svg>' }));
     var flap = h("div", { className: "op-flap", style: "height:" + flapH + "px" });
     flap.appendChild(h("div", { className: "op-flap-face", html: '<svg viewBox="0 0 400 184" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 L400,0 L200,184 Z" fill="' + v + '" stroke="' + dd + '" stroke-width="1.5"/></svg>' }));
-    flap.appendChild(h("div", { className: "op-flap-face op-flap-in", html: '<svg viewBox="0 0 400 184" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 L400,0 L200,184 Z" fill="' + v + '"/><path d="M16,0 L384,0 L200,168 Z" fill="url(#ln-' + state.env.l + ')"/></svg>' }));
+    flap.appendChild(h("div", { className: "op-flap-face op-flap-in", html: '<svg viewBox="0 0 400 184" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><path d="M0,184 L400,184 L200,0 Z" fill="' + v + '"/><path d="M16,184 L384,184 L200,16 Z" fill="url(#ln-' + state.env.l + ')"/></svg>' }));
     var seal = h("div", { className: "op-seal", html: stampSvg(state.env.s, v, envW * 0.12) });
     flap.appendChild(seal);
     scene.appendChild(flap);
@@ -3386,7 +3392,10 @@ function renderOpening(app, isPreview) {
     var face = renderCardSide("front", s, false);
     face.classList.add("op-face");
     cover.appendChild(face);
-    cover.appendChild(h("div", { className: "op-cover-back", style: "border-radius:" + (20 * s) + "px;" + getBgStyle(state.backBg) }));
+    face.appendChild(h("div", { className: "op-shade op-shade-front" }));
+    var backFace = h("div", { className: "op-cover-back", style: "border-radius:" + (20 * s) + "px;" + getBgStyle(state.backBg) });
+    backFace.appendChild(h("div", { className: "op-shade op-shade-back" }));
+    cover.appendChild(backFace);
     book.appendChild(cover);
     var riser = h("div", { className: "op-riser" + (startOpen ? "" : " op-rise") });
     riser.appendChild(book);
