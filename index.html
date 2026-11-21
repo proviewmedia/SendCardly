@@ -15,9 +15,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="Sendr"/>
-<!-- Open Graph: Default (site sharing) -->
-<meta property="og:title" content="A card, just for you"/>
-<meta property="og:description" content="Open it on Sendr. Free cards for every occasion, no app needed."/>
+<!-- Open Graph: the site itself. Card links use /c/, which has its own "You've got a card" preview. -->
+<meta property="og:title" content="Sendr | Say it with a card"/>
+<meta property="og:description" content="Pick a card, write your note and send it by text or link. Free, with no app and no sign-up."/>
 <meta property="og:image" content="https://www.sendrcards.com/og-image.png"/>
 <meta property="og:url" content="https://www.sendrcards.com/"/>
 <meta property="og:image:width" content="1200"/>
@@ -27,8 +27,8 @@
 <meta property="og:locale" content="en_US"/>
 <!-- Twitter: Default (site sharing) -->
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="A card, just for you"/>
-<meta name="twitter:description" content="Open it on Sendr. Free cards for every occasion, no app needed."/>
+<meta name="twitter:title" content="Sendr | Say it with a card"/>
+<meta name="twitter:description" content="Pick a card, write your note and send it by text or link. Free, with no app and no sign-up."/>
 <meta name="twitter:image" content="https://www.sendrcards.com/og-image.png"/>
 <!-- Additional SEO -->
 <meta name="robots" content="index, follow"/>
@@ -568,6 +568,8 @@ var BASE_URL = (function() {
   }
   return "https://www.sendrcards.com/";
 })();
+
+var CARD_LINK_BASE = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? location.origin + "/" : "https://www.sendrcards.com/";
 
 var BG_CATEGORIES = [
   { label: "Gradients", items: [
@@ -6825,7 +6827,8 @@ function renderOpening(app, isPreview) {
 
 // ── Send ──
 function renderSend(app) {
-  function shareUrlNow() { return BASE_URL + "?card=" + encodeCard(buildPayload()); }
+  // Card links go through /c/ so link previews say "You've got a card" instead of describing the site.
+  function shareUrlNow() { return CARD_LINK_BASE + "c/?card=" + encodeCard(buildPayload()); }
   var root = h("div", { className: "sd" });
   var top = h("header", { className: "st-top" });
   var back = h("button", { className: "st-top-btn", onClick: function() { go("#/studio/envelope"); } });
@@ -8105,12 +8108,13 @@ function renderOgArt(app) {
   brand.appendChild(mk);
   brand.appendChild(document.createTextNode("Sendr"));
   left.appendChild(brand);
+  var site = /[?&]og=site(&|$)/.test(location.search);
   var h1 = h("div", { style: "font-size:104px;font-weight:500;letter-spacing:-0.05em;line-height:.94" });
-  h1.appendChild(document.createTextNode("You\u2019ve got"));
+  h1.appendChild(document.createTextNode(site ? "Say it with" : "You\u2019ve got"));
   h1.appendChild(h("br"));
   h1.appendChild(h("span", { style: "color:#E8502F" }, "a card."));
   left.appendChild(h1);
-  left.appendChild(h("div", { style: "font-family:'DM Mono',monospace;font-size:20px;letter-spacing:.16em;text-transform:uppercase;color:#6B5A50;margin-top:36px" }, "Tap to open it"));
+  left.appendChild(h("div", { style: "font-family:'DM Mono',monospace;font-size:20px;letter-spacing:.16em;text-transform:uppercase;color:#6B5A50;margin-top:36px" }, site ? "Free. No app. No sign-up." : "Tap to open it"));
   root.appendChild(left);
   var env = { c: "cream", l: "confetti", s: "heart", k: "cream" };
   var e1 = envelopeBack(env, 330);
@@ -8127,7 +8131,7 @@ function renderOgArt(app) {
   card("i-ty1", 930, 70, 9, 0.6);
   card("i-bd1", 760, 120, -3, 0.78);
   for (var k in keep) state[k] = keep[k];
-  var front = envelopeFront(env, 300, "You");
+  var front = envelopeFront(env, 300, site ? "Someone special" : "You");
   front.style.position = "absolute"; front.style.left = "640px"; front.style.top = "392px"; front.style.transform = "rotate(4deg)";
   root.appendChild(front);
   app.appendChild(root);
