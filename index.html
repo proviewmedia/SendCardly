@@ -6803,11 +6803,15 @@ function renderOpening(app, isPreview) {
       if (animate) { flip.classList.remove("lift"); void flip.offsetWidth; flip.classList.add("lift"); }
       flip.classList.toggle("flipped", showBack);
       state.opPhase = showBack ? "inside" : "card";
-      flip.setAttribute("aria-label", showBack ? "Flip to the front" : "Flip to read the message");
-      var flipBtn = h("button", { className: "mk-pill " + (showBack ? "mk-pill-paper mk-pill-sm" : "mk-pill-ink"), onClick: function() { setSide(!flip.classList.contains("flipped"), true); } });
+      // "Flip to read" shows only until the message has been seen once. After that the
+      // three controls stay put and the flip button just names the other side.
+      if (showBack) state.opRead = true;
+      var first = !state.opRead;
+      flip.setAttribute("aria-label", showBack ? "Flip to the front" : (first ? "Flip to read the message" : "Flip to the back"));
+      var flipBtn = h("button", { className: "mk-pill " + (first ? "mk-pill-ink" : "mk-pill-paper mk-pill-sm"), onClick: function() { setSide(!flip.classList.contains("flipped"), true); } });
       flipBtn.appendChild(icon("rotate", 16));
-      flipBtn.appendChild(h("span", null, showBack ? "See the front" : "Flip to read"));
-      if (!showBack) { setFoot([flipBtn]); return; }
+      flipBtn.appendChild(h("span", null, showBack ? "See the front" : (first ? "Flip to read" : "See the back")));
+      if (first) { setFoot([flipBtn]); return; }
       var replay = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm", onClick: showArrive }, "Replay");
       var last;
       if (isPreview) {
@@ -6862,7 +6866,7 @@ function renderSend(app) {
   tileInner.appendChild(envelopeFront(state.env, 250, state.recipientName));
   tileInner.appendChild(mini);
   tile.appendChild(tileInner);
-  var pv = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm sd-pv", onClick: function() { state.opPhase = "arrive"; go("#/preview"); } });
+  var pv = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm sd-pv", onClick: function() { state.opPhase = "arrive"; state.opRead = false; go("#/preview"); } });
   pv.appendChild(icon("eye", 15));
   pv.appendChild(h("span", null, "Preview what they'll see"));
   tile.appendChild(pv);
@@ -7243,7 +7247,7 @@ function applyRoute() {
   } else if (parts[0] === "preview") {
     ensureStudio();
     state.screen = "preview";
-    state.opPhase = "arrive";
+    state.opPhase = "arrive"; state.opRead = false;
   } else if (!sharedData) {
     state.screen = "marketing";
   }
