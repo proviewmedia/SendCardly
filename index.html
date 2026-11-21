@@ -154,6 +154,7 @@ textarea:focus, input:focus { outline: none; border-color: var(--accent) !import
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
   <filter id="sg-grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="1.8" intercept="-0.35"/><feFuncG type="linear" slope="1.8" intercept="-0.35"/><feFuncB type="linear" slope="1.8" intercept="-0.35"/></feComponentTransfer></filter>
   <filter id="sg-wob" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="turbulence" baseFrequency="0.028" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="sg-paper" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.005 0.04" numOctaves="4" seed="9" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="0.55" intercept="0.6"/><feFuncG type="linear" slope="0.55" intercept="0.6"/><feFuncB type="linear" slope="0.55" intercept="0.6"/></feComponentTransfer></filter>
 </defs></svg>
 <div id="app"></div>
 <script>
@@ -250,7 +251,9 @@ var FONT_CATEGORIES = [
   { label: "Card", items: [
     { id: "fraunces", name: "Fraunces", style: "serif", preview: "Soft and warm" },
     { id: "instrument", name: "Instrument Serif", style: "serif", preview: "Quiet and elegant" },
-    { id: "caprasimo", name: "Caprasimo", style: "serif", preview: "Chunky and joyful" }
+    { id: "caprasimo", name: "Caprasimo", style: "serif", preview: "Chunky and joyful" },
+    { id: "isans", name: "Instrument Sans", style: "sans-serif", preview: "Clean and modern" },
+    { id: "dmmono", name: "DM Mono", style: "monospace", preview: "Quiet typewriter" }
   ]}
 ];
 var ALL_FONTS = FONT_CATEGORIES.flatMap(function(c) { return c.items; });
@@ -399,164 +402,172 @@ var ALL_DESIGNS = CARD_DESIGNS.flatMap(function(c) { return c.items; });
 ALL_DESIGNS.forEach(function(d) { d.legacy = true; });
 
 // ═══ ILLUSTRATED DESIGNS ═══
-// Each art design draws an SVG scene (viewBox 360x480). The headline is real
+// Art direction: modern stationery (Givingli's artist cards are the reference).
+// Flat matte paper with fiber texture, one motif with lots of breathing room,
+// brush ink line, small tracked lettering or type as the artwork.
+// Each art function returns an SVG scene (viewBox 360x480). The headline is real
 // DOM text on top, so people can edit it. Art strings are static code, never
 // built from user input.
-var ART_INK = "#2B1B12";
+var INK = "#1E1712";
 
-function svgCard(paper, body, grain) {
+function paperCard(color, body, tex) {
   return '<svg viewBox="0 0 360 480" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;display:block" aria-hidden="true">' +
-    '<rect width="360" height="480" fill="' + paper + '"/>' + body +
-    '<rect width="360" height="480" fill="#fff" filter="url(#sg-grain)" opacity="' + (grain || 0.22) + '" style="mix-blend-mode:multiply"/></svg>';
+    '<rect width="360" height="480" fill="' + color + '"/>' + body +
+    '<rect width="360" height="480" fill="#fff" filter="url(#sg-paper)" opacity="' + (tex == null ? 0.4 : tex) + '" style="mix-blend-mode:multiply"/>' +
+    '<rect width="360" height="480" fill="#fff" filter="url(#sg-grain)" opacity="0.1" style="mix-blend-mode:multiply"/></svg>';
 }
-// Riso look: flat color fill nudged off the ink outline.
-function riso(shape, fill, dx, dy) {
-  return '<g transform="translate(' + (dx == null ? 4 : dx) + ',' + (dy == null ? 3 : dy) + ')" fill="' + fill + '" stroke="none">' + shape + '</g>' +
-    '<g fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' + shape + '</g>';
+function ink(d, w, color) {
+  return '<path d="' + d + '" fill="none" stroke="' + (color || INK) + '" stroke-width="' + (w || 3) + '" stroke-linecap="round" stroke-linejoin="round"/>';
+}
+function shape(d, fill, stroke, w) {
+  return '<path d="' + d + '" fill="' + fill + '"' + (stroke ? ' stroke="' + stroke + '" stroke-width="' + (w || 3) + '" stroke-linejoin="round"' : '') + '/>';
 }
 function wob(inner) { return '<g filter="url(#sg-wob)">' + inner + '</g>'; }
-function heartPath(cx, cy, s, rot) {
-  return '<path transform="translate(' + cx + ',' + cy + ') rotate(' + (rot || 0) + ') scale(' + s + ')" d="M0,14 C-22,-2 -18,-24 0,-12 C18,-24 22,-2 0,14 Z"/>';
+function heart(cx, cy, s, rot, fill) {
+  return '<path transform="translate(' + cx + ',' + cy + ') rotate(' + (rot || 0) + ') scale(' + s + ')" d="M0,14 C-22,-2 -18,-24 0,-12 C18,-24 22,-2 0,14 Z" fill="' + fill + '"/>';
 }
-function confetti(seed, n, colors, box) {
-  var out = "", x = seed;
-  function rnd() { x = (x * 9301 + 49297) % 233280; return x / 233280; }
-  for (var i = 0; i < n; i++) {
-    var cx = box[0] + rnd() * (box[2] - box[0]), cy = box[1] + rnd() * (box[3] - box[1]);
-    var c = colors[i % colors.length], r = Math.round(rnd() * 180);
-    out += (i % 3 === 0)
-      ? '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="3.2" fill="' + c + '"/>'
-      : '<rect x="' + (cx - 6).toFixed(1) + '" y="' + (cy - 2).toFixed(1) + '" width="12" height="4.5" rx="2" fill="' + c + '" transform="rotate(' + r + ' ' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ')"/>';
+function ring(cx, cy, r0, r1, step, from) {
+  var s = "";
+  for (var a = from || 0; a < 360 + (from || 0); a += step) {
+    var t = a * Math.PI / 180;
+    s += 'M' + (cx + Math.cos(t) * r0).toFixed(1) + ',' + (cy + Math.sin(t) * r0).toFixed(1) + ' L' + (cx + Math.cos(t) * r1).toFixed(1) + ',' + (cy + Math.sin(t) * r1).toFixed(1) + ' ';
   }
-  return out;
+  return s;
+}
+function sparkle(x, y, s, color) {
+  return '<path transform="translate(' + x + ',' + y + ') scale(' + s + ')" d="M0,-10 Q1.2,-1.2 10,0 Q1.2,1.2 0,10 Q-1.2,1.2 -10,0 Q-1.2,-1.2 0,-10 Z" fill="' + (color || INK) + '"/>';
 }
 
 var ART = {
-  cake: function() {
-    var x0 = 92, x1 = 268, y = 318, n = 7, w = (x1 - x0) / n;
-    var icing = "M" + x0 + "," + (y + 4) + " Q" + x0 + "," + (y - 10) + " " + (x0 + 14) + "," + (y - 10) + " L" + (x1 - 14) + "," + (y - 10) + " Q" + x1 + "," + (y - 10) + " " + x1 + "," + (y + 4);
-    for (var i = n; i > 0; i--) {
-      var xa = x0 + i * w, xb = xa - w, dep = y + (i % 2 ? 34 : 18);
-      icing += " Q" + (xa - 1) + "," + dep + " " + ((xa + xb) / 2) + "," + dep + " Q" + (xb + 1) + "," + dep + " " + xb + "," + (y + 4);
-    }
-    icing += " Z";
-    var candles = "", flames = "", cx = [126, 153, 180, 207, 234], cc = ["#E8502F", "#5DA9A1", "#F2B233", "#5DA9A1", "#E8502F"];
-    for (var k = 0; k < cx.length; k++) {
-      candles += riso('<rect x="' + (cx[k] - 5) + '" y="266" width="10" height="44" rx="3"/>', cc[k], 3, 2);
-      flames += riso('<path d="M' + cx[k] + ',236 C' + (cx[k] + 9) + ',248 ' + (cx[k] + 7) + ',258 ' + cx[k] + ',259 C' + (cx[k] - 7) + ',258 ' + (cx[k] - 9) + ',248 ' + cx[k] + ',236 Z"/>', "#F2B233", 2, 2);
-    }
-    return svgCard("#F8E7C6",
-      confetti(7, 26, ["#E8502F", "#F49AB0", "#5DA9A1", "#F2B233"], [20, 200, 340, 260]) +
-      confetti(11, 10, ["#E8502F", "#F49AB0", "#5DA9A1"], [20, 300, 80, 440]) +
-      confetti(19, 10, ["#F2B233", "#F49AB0", "#5DA9A1"], [282, 300, 340, 440]) +
-      wob(
-        riso('<ellipse cx="180" cy="420" rx="128" ry="15"/>', "#FFFFFF", 3, 3) +
-        riso('<rect x="92" y="316" width="176" height="100" rx="10"/>', "#F49AB0", 5, 4) +
-        '<path d="M96,372 Q118,362 140,372 T184,372 T228,372 T266,372" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
-        riso('<path d="' + icing + '"/>', "#FFF6E6", 3, 3) +
-        candles + flames
-      ));
-  },
-  tulips: function() {
-    function tulip(x, y, c, rot) {
-      return riso('<path transform="translate(' + x + ',' + y + ') rotate(' + rot + ')" d="M-19,0 Q-22,-32 -9,-38 L0,-24 L9,-38 Q22,-32 19,0 Q0,13 -19,0 Z"/>', c, 4, 3);
-    }
-    function stem(x1, y1) { return '<path d="M180,448 Q' + ((180 + x1) / 2) + ',' + ((448 + y1) / 2 + 20) + ' ' + x1 + ',' + y1 + '"/>'; }
-    var stems = '<g fill="none" stroke="#3F6B4A" stroke-width="3.5" stroke-linecap="round">' +
-      stem(126, 262) + stem(166, 236) + stem(206, 244) + stem(240, 274) + stem(148, 292) + stem(214, 296) + '</g>';
-    var leaves = riso('<path d="M150,380 Q104,350 96,300 Q140,322 160,370 Z"/>', "#7FA06B", 4, 3) +
-      riso('<path d="M210,380 Q258,352 266,302 Q222,324 200,370 Z"/>', "#7FA06B", 4, 3);
-    return svgCard("#DDE6D3",
-      '<g transform="translate(0,22)">' + wob(stems + leaves +
-        tulip(126, 262, "#E8502F", -14) + tulip(166, 236, "#F2A0A8", -4) + tulip(206, 244, "#F2B233", 8) +
-        tulip(240, 274, "#F2A0A8", 16) + tulip(148, 292, "#F2B233", -8) + tulip(214, 296, "#E8502F", 6) +
-        riso('<path d="M112,352 L248,352 L196,474 L164,474 Z"/>', "#E2B482", 5, 3) +
-        '<path d="M150,384 Q180,398 210,384" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
-        riso('<path d="M180,392 Q160,372 150,392 Q160,404 180,392 Q200,372 210,392 Q200,404 180,392 Z"/>', "#E8502F", 2, 2)
-      ) + '</g>');
-  },
-  hearts: function() {
-    var list = [[52, 64, 1.5, -18, "#D7263D"], [150, 40, 0.9, 10, "#F49AB0"], [300, 70, 1.9, 14, "#E8502F"], [236, 128, 0.8, -6, "#D7263D"],
-      [40, 170, 0.9, 22, "#F49AB0"], [320, 196, 1.1, -12, "#F49AB0"], [90, 128, 0.7, 8, "#E8502F"],
-      [62, 330, 1.2, -10, "#E8502F"], [312, 320, 1.6, 18, "#D7263D"], [130, 420, 2.1, 8, "#D7263D"], [258, 412, 1.0, -16, "#F49AB0"],
-      [200, 360, 0.7, 12, "#F49AB0"], [40, 436, 0.8, -20, "#F49AB0"], [330, 450, 0.8, 6, "#E8502F"]];
-    var out = "";
-    for (var i = 0; i < list.length; i++) out += riso(heartPath(list[i][0], list[i][1], list[i][2], list[i][3]), list[i][4], 4, 3);
-    return svgCard("#F8D8D0", wob(out));
-  },
-  sun: function() {
-    var rays = "";
-    for (var a = -168; a <= -12; a += 13) {
-      var r = a * Math.PI / 180;
-      rays += '<line x1="' + (180 + Math.cos(r) * 104).toFixed(1) + '" y1="' + (318 + Math.sin(r) * 104).toFixed(1) + '" x2="' + (180 + Math.cos(r) * 134).toFixed(1) + '" y2="' + (318 + Math.sin(r) * 134).toFixed(1) + '"/>';
-    }
-    return svgCard("#F4EADB", wob(
-      '<g stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round">' + rays + '</g>' +
-      riso('<circle cx="180" cy="318" r="88"/>', "#F2B233", 5, 4) +
-      '<g fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"><path d="M148,300 Q156,292 164,300"/><path d="M196,300 Q204,292 212,300"/><path d="M160,326 Q180,344 200,326"/></g>' +
-      '<circle cx="146" cy="318" r="7" fill="#F49AB0"/><circle cx="214" cy="318" r="7" fill="#F49AB0"/>' +
-      riso('<path d="M-10,392 Q70,344 150,384 T370,370 L370,490 L-10,490 Z"/>', "#E9805E", 4, 3) +
-      riso('<path d="M-10,424 Q90,388 190,420 T370,404 L370,490 L-10,490 Z"/>', "#7FA06B", 4, 3) +
-      riso('<path d="M-10,452 Q120,428 230,452 T370,446 L370,490 L-10,490 Z"/>', "#2E5E4E", 4, 3)
+  partyHat: function() {
+    var tri = "M180,136 L254,352 Q180,378 106,352 Z", stripes = "";
+    for (var i = -7; i < 8; i++) stripes += '<path d="M' + (40 + i * 36) + ',430 L' + (190 + i * 36) + ',110 L' + (208 + i * 36) + ',110 L' + (58 + i * 36) + ',430 Z" fill="#F4A9BC"/>';
+    return paperCard("#E4563B", '<defs><clipPath id="ac-hat"><path d="' + tri + '"/></clipPath></defs>' + wob(
+      shape(tri, "#F6EBDD") + '<g clip-path="url(#ac-hat)">' + stripes + '</g>' + ink(tri, 3.5) +
+      '<circle cx="180" cy="122" r="17" fill="#F6EBDD"/>' + ink(ring(180, 122, 15, 29, 30, 8), 5, "#F6EBDD") +
+      '<circle cx="70" cy="110" r="4" fill="#F6EBDD"/><circle cx="292" cy="92" r="3" fill="#F6EBDD"/><circle cx="300" cy="236" r="4" fill="#F6EBDD"/><circle cx="58" cy="262" r="3" fill="#F6EBDD"/>'
     ));
   },
-  fireworks: function() {
-    function burst(cx, cy, r, n, c) {
-      var s = "";
-      for (var i = 0; i < n; i++) {
-        var a = (i / n) * Math.PI * 2;
-        s += '<line x1="' + (cx + Math.cos(a) * r * 0.32).toFixed(1) + '" y1="' + (cy + Math.sin(a) * r * 0.32).toFixed(1) + '" x2="' + (cx + Math.cos(a) * r).toFixed(1) + '" y2="' + (cy + Math.sin(a) * r).toFixed(1) + '"/>' +
-          '<circle cx="' + (cx + Math.cos(a) * (r + 9)).toFixed(1) + '" cy="' + (cy + Math.sin(a) * (r + 9)).toFixed(1) + '" r="3" fill="' + c + '" stroke="none"/>';
+  balloon: function() {
+    var b = "M180,108 C238,108 262,156 258,200 C254,252 214,290 180,294 C146,290 106,252 102,200 C98,156 122,108 180,108 Z";
+    return paperCard("#6E7746", wob(
+      ink("M180,302 C158,332 204,352 182,384 C162,412 200,430 184,470", 2.5, "#F3E7D3") +
+      shape(b, "#F2A7C3") + shape("M171,292 L189,292 L185,304 L175,304 Z", "#DF86A8") +
+      ink("M134,178 Q138,146 164,132", 6, "#FBE6EE")
+    ), 0.5);
+  },
+  bdayType: function() {
+    var c = "", xs = [140, 180, 220], cols = ["#F2A7C3", "#8DB7D9", "#EDB834"];
+    for (var i = 0; i < 3; i++) {
+      c += shape("M" + (xs[i] - 8) + ",84 L" + (xs[i] + 8) + ",84 L" + (xs[i] + 8) + ",140 L" + (xs[i] - 8) + ",140 Z", cols[i], INK, 2.5) +
+        ink("M" + xs[i] + ",84 L" + xs[i] + ",76", 2) +
+        shape("M" + xs[i] + ",44 C" + (xs[i] + 12) + ",58 " + (xs[i] + 9) + ",72 " + xs[i] + ",72 C" + (xs[i] - 9) + ",72 " + (xs[i] - 12) + ",58 " + xs[i] + ",44 Z", "#E4563B");
+    }
+    return paperCard("#F3EADB", wob(c + sparkle(58, 404, 1.1) + sparkle(304, 416, 0.8) + sparkle(290, 380, 0.5) + sparkle(76, 440, 0.6)));
+  },
+  cherries: function() {
+    return paperCard("#F3C4CC", wob(
+      ink("M150,258 C150,206 170,170 198,150", 3) + ink("M218,276 C218,226 210,180 198,150", 3) +
+      shape("M198,150 C222,118 266,122 280,138 C252,162 216,164 198,150 Z", "#4E7A3A", INK, 2.5) + ink("M204,148 Q240,138 270,138", 2) +
+      '<circle cx="148" cy="298" r="42" fill="#D42A2F" stroke="' + INK + '" stroke-width="3"/>' +
+      '<circle cx="220" cy="316" r="42" fill="#D42A2F" stroke="' + INK + '" stroke-width="3"/>' +
+      ink("M124,282 Q130,266 144,262", 5, "#F6C9CC") + ink("M196,300 Q202,284 216,280", 5, "#F6C9CC")
+    ));
+  },
+  loveLots: function() {
+    return paperCard("#2C56C9", wob(
+      heart(56, 62, 1.1, -14, "#E8533A") + heart(304, 70, 0.8, 12, "#F3A6BE") + heart(64, 420, 0.8, 10, "#F3A6BE") + heart(300, 414, 1.2, -10, "#E8533A") +
+      '<circle cx="110" cy="40" r="3" fill="#FBEFE3"/><circle cx="252" cy="440" r="3" fill="#FBEFE3"/><circle cx="330" cy="240" r="3" fill="#FBEFE3"/><circle cx="30" cy="236" r="3" fill="#FBEFE3"/>'
+    ), 0.45);
+  },
+  daisies: function() {
+    function daisy(cx, cy, r) {
+      var p = "";
+      for (var a = 0; a < 360; a += 36) {
+        p += '<ellipse cx="' + cx + '" cy="' + (cy - r * 0.62) + '" rx="' + (r * 0.24) + '" ry="' + (r * 0.5) + '" transform="rotate(' + a + ' ' + cx + ' ' + cy + ')" fill="#FBF7EF" stroke="' + INK + '" stroke-width="2.2"/>';
       }
-      return '<g stroke="' + c + '" stroke-width="4" stroke-linecap="round">' + s + '</g>';
+      return p + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.28) + '" fill="#EDB834" stroke="' + INK + '" stroke-width="2.2"/>';
     }
-    function star(x, y, s) { return '<path transform="translate(' + x + ',' + y + ') scale(' + s + ')" d="M0,-10 Q1.5,-1.5 10,0 Q1.5,1.5 0,10 Q-1.5,1.5 -10,0 Q-1.5,-1.5 0,-10 Z" fill="#F8E7C6"/>'; }
-    return svgCard("#1C2747", wob(
-      burst(108, 120, 66, 16, "#F2B233") + burst(262, 176, 58, 14, "#F49AB0") + burst(160, 262, 44, 12, "#E8502F") + burst(290, 300, 26, 10, "#F2B233") +
-      star(46, 236, 1) + star(316, 70, 0.8) + star(220, 72, 0.6) + star(60, 330, 0.7) + star(236, 330, 0.9)
-    ), 0.28);
+    return paperCard("#EFE5D3", wob(
+      ink("M128,238 C140,300 166,350 180,392", 2.5) + ink("M184,196 C182,280 182,340 180,392", 2.5) + ink("M238,250 C224,310 196,360 180,392", 2.5) +
+      ink("M180,392 L170,452 M180,392 L188,454 M180,392 L180,456", 2.5) +
+      shape("M156,316 C140,296 140,280 150,276 C160,290 164,304 160,318 Z", "#7E9A63", INK, 2) +
+      shape("M204,326 C222,308 228,292 220,286 C206,298 200,312 204,328 Z", "#7E9A63", INK, 2) +
+      daisy(128, 238, 46) + daisy(238, 250, 42) + daisy(184, 196, 50) +
+      shape("M180,394 C160,376 144,384 150,398 C156,410 172,402 180,394 C188,402 204,410 210,398 C216,384 200,376 180,394 Z", "#E4563B", INK, 2.2) +
+      ink("M176,398 L164,426 M184,398 L196,426", 2.2)
+    ));
   },
-  envelope: function() {
-    return svgCard("#D5E3EC",
-      '<g transform="rotate(-8 180 318)">' + wob(
-        riso('<rect x="64" y="236" width="232" height="152" rx="6"/>', "#FBF6EC", 5, 4) +
-        '<path d="M68,240 L180,326 L292,240" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linejoin="round"/>' +
-        '<path d="M68,384 L150,312 M292,384 L210,312" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
-        riso('<rect x="236" y="250" width="46" height="56" rx="2"/>', "#E8502F", 3, 3) +
-        '<rect x="232" y="246" width="54" height="64" fill="none" stroke="' + ART_INK + '" stroke-width="2" stroke-dasharray="3 4"/>' +
-        heartPath(259, 278, 0.7, 0).replace('<path ', '<path fill="#FBF6EC" ') +
-        '<g fill="none" stroke="#3E5C7A" stroke-width="2.5" stroke-linecap="round"><circle cx="214" cy="272" r="22" stroke-dasharray="5 5"/><path d="M168,262 Q178,256 188,262 T208,262 M164,276 Q174,270 184,276 T204,276 M168,290 Q178,284 188,290 T208,290"/></g>' +
-        '<g stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round" opacity=".55"><path d="M96,350 L176,350 M96,366 L150,366"/></g>'
-      ) + '</g>' +
-      riso(heartPath(80, 160, 0.8, -16), "#E8502F", 3, 2) + riso(heartPath(292, 430, 0.6, 14), "#F49AB0", 3, 2));
+  twoCups: function() {
+    return paperCard("#BCD6E8", wob(
+      ink("M36,372 L324,372", 3) +
+      shape("M94,272 L172,272 L166,360 Q164,370 154,370 L112,370 Q102,370 100,360 Z", "#F7EFE2", INK, 3) +
+      ink("M98,292 C70,292 70,338 102,336", 3) +
+      shape("M188,272 L266,272 L260,360 Q258,370 248,370 L206,370 Q196,370 194,360 Z", "#E4563B", INK, 3) +
+      ink("M262,292 C292,292 292,338 258,336", 3) +
+      ink("M122,250 C112,234 132,222 122,204 M144,250 C134,234 154,222 144,204", 2.5) +
+      ink("M216,250 C206,234 226,222 216,204 M238,250 C228,234 248,222 238,204", 2.5) +
+      heart(180, 176, 0.75, 0, "#E4563B")
+    ));
   },
-  branch: function() {
-    var leaves = "", pts = [[118, 400, -60], [140, 368, 30], [150, 340, -70], [176, 314, 20], [184, 284, -64], [210, 262, 26], [216, 232, -58], [242, 214, 30], [250, 186, -50], [272, 168, 34]];
-    for (var i = 0; i < pts.length; i++) {
-      leaves += riso('<path transform="translate(' + pts[i][0] + ',' + pts[i][1] + ') rotate(' + pts[i][2] + ')" d="M0,0 Q22,-16 52,0 Q22,16 0,0 Z"/>', i % 3 === 0 ? "#8FA67E" : "#B5C3A3", 3, 3);
+  coupe: function() {
+    var bub = [[160, 176, 5], [196, 160, 4], [176, 140, 6], [214, 124, 4], [150, 112, 4], [190, 94, 5], [228, 82, 3], [168, 70, 3], [124, 150, 3], [240, 160, 3]], b = "";
+    for (var i = 0; i < bub.length; i++) b += '<circle cx="' + bub[i][0] + '" cy="' + bub[i][1] + '" r="' + bub[i][2] + '" fill="none" stroke="#F6EBDD" stroke-width="2"/>';
+    return paperCard("#5A1E2A", wob(
+      b +
+      shape("M100,200 L260,200 Q252,258 180,262 Q108,258 100,200 Z", "#E9B949", "#F6EBDD", 3) +
+      ink("M100,200 Q180,218 260,200", 2.5, "#F6EBDD") +
+      ink("M180,262 L180,360", 3.5, "#F6EBDD") +
+      shape("M134,370 Q180,350 226,370 Q180,380 134,370 Z", "#F6EBDD", "#F6EBDD", 2.5)
+    ), 0.5);
+  },
+  stamp: function() {
+    var x0 = 108, y0 = 146, x1 = 252, y1 = 354, holes = "";
+    for (var x = x0; x <= x1; x += 16) holes += '<circle cx="' + x + '" cy="' + y0 + '" r="6"/><circle cx="' + x + '" cy="' + y1 + '" r="6"/>';
+    for (var y = y0 + 16; y < y1; y += 16) holes += '<circle cx="' + x0 + '" cy="' + y + '" r="6"/><circle cx="' + x1 + '" cy="' + y + '" r="6"/>';
+    return paperCard("#F1DC9A", wob(
+      '<g transform="rotate(-6 180 250)">' +
+        '<rect x="' + x0 + '" y="' + y0 + '" width="' + (x1 - x0) + '" height="' + (y1 - y0) + '" fill="#FBF6EA"/>' +
+        '<g fill="#F1DC9A">' + holes + '</g>' +
+        '<rect x="128" y="166" width="104" height="168" fill="#8FB8D8"/>' +
+        shape("M146,236 C140,222 160,212 170,222 C176,206 202,208 204,224 C220,222 222,242 208,244 L150,244 C140,244 138,236 146,236 Z", "#FBF6EA") +
+        ink("M150,312 C170,296 186,300 196,286", 2, INK).replace('/>', ' stroke-dasharray="4 6"/>') +
+        shape("M196,286 L230,262 L214,296 L208,284 Z", "#E4563B", INK, 2) + ink("M208,284 L230,262", 2) +
+      '</g>' +
+      '<g fill="none" stroke="' + INK + '" stroke-width="2.2" opacity=".7"><circle cx="262" cy="176" r="34" stroke-dasharray="6 5"/><path d="M200,166 Q214,158 228,166 T256,166 T284,166 T312,166 M196,186 Q210,178 224,186 T252,186 T280,186 T308,186"/></g>'
+    ));
+  },
+  anemone: function() {
+    var petals = "", dots = "";
+    for (var a = -90; a < 270; a += 72) {
+      var t = a * Math.PI / 180;
+      petals += '<circle cx="' + (180 + Math.cos(t) * 30).toFixed(1) + '" cy="' + (220 + Math.sin(t) * 30).toFixed(1) + '" r="34" fill="#FAF6EE" stroke="' + INK + '" stroke-width="2"/>';
     }
-    var sprig = '<path d="M60,470 Q84,420 74,360" fill="none" stroke="#5B6B4E" stroke-width="3" stroke-linecap="round"/>' +
-      riso('<path transform="translate(76,420) rotate(-130)" d="M0,0 Q18,-13 42,0 Q18,13 0,0 Z"/>', "#B5C3A3", 3, 3) +
-      riso('<path transform="translate(80,392) rotate(-40)" d="M0,0 Q18,-13 42,0 Q18,13 0,0 Z"/>', "#8FA67E", 3, 3) +
-      riso('<path transform="translate(75,364) rotate(-100)" d="M0,0 Q18,-13 42,0 Q18,13 0,0 Z"/>', "#B5C3A3", 3, 3);
-    return svgCard("#EDE8DF", wob(
-      sprig + '<path d="M86,452 Q150,360 196,280 T284,150" fill="none" stroke="#5B6B4E" stroke-width="3.5" stroke-linecap="round"/>' + leaves +
-      '<ellipse cx="164" cy="330" rx="6" ry="8" fill="#4A5A3E"/><ellipse cx="228" cy="236" rx="6" ry="8" fill="#4A5A3E"/>'
-    ), 0.2);
-  },
-  wreath: function() {
-    var s = "", berries = "";
-    for (var a = 0; a < 360; a += 10) {
-      var r = a * Math.PI / 180, x = 180 + Math.cos(r) * 124, y = 236 + Math.sin(r) * 124;
-      var r2 = (a + 5) * Math.PI / 180, x2 = 180 + Math.cos(r2) * 108, y2 = 236 + Math.sin(r2) * 108;
-      var rot = a + 90 + (a % 20 ? 30 : -30);
-      s += '<path transform="translate(' + x2.toFixed(1) + ',' + y2.toFixed(1) + ') rotate(' + (a + 95 - 30) + ') scale(1.1)" d="M-15,0 Q0,-9 15,0 Q0,9 -15,0 Z" fill="#3F6E48"/>';
-      s += '<path transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') rotate(' + rot + ') scale(1.35)" d="M-15,0 Q0,-9 15,0 Q0,9 -15,0 Z" fill="' + (a % 20 ? "#6E9B6A" : "#A3C49A") + '"/>';
-      if (a % 40 === 0 && (a < 50 || a > 130)) berries += '<circle cx="' + (x + 7).toFixed(1) + '" cy="' + (y - 5).toFixed(1) + '" r="5.5" fill="#E8502F"/><circle cx="' + (x - 4).toFixed(1) + '" cy="' + (y + 6).toFixed(1) + '" r="4.5" fill="#E8502F"/>';
+    for (var b = 0; b < 360; b += 30) {
+      var u = b * Math.PI / 180;
+      dots += '<circle cx="' + (180 + Math.cos(u) * 22).toFixed(1) + '" cy="' + (220 + Math.sin(u) * 22).toFixed(1) + '" r="2.2" fill="' + INK + '"/>';
     }
-    var bow = riso('<path d="M180,344 Q150,320 138,340 Q150,362 180,344 Q210,320 222,340 Q210,362 180,344 Z M174,348 L160,386 M186,348 L200,386"/>', "#E8502F", 3, 2)
-      .replace(/stroke="#2B1B12"/g, 'stroke="#F8E7C6"');
-    return svgCard("#1F3D2F", wob(s + berries + '<g transform="translate(0,22) scale(1.15)" transform-origin="180 344">' + bow + '</g>'), 0.3);
+    return paperCard("#D8D2C6", wob(
+      ink("M180,470 C176,396 188,330 180,256", 3, "#4C5A44") +
+      shape("M182,384 C200,350 236,340 252,346 C238,374 206,388 182,384 Z", "#8C9A7C", "#4C5A44", 2) +
+      shape("M178,420 C160,392 128,386 114,392 C128,418 156,428 178,420 Z", "#8C9A7C", "#4C5A44", 2) +
+      petals + '<circle cx="180" cy="220" r="14" fill="#2A2622"/>' + dots
+    ));
+  },
+  ornament: function() {
+    return paperCard("#22432E", '<defs><clipPath id="ac-orn"><circle cx="180" cy="262" r="78"/></clipPath></defs>' + wob(
+      ink("M180,-4 L180,170", 2, "#F6EBDD") + ink("M172,172 C172,156 188,156 188,172", 2.5, "#F6EBDD") +
+      '<circle cx="180" cy="262" r="78" fill="#E4563B"/>' +
+      '<g clip-path="url(#ac-orn)">' + ink("M96,242 Q138,222 180,242 T264,242", 7, "#F6EBDD") + ink("M96,282 Q138,302 180,282 T264,282", 7, "#F6EBDD") +
+      '</g>' +
+      shape("M164,170 L196,170 L198,190 L162,190 Z", "#E9B949") +
+      ink("M128,226 Q138,206 156,198", 5, "#F49A84")
+    ), 0.5);
+  },
+  snapshot: function() {
+    return paperCard("#F3EADB", wob(
+      sparkle(46, 60, 0.9) + sparkle(318, 380, 0.7) + sparkle(36, 380, 0.6) + sparkle(304, 404, 0.4)
+    ));
   }
 };
 
@@ -565,8 +576,7 @@ var ART = {
 var ART_OVER = {
   tape: function() {
     return '<svg viewBox="0 0 360 480" width="100%" height="100%" style="position:absolute;inset:0;pointer-events:none;z-index:6" aria-hidden="true">' +
-      '<rect x="124" y="92" width="76" height="26" fill="#F2B233" opacity=".78" transform="rotate(-12 162 105)"/>' +
-      '<rect x="196" y="330" width="80" height="26" fill="#F49AB0" opacity=".8" transform="rotate(14 236 343)"/></svg>';
+      '<rect x="140" y="38" width="84" height="28" fill="#D8C49E" opacity=".75" transform="rotate(-5 182 52)"/></svg>';
   }
 };
 
@@ -581,20 +591,22 @@ var OCCASIONS = [
   { id: "holiday", label: "Holidays" }
 ];
 
+// Headline fields: font, size (px at scale 1), ink, pos (top|bottom|center),
+// optional italic, caps, track (em), lh (line height).
 var ART_DESIGNS = [
-  { id: "i-bd1", occasion: "birthday", label: "Five candles", art: "cake", headline: "Happy\nbirthday", font: "caprasimo", ink: "#D9472B", size: 54, pos: "top" },
-  { id: "i-bd2", occasion: "birthday", label: "Snapshot", art: "snapshotBg", over: "tape", slot: { x: 0.17, y: 0.2, w: 0.66, h: 0.56, rot: -4, frame: "polaroid" }, headline: "Happy birthday", font: "caveat", ink: "#2B1B12", size: 46, pos: "bottom" },
-  { id: "i-ty1", occasion: "thanks", label: "Tulips", art: "tulips", headline: "Thank\nyou", font: "instrument", italic: true, ink: "#1F3B2C", size: 80, pos: "top" },
-  { id: "i-lv1", occasion: "love", label: "Hearts", art: "hearts", headline: "You\n& me", font: "fraunces", italic: true, ink: "#8E1B2C", size: 72, pos: "center" },
-  { id: "i-jb1", occasion: "just", label: "Sunny", art: "sun", headline: "Thinking\nof you", font: "fraunces", ink: "#2B1B12", size: 50, pos: "top" },
-  { id: "i-cg1", occasion: "congrats", label: "Fireworks", art: "fireworks", headline: "Congrats!", font: "caprasimo", ink: "#F8E7C6", size: 60, pos: "bottom" },
-  { id: "i-my1", occasion: "miss", label: "Airmail", art: "envelope", headline: "Miss\nyou", font: "caveat", ink: "#1F2F4A", size: 92, pos: "top" },
-  { id: "i-sy1", occasion: "sympathy", label: "Olive branch", art: "branch", headline: "Holding you\nclose", font: "instrument", ink: "#3B3A36", size: 50, pos: "top" },
-  { id: "i-hd1", occasion: "holiday", label: "Wreath", art: "wreath", headline: "Happy\nholidays", font: "instrument", italic: true, ink: "#F8E7C6", size: 54, pos: "center", centerY: 0.49 }
+  { id: "i-bd1", occasion: "birthday", label: "Party hat", art: "partyHat", headline: "It's your day", font: "isans", caps: true, track: 0.24, ink: "#F6EBDD", size: 15, pos: "bottom" },
+  { id: "i-bd2", occasion: "birthday", label: "Big day", art: "bdayType", headline: "Happy\nbirthday", font: "caprasimo", ink: "#E4563B", size: 66, pos: "center", centerY: 0.53, lh: 0.92 },
+  { id: "i-bd3", occasion: "birthday", label: "One balloon", art: "balloon", headline: "Happy birthday", font: "dmmono", caps: true, track: 0.3, ink: "#F3E7D3", size: 13, pos: "top" },
+  { id: "i-bd4", occasion: "birthday", label: "Snapshot", art: "snapshot", over: "tape", slot: { x: 0.15, y: 0.11, w: 0.7, h: 0.6, rot: -3, frame: "print" }, headline: "Happy birthday", font: "caveat", ink: "#E4563B", size: 44, pos: "bottom" },
+  { id: "i-ty1", occasion: "thanks", label: "Daisies", art: "daisies", headline: "Thank you", font: "caveat", ink: INK, size: 56, pos: "top" },
+  { id: "i-lv1", occasion: "love", label: "Cherries", art: "cherries", headline: "You & me", font: "instrument", italic: true, caps: true, track: 0.06, ink: INK, size: 24, pos: "bottom" },
+  { id: "i-lv2", occasion: "love", label: "Love you lots", art: "loveLots", headline: "Love\nyou\nlots", font: "caprasimo", ink: "#FBEFE3", size: 96, pos: "center", lh: 0.86 },
+  { id: "i-jb1", occasion: "just", label: "Coffee for two", art: "twoCups", headline: "Thinking of you", font: "isans", caps: true, track: 0.24, ink: INK, size: 14, pos: "bottom" },
+  { id: "i-cg1", occasion: "congrats", label: "Coupe", art: "coupe", headline: "Cheers to you", font: "dmmono", caps: true, track: 0.3, ink: "#F4B6C8", size: 13, pos: "bottom" },
+  { id: "i-my1", occasion: "miss", label: "Postage", art: "stamp", headline: "Wish you were here", font: "isans", caps: true, track: 0.22, ink: INK, size: 13, pos: "bottom" },
+  { id: "i-sy1", occasion: "sympathy", label: "Anemone", art: "anemone", headline: "Thinking of you", font: "instrument", italic: true, ink: "#3B3A36", size: 32, pos: "top" },
+  { id: "i-hd1", occasion: "holiday", label: "Ornament", art: "ornament", headline: "Merry everything", font: "dmmono", caps: true, track: 0.3, ink: "#F6EBDD", size: 13, pos: "bottom" }
 ];
-ART.snapshotBg = function() {
-  return svgCard("#F3E1E6", confetti(3, 34, ["#E8502F", "#F2B233", "#5DA9A1", "#F49AB0"], [14, 14, 346, 466]));
-};
 ALL_DESIGNS = ALL_DESIGNS.concat(ART_DESIGNS);
 
 function findDesign(id) {
@@ -984,7 +996,7 @@ function updateCharCounter() {
 
 // ── CARD RENDERER ──
 
-var FONT_WEIGHT = { caprasimo: 400, fraunces: 600, instrument: 400, caveat: 700, dancing: 700, abril: 400, righteous: 400 };
+var FONT_WEIGHT = { isans: 500, dmmono: 500, caprasimo: 400, fraunces: 600, instrument: 400, caveat: 700, dancing: 700, abril: 400, righteous: 400 };
 
 function fontFamilyFor(id) {
   var f = ALL_FONTS.find(function(x) { return x.id === id; }) || ALL_FONTS[0];
@@ -1020,7 +1032,7 @@ function renderArtFront(card, d, scale) {
   if (text) {
     var fontId = state.frontHeadFont || d.font;
     var posCss = d.pos === "bottom" ? "bottom:7%;" : d.pos === "center" ? "top:" + ((d.centerY || 0.5) * 100) + "%;transform:translateY(-50%);" : "top:7%;";
-    card.appendChild(h("p", { style: "position:absolute;left:7%;right:7%;" + posCss + "margin:0;z-index:7;text-align:center;white-space:pre-line;text-wrap:balance;overflow-wrap:break-word;line-height:0.95;letter-spacing:-0.01em;" +
+    card.appendChild(h("p", { style: "position:absolute;left:7%;right:7%;" + posCss + "margin:0;z-index:7;text-align:center;white-space:pre-line;text-wrap:balance;overflow-wrap:break-word;line-height:" + (d.lh || (d.caps ? 1.3 : 0.95)) + ";letter-spacing:" + (d.track != null ? d.track + "em" : "-0.01em") + ";" + (d.caps ? "text-transform:uppercase;" : "") +
       "font-family:" + fontFamilyFor(fontId) + ";font-weight:" + (FONT_WEIGHT[fontId] || 600) + ";font-style:" + (d.italic && fontId === d.font ? "italic" : "normal") + ";" +
       "font-size:" + (d.size * scale * (state.frontFontSize || 1)) + "px;color:" + (state.frontInk || d.ink) }, text));
   }
@@ -1057,7 +1069,7 @@ function icon(name, size, strokeWidth) {
 }
 
 function renderCardSide(side, size, interactive) {
-  var scaleMap = { small: 0.48, preview: 0.82, mobile: Math.min((window.innerWidth - 40) / 360, 0.85), previewMobile: Math.min((window.innerWidth - 40) / 360, (window.innerHeight - 180) / 480, 0.82), reveal: 0.88, normal: 1.15 };
+  var scaleMap = { thumb: 0.7, small: 0.48, preview: 0.82, mobile: Math.min((window.innerWidth - 40) / 360, 0.85), previewMobile: Math.min((window.innerWidth - 40) / 360, (window.innerHeight - 180) / 480, 0.82), reveal: 0.88, normal: 1.15 };
   var scale = scaleMap[size] || 1;
   var cardWidth = 360 * scale;
   var cardHeight = 480 * scale;
@@ -1072,7 +1084,11 @@ function renderCardSide(side, size, interactive) {
   var isTypographic = layout.id === "typographic";
   var layoutConfig = LAYOUT_MAP[layout.id] || LAYOUT_MAP["centered"];
 
-  var card = h("div", { style: "width:" + cardWidth + "px;height:" + cardHeight + "px;border-radius:" + (20 * scale) + "px;overflow:hidden;position:relative;flex-shrink:0;box-shadow:0 8px 32px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06);" + getBgStyle(bg) });
+  var isArt = side === "front" && state.frontDesign && state.frontDesign.art;
+  var cardChrome = isArt
+    ? "border-radius:" + (3 * scale) + "px;box-shadow:0 1px 2px rgba(30,23,18,0.08), 0 10px 28px rgba(30,23,18,0.08);"
+    : "border-radius:" + (20 * scale) + "px;box-shadow:0 8px 32px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06);";
+  var card = h("div", { style: "width:" + cardWidth + "px;height:" + cardHeight + "px;" + cardChrome + "overflow:hidden;position:relative;flex-shrink:0;" + getBgStyle(bg) });
   if (interactive) card.id = "cardZone";
 
   if (side === "front") {
@@ -1803,6 +1819,9 @@ function render() {
   app.innerHTML = "";
   var mobile = isMobile();
 
+  // ═══ DESIGN GALLERY (review page, ?designs) ═══
+  if (state.screen === "designs") { renderDesignGallery(app); return; }
+
   // ═══ MARKETING PAGE ═══
   if (state.screen === "marketing") {
     var mobile = isMobile();
@@ -2488,7 +2507,43 @@ function render() {
 }
 
 
+// Review page listing every illustrated design. Renders each design through
+// the real card renderer by swapping the front fields in and out of state.
+function renderDesignGallery(app) {
+  var keys = ["frontDesign", "frontText", "frontPhoto", "frontHeadFont", "frontInk", "frontFontSize", "frontStickers"];
+  var saved = {};
+  keys.forEach(function(k) { saved[k] = state[k]; });
+  var page = h("div", { style: "min-height:100vh;background:#fff;font-family:'Instrument Sans',sans-serif;color:#22120A" });
+  var head = h("div", { style: "background:#F1EBE1;padding:56px 24px 48px;text-align:center" });
+  head.appendChild(h("div", { style: "font-family:'DM Mono',monospace;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#6B5A50" }, "Design review"));
+  head.appendChild(h("h1", { style: "font-weight:500;font-size:clamp(48px,8vw,104px);letter-spacing:-0.045em;line-height:1;margin:16px 0 0" }, "Sendr cards"));
+  page.appendChild(head);
+  var occLabel = {};
+  OCCASIONS.forEach(function(oc) { occLabel[oc.id] = oc.label; });
+  var sec = h("div", { style: "max-width:1240px;margin:0 auto;padding:48px 24px 8px" });
+  var row = h("div", { style: "display:grid;grid-template-columns:repeat(auto-fill,252px);justify-content:center;gap:40px 32px" });
+  [ART_DESIGNS].forEach(function(list) {
+    list.forEach(function(d) {
+      state.frontDesign = d; state.frontText = null; state.frontPhoto = null; state.frontHeadFont = null; state.frontInk = null; state.frontFontSize = 1; state.frontStickers = [];
+      var cell = h("div", { style: "width:252px" });
+      cell.appendChild(renderCardSide("front", "thumb", false));
+      var cap = h("div", { style: "display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:17px" });
+      var capText = h("span", null, d.label);
+      cap.appendChild(h("span", { style: "display:flex;flex-direction:column;gap:2px" }, [h("span", { style: "font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#6B5A50" }, occLabel[d.occasion]), capText]));
+      cap.appendChild(icon("arrowRight", 16, 1.5));
+      cell.appendChild(cap);
+      row.appendChild(cell);
+    });
+  });
+  sec.appendChild(row);
+  page.appendChild(sec);
+  page.appendChild(h("div", { style: "height:64px" }));
+  keys.forEach(function(k) { state[k] = saved[k]; });
+  app.appendChild(page);
+}
+
 // ── INIT ──
+if (/[?&]designs(=|&|$)/.test(location.search)) { state.screen = "designs"; document.title = "Sendr design review"; }
 var resizeTimer;
 window.addEventListener("resize", function() {
   clearTimeout(resizeTimer);
