@@ -85,12 +85,19 @@ if (window.location.search.indexOf('card=') > -1) {
 }
 </script>
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-P65EQM0R01"></script>
+<!-- Not loaded on card links: the link itself holds the card's words and names,
+     and those must never reach Google. See /privacy.html. -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-P65EQM0R01');
+  if (location.search.indexOf('card=') === -1) {
+    var gaS = document.createElement('script');
+    gaS.async = true;
+    gaS.src = 'https://www.googletagmanager.com/gtag/js?id=G-P65EQM0R01';
+    document.head.appendChild(gaS);
+    gtag('js', new Date());
+    gtag('config', 'G-P65EQM0R01', { page_location: location.origin + location.pathname });
+  }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -231,7 +238,17 @@ textarea:focus, input:focus { outline: none; border-color: var(--accent) !import
 .mk-final { background: var(--ink); color: #F1EBE1; text-align: center; padding: 140px 24px; }
 .mk-final .mk-h2 { max-width: 11em; margin: 14px auto 40px; }
 
-.mk-foot { padding: 56px 48px 40px; display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; color: var(--ink-2); font-size: 14px; }
+.mk-foot { padding: 72px 48px 36px; color: var(--ink-2); font-size: 14px; line-height: 1.5; max-width: 1280px; margin: 0 auto; }
+.mk-foot-top { display: grid; grid-template-columns: auto 1fr; gap: 48px; align-items: start; }
+.mk-foot-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; justify-self: end; max-width: 760px; }
+.mk-foot-col .mk-eyebrow { color: var(--ink); margin-bottom: 12px; }
+.mk-foot-col p { margin: 0 0 6px; }
+.mk-foot-links { display: flex; flex-direction: column; gap: 8px; }
+.mk-foot a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(34,18,10,0.3); }
+.mk-foot a:hover { text-decoration-color: var(--ink); }
+.mk-foot a:focus-visible { outline: 2px solid var(--tomato); outline-offset: 2px; border-radius: 2px; }
+.mk-foot-base { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); }
+.mk-foot-base p { margin: 0; }
 .mk-foot-word { font-size: clamp(64px, 12vw, 180px); font-weight: 500; letter-spacing: -0.06em; line-height: .8; color: var(--ink); }
 
 @media (max-width: 1100px) {
@@ -249,7 +266,7 @@ textarea:focus, input:focus { outline: none; border-color: var(--accent) !import
   .mk-bar { padding: 9px 16px; }
   .mk-bar-long { display: none; }
   .mk-bar-short { display: inline; }
-  .mk-foot > div:last-child { text-align: left !important; }
+
   .mk-nav { padding: 12px 16px; grid-template-columns: 1fr auto; }
   .mk-links { display: none; }
   .mk-hero { padding: 48px 16px 40px; }
@@ -265,7 +282,10 @@ textarea:focus, input:focus { outline: none; border-color: var(--accent) !import
   .mk-fact, .mk-fact + .mk-fact { padding: 28px 0 8px; border-left: none; border-top: 1px solid var(--line); }
   .mk-fact h3 { margin-top: 16px; }
   .mk-final { padding: 96px 16px; }
-  .mk-foot { padding: 40px 16px 32px; }
+  .mk-foot { padding: 48px 16px 32px; }
+  .mk-foot-top { grid-template-columns: 1fr; gap: 32px; }
+  .mk-foot-cols { grid-template-columns: 1fr; gap: 28px; justify-self: stretch; }
+  .mk-foot-base { flex-direction: column; margin-top: 36px; }
 }
 
 /* ═══ Card studio ═══ */
@@ -6393,14 +6413,7 @@ function render() {
     fin.appendChild(pill("tomato", "Send a card", ctaAction, true));
     screen.appendChild(fin);
 
-    // ── Footer ──
-    var foot = h("footer", { className: "mk-foot" });
-    foot.appendChild(h("div", { className: "mk-foot-word" }, "Sendr"));
-    var fr = h("div", { style: "display:flex;flex-direction:column;gap:6px;text-align:right" });
-    fr.appendChild(h("span", null, "Free cards for every occasion. Made with care."));
-    fr.appendChild(h("span", null, "Some photo cards use images from Pexels."));
-    foot.appendChild(fr);
-    screen.appendChild(foot);
+    screen.appendChild(siteFooter());
 
     app.appendChild(screen);
     return;
@@ -7875,6 +7888,37 @@ function startDesign(d) {
   applyDesign(d);
   go("#/studio/card");
 }
+// Footer for the site pages: what Sendr is, the privacy promise, legal links and who makes it.
+function siteFooter() {
+  var foot = h("footer", { className: "mk-foot" });
+  var top = h("div", { className: "mk-foot-top" });
+  top.appendChild(h("div", { className: "mk-foot-word" }, "Sendr"));
+  var cols = h("div", { className: "mk-foot-cols" });
+  function col(title, nodes) {
+    var c = h("div", { className: "mk-foot-col" });
+    c.appendChild(h("div", { className: "mk-eyebrow" }, title));
+    nodes.forEach(function(n) { c.appendChild(typeof n === "string" ? h("p", null, n) : n); });
+    cols.appendChild(c);
+  }
+  function link(text, href, ext) { return h("a", ext ? { href: href, target: "_blank", rel: "noopener" } : { href: href }, text); }
+  col("Free, for real", ["Every card is free to make and send.", "No account, no app, no ads."]);
+  col("Your privacy", ["Your card lives in its link. We don't store cards, messages, names or photos.", "We use Google Analytics to count visits to our pages, never on card links."]);
+  var legal = h("div", { className: "mk-foot-links" });
+  legal.appendChild(link("Privacy policy", "/privacy.html"));
+  legal.appendChild(link("Terms of use", "/terms.html"));
+  legal.appendChild(link("Contact", "mailto:proviewmediaco@gmail.com"));
+  col("Legal", [legal]);
+  top.appendChild(cols);
+  foot.appendChild(top);
+  var base = h("div", { className: "mk-foot-base" });
+  var by = h("p", null, "\u00A9 " + new Date().getFullYear() + " Sendr. A ");
+  by.appendChild(link("Proview Studio", "https://www.proviewstudio.com", true));
+  by.appendChild(document.createTextNode(" project."));
+  base.appendChild(by);
+  base.appendChild(h("p", null, "Some photo cards use images from Pexels."));
+  foot.appendChild(base);
+  return foot;
+}
 function siteNav() {
   var nav = h("nav", { className: "mk-nav" });
   var logo = h("button", { className: "mk-logo", onClick: function() { state.picking = false; go("#/"); }, "aria-label": "Sendr home" });
@@ -7994,6 +8038,7 @@ function renderBrowse(app, occId) {
   }
   q.addEventListener("input", function() { state.browseQuery = q.value; draw(); });
   draw();
+  root.appendChild(siteFooter());
   app.appendChild(root);
   var navEl = root.querySelector(".mk-nav");
   if (navEl) document.documentElement.style.setProperty("--nav-h", navEl.offsetHeight + "px");
