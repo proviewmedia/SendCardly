@@ -6875,7 +6875,7 @@ function renderSend(app) {
   [["To", "recipientName", "Their name"], ["From", "senderName", "Your name"]].forEach(function(f) {
     var wrap = h("label", { className: "sd-field" });
     wrap.appendChild(h("span", { className: "st-label", style: "margin:0 0 6px" }, f[0]));
-    var inp = h("input", { className: "st-input", maxlength: "40", placeholder: f[2], "data-field": f[1] });
+    var inp = h("input", { className: "st-input", maxlength: "40", placeholder: f[2], "data-field": f[1], autocomplete: "off" });
     inp.value = state[f[1]] || "";
     inp.addEventListener("input", function() {
       state[f[1]] = inp.value;
@@ -7219,6 +7219,7 @@ function go(hash) {
 }
 function applyRoute() {
   var parts = location.hash.replace(/^#\/?/, "").split("/");
+  if (parts[0] !== "cards" && parts[0] !== "card" && parts[0] !== "studio") state.changingCard = false;
   if (parts[0] === "studio") {
     var prevObj = state.screen === "studio" ? state.studioObj : null;
     state.screen = "studio";
@@ -7309,6 +7310,7 @@ function renderStudio(app) {
         var oc = state.frontDesign && state.frontDesign.occasion;
         state.detailFrom = OCCASIONS.some(function(o) { return o.id === oc; }) ? oc : null;
         state.picking = true;
+        state.changingCard = true;
         go(state.detailFrom ? "#/cards/" + state.detailFrom : "#/cards");
         return;
       }
@@ -7706,7 +7708,7 @@ var PANELS = {
   "card:stickers": function(el) { stickerPicker(el, "front"); },
   "message:write": function(el) {
     el.appendChild(label("To"));
-    var to = h("input", { className: "st-input", maxlength: "40", placeholder: "Their name", "data-field": "to" });
+    var to = h("input", { className: "st-input", maxlength: "40", placeholder: "Their name", "data-field": "to", autocomplete: "off" });
     to.value = state.recipientName;
     to.addEventListener("input", function() { state.recipientName = to.value; refreshStage(); });
     el.appendChild(to);
@@ -7729,7 +7731,7 @@ var PANELS = {
     el.appendChild(ta);
     el.appendChild(h("div", { className: "st-count" + (state.msgFull ? " full" : ""), id: "stCount" }, state.msgFull ? "Card is full. Delete some words to add more." : (state.message || "").length + " / " + MAX_MSG_CHARS));
     el.appendChild(label("From"));
-    var fr = h("input", { className: "st-input", maxlength: "40", placeholder: "Your name", "data-field": "from" });
+    var fr = h("input", { className: "st-input", maxlength: "40", placeholder: "Your name", "data-field": "from", autocomplete: "off" });
     fr.value = state.senderName;
     fr.addEventListener("input", function() { state.senderName = fr.value; refreshStage(); });
     el.appendChild(fr);
@@ -7827,7 +7829,7 @@ var PANELS = {
   },
   "envelope:color": function(el) {
     el.appendChild(label("Addressed to"));
-    var to = h("input", { className: "st-input", maxlength: "40", placeholder: "Their name", "data-field": "to" });
+    var to = h("input", { className: "st-input", maxlength: "40", placeholder: "Their name", "data-field": "to", autocomplete: "off" });
     to.value = state.recipientName;
     to.addEventListener("input", function() { state.recipientName = to.value; refreshStage(); });
     el.appendChild(to);
@@ -7892,13 +7894,17 @@ function resetCard() {
 }
 // Sending always starts by picking a card from the list, never a card chosen for you.
 function startSending() {
-  if (state.sent) resetCard();
+  resetCard();
   state.picking = true;
   go("#/cards");
 }
+// Picking a card starts a blank one (no names, message, stickers or photo), unless the
+// person tapped Change card in the studio: then only the front design swaps.
 function startDesign(d) {
   var fromList = state.screen === "detail" || state.screen === "browse", fromOcc = state.detailFrom;
-  if (state.sent) { resetCard(); state.detailFrom = fromOcc; }
+  var keep = state.changingCard && !state.sent;
+  if (!keep) { resetCard(); state.detailFrom = fromOcc; }
+  state.changingCard = false;
   state.picking = false;
   state.studioFrom = fromList ? (fromOcc ? "#/cards/" + fromOcc : "#/cards") : "#/";
   ensureStudio();
