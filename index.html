@@ -415,25 +415,16 @@ body.st-lock { overflow: hidden; }
 .op-flap-in { transform: rotateX(180deg); }
 .op-seal { position: absolute; left: 50%; top: 100%; transform: translate(-50%, -78%) rotate(-4deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; filter: drop-shadow(0 1px 2px rgba(0,0,0,.18)); }
 
-.op-spread { position: absolute; left: 0; perspective: 1100px; perspective-origin: 50% 40%; transition: transform .9s cubic-bezier(.4,0,.2,1); }
 .op-riser { position: absolute; inset: 0; }
 .op-riser.op-rise { animation: opRise .5s cubic-bezier(.2,.8,.2,1) both; }
-.op-spread.no-anim, .op-spread.no-anim .op-cover { transition: none; }
-.op-page { position: absolute; top: 0; z-index: 1; }
-.op-page > div { box-shadow: 0 14px 34px rgba(34,18,10,0.16) !important; }
-.op-cover { position: absolute; top: 0; z-index: 2; cursor: pointer; transform-origin: left center; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.4,0,.2,1); }
-.op-cover:focus-visible { outline: 2px solid var(--tomato); outline-offset: 6px; border-radius: 12px; }
-.op-cover .op-face { position: absolute !important; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: translateZ(1px); }
-.op-cover-back { position: absolute; inset: 0; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; background-clip: padding-box; box-shadow: inset -18px 0 28px -14px rgba(34,18,10,0.18), 0 14px 34px rgba(34,18,10,0.16); }
-.op-spread.open .op-cover { transform: rotateY(-172deg); }
-.op-shade { position: absolute; inset: 0; pointer-events: none; z-index: 20; border-radius: inherit; transition: opacity .9s cubic-bezier(.4,0,.2,1); }
-.op-shade-front { background: linear-gradient(90deg, rgba(34,18,10,0.28), rgba(34,18,10,0.05)); opacity: 0; }
-.op-shade-back { background: linear-gradient(270deg, rgba(34,18,10,0.22), rgba(34,18,10,0) 60%); opacity: 1; }
-.op-spread.open .op-shade-front { opacity: 1; }
-.op-spread.open .op-shade-back { opacity: .45; }
-.op-spread.no-anim .op-shade { transition: none; }
-.op-page > div, .op-cover .op-face { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
-.op-cover-back { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+.op-flip { position: absolute; perspective: 1400px; cursor: pointer; }
+.op-flip:focus-visible { outline: 2px solid var(--tomato); outline-offset: 6px; border-radius: 16px; }
+.op-flip-in { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .85s cubic-bezier(.45,.05,.2,1); }
+.op-flip.flipped .op-flip-in { transform: rotateY(180deg); }
+.op-flip.no-anim .op-flip-in { transition: none; }
+.op-side { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.op-side-back { transform: rotateY(180deg); }
+.op-side > div { box-shadow: 0 16px 40px rgba(34,18,10,0.18) !important; }
 .op-settle { animation: opRise .4s ease both; }
 @keyframes opRise { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: none; } }
 
@@ -468,7 +459,7 @@ body.st-lock { overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) {
   .op-arrive, .op-riser, .op-settle { animation: none !important; }
-  .op-spread, .op-cover { transition: none !important; }
+  .op-flip-in { transition: none !important; }
   .op-flap, .op-card-in, .op-scene-wrap, .op-cover { transition: none; }
 }
 
@@ -3475,78 +3466,58 @@ function renderOpening(app, isPreview) {
         var tx = sr.left + W / 2 - cw / 2, ty = sr.top + Math.max(8, (H - ch) / 2);
         var r = cardEl.getBoundingClientRect();
         var natTop = r.top + r.height * 0.62, natLeft = r.left;
-        cardEl.style.transition = fast ? "none" : "transform .75s cubic-bezier(.33,.0,.2,1), border-radius .75s ease";
+        cardEl.style.transition = fast ? "none" : "transform .75s cubic-bezier(.33,.0,.2,1)";
         cardEl.style.transformOrigin = "0 0";
         cardEl.style.transform = "translate(" + (tx - natLeft) + "px," + (ty - natTop) + "px) scale(" + (cw / r.width) + ")";
-        cardEl.style.borderTopLeftRadius = "0";
-        cardEl.style.borderBottomLeftRadius = "0";
         scene.classList.add("drop");
       }, fast ? 0 : 1450);
       opLater(function() { showCard(false, true); }, fast ? 50 : 2250);
     });
   }
 
-  // A real fold: the inside page sits right of the spine, the cover is hinged on the
-  // spine and swings open to the left, showing its blank inside face. The card stays open.
-  function showCard(startOpen, seamless) {
-    state.opPhase = startOpen ? "inside" : "card";
+  // One flat card: design on the front, message on the back. It flips over to read.
+  function showCard(startBack, seamless) {
     stage.innerHTML = "";
     var cw = 360 * s, ch = 480 * s;
-    var fits = cw * 2 + 48 <= W;
-    var k = fits ? 1 : Math.min(1, (W * 0.8) / cw);
-    var spineClosed = W / 2 - cw / 2;
-    var spineOpen = fits ? W / 2 : W * 0.16;
     var top = Math.max(8, (H - ch) / 2);
-    var book = h("div", { className: "op-spread", style: "width:" + (cw * 2) + "px;height:" + ch + "px;top:" + top + "px;transform-origin:" + cw + "px 50%" });
-    function place(open) {
-      book.style.transform = open
-        ? "translateX(" + (spineOpen - cw) + "px) scale(" + k + ")"
-        : "translateX(" + (spineClosed - cw) + "px)";
-    }
-    var page = h("div", { className: "op-page", style: "left:" + cw + "px" });
-    page.appendChild(renderCardSide("back", s, false));
-    book.appendChild(page);
-    var cover = h("div", { className: "op-cover", style: "left:" + cw + "px;width:" + cw + "px;height:" + ch + "px", role: "button", tabindex: "0", "aria-label": "Open the card" });
-    var face = renderCardSide("front", s, false);
-    face.classList.add("op-face");
-    cover.appendChild(face);
-    face.appendChild(h("div", { className: "op-shade op-shade-front" }));
-    var backFace = h("div", { className: "op-cover-back", style: "border-radius:" + (20 * s) + "px;" + getBgStyle(state.backBg) });
-    backFace.appendChild(h("div", { className: "op-shade op-shade-back" }));
-    cover.appendChild(backFace);
-    book.appendChild(cover);
-    var riser = h("div", { className: "op-riser" + (startOpen || seamless ? "" : " op-rise") });
-    riser.appendChild(book);
+    var riser = h("div", { className: "op-riser" + (startBack || seamless ? "" : " op-rise") });
+    var flip = h("div", { className: "op-flip", style: "left:" + (W / 2 - cw / 2) + "px;top:" + top + "px;width:" + cw + "px;height:" + ch + "px", role: "button", tabindex: "0" });
+    var inner = h("div", { className: "op-flip-in" });
+    var front = h("div", { className: "op-side op-side-front" });
+    front.appendChild(renderCardSide("front", s, false));
+    var back = h("div", { className: "op-side op-side-back" });
+    back.appendChild(renderCardSide("back", s, false));
+    inner.appendChild(front);
+    inner.appendChild(back);
+    flip.appendChild(inner);
+    riser.appendChild(flip);
     stage.appendChild(riser);
 
-    function setOpen(open, animate) {
-      book.classList.toggle("no-anim", !animate);
-      book.classList.toggle("open", open);
-      place(open);
-      state.opPhase = open ? "inside" : "card";
-      cover.setAttribute("aria-label", open ? "Close the card" : "Open the card");
-      if (open) {
-        var closeBtn = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm", onClick: function() { setOpen(false, true); } }, "Close card");
-        var replay = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm", onClick: showArrive }, "Replay");
-        replay.insertBefore(icon("rotate", 15), replay.firstChild);
-        var last;
-        if (isPreview) {
-          last = h("button", { className: "mk-pill mk-pill-tomato mk-pill-sm", onClick: function() { go("#/send"); } }, "Send it");
-          last.appendChild(icon("send", 15));
-        } else {
-          last = h("button", { className: "mk-pill mk-pill-tomato mk-pill-sm", onClick: makeOneBack }, "Make one back");
-          last.appendChild(icon("arrowRight", 15));
-        }
-        setFoot([closeBtn, replay, last]);
+    function setSide(showBack, animate) {
+      flip.classList.toggle("no-anim", !animate);
+      flip.classList.toggle("flipped", showBack);
+      state.opPhase = showBack ? "inside" : "card";
+      flip.setAttribute("aria-label", showBack ? "Flip to the front" : "Flip to read the message");
+      var flipBtn = h("button", { className: "mk-pill " + (showBack ? "mk-pill-paper mk-pill-sm" : "mk-pill-ink"), onClick: function() { setSide(!flip.classList.contains("flipped"), true); } });
+      flipBtn.appendChild(icon("rotate", 16));
+      flipBtn.appendChild(h("span", null, showBack ? "See the front" : "Flip to read"));
+      if (!showBack) { setFoot([flipBtn]); return; }
+      var replay = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm", onClick: showArrive }, "Replay");
+      var last;
+      if (isPreview) {
+        last = h("button", { className: "mk-pill mk-pill-tomato mk-pill-sm", onClick: function() { go("#/send"); } }, "Send it");
+        last.appendChild(icon("send", 15));
       } else {
-        setFoot([h("button", { className: "mk-pill mk-pill-ink", onClick: function() { setOpen(true, true); } }, "Open the card")]);
+        last = h("button", { className: "mk-pill mk-pill-tomato mk-pill-sm", onClick: makeOneBack }, "Make one back");
+        last.appendChild(icon("arrowRight", 15));
       }
+      setFoot([flipBtn, replay, last]);
     }
-    function toggle() { setOpen(!book.classList.contains("open"), true); }
-    cover.addEventListener("click", toggle);
-    cover.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
-    setOpen(!!startOpen, false);
-    requestAnimationFrame(function() { requestAnimationFrame(function() { book.classList.remove("no-anim"); }); });
+    function toggle() { setSide(!flip.classList.contains("flipped"), true); }
+    flip.addEventListener("click", toggle);
+    flip.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+    setSide(!!startBack, false);
+    requestAnimationFrame(function() { requestAnimationFrame(function() { flip.classList.remove("no-anim"); }); });
   }
   function showInside() { showCard(true); }
 
