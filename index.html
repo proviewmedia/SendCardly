@@ -347,6 +347,12 @@ body.st-lock { overflow: hidden; }
 .st-editable { cursor: text; border-radius: 6px; outline: 1.5px dashed transparent; outline-offset: 6px; transition: outline-color .15s ease; }
 .st-editable:hover { outline-color: rgba(34,18,10,0.35); }
 .st-editable:focus { outline: 1.5px solid var(--tomato); }
+.st-warn { position: absolute; left: 50%; top: 16px; transform: translateX(-50%); z-index: 12; display: flex; align-items: center; gap: 10px; background: #FFF1EC; color: #8A2A14; border: 1px solid #F2B8A6; border-radius: 14px; padding: 10px 10px 10px 14px; font-size: 14px; box-shadow: 0 8px 24px rgba(34,18,10,0.14); max-width: calc(100% - 32px); }
+.st-warn[hidden] { display: none; }
+.st-warn button { border: none; background: #8A2A14; color: #fff; border-radius: 999px; padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.sd-block { display: flex; gap: 12px; align-items: flex-start; background: #FFF1EC; color: #8A2A14; border: 1px solid #F2B8A6; border-radius: 16px; padding: 14px 16px; margin-bottom: 16px; font-size: 15px; line-height: 1.45; }
+.sd-block button { margin-top: 10px; border: none; background: #8A2A14; color: #fff; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+.sd-opts.blocked { opacity: .45; pointer-events: none; }
 .st-switch { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; gap: 2px; background: var(--paper); border-radius: 999px; padding: 4px; box-shadow: 0 6px 24px rgba(34,18,10,0.16); z-index: 10; }
 .st-switch button { border: none; background: none; border-radius: 999px; padding: 10px 20px; font-size: 15px; color: var(--ink); cursor: pointer; }
 .st-switch button.on { background: var(--ink); color: var(--paper); }
@@ -1801,6 +1807,7 @@ function initState() {
       backFont: ALL_FONTS.find(function(f) { return f.id === (bb.fn || "caveat"); }) || ALL_FONTS.find(function(f) { return f.id === "caveat"; }),
       backTextColor: TEXT_COLORS.find(function(t) { return t.id === (bb.tc || "ink"); }) || TEXT_COLORS.find(function(t) { return t.id === "ink"; }),
       backFontSize: clampNum(bb.fs, 0.5, 2, 1),
+      backAutoFit: bb.af !== 0,
       backStickers: sanitizeStickers(bb.st),
       message: bb.ms || "",
       recipientName: bb.to || "",
@@ -2092,12 +2099,10 @@ function renderCardSide(side, size, interactive) {
     var isPhotoLayout = layout.id === "photo-full" || layout.id === "photo-circle" || layout.id === "photo-corner";
 
     var innerStyle = "position:absolute;inset:0;display:flex;flex-direction:column;z-index:5;" +
-      "padding:" + Math.round(28 * scale) + "px " + Math.round(24 * scale) + "px;" +
+      "padding:" + Math.round(34 * scale) + "px;" +
       "justify-content:" + (layoutConfig.justifyContent || "center") + ";" +
       "align-items:" + (layoutConfig.alignItems || "center") + ";" +
-      "text-align:" + (layoutConfig.textAlign || "center") + ";" +
-      (layoutConfig.paddingTop ? "padding-top:" + layoutConfig.paddingTop + ";" : "") +
-      (layoutConfig.paddingBottom ? "padding-bottom:" + layoutConfig.paddingBottom + ";" : "");
+      "text-align:" + (layoutConfig.textAlign || "center") + ";";
 
     var inner = h("div", { style: innerStyle });
 
@@ -2105,11 +2110,12 @@ function renderCardSide(side, size, interactive) {
       inner.appendChild(h("p", { style: "font-family:" + fontFamily + ";font-size:" + (12 * scale) + "px;color:" + textColor.color + ";opacity:0.6;margin:0 0 " + (6 * scale) + "px;letter-spacing:2.5px;text-transform:uppercase" }, state.recipientName));
     }
 
-    var maxWidth = layout.id === "photo-corner" ? "65%" : (layout.id.indexOf("offset") > -1 ? "80%" : "90%");
+    var maxWidth = layout.id === "photo-corner" ? "65%" : (layout.id.indexOf("offset") > -1 ? "82%" : "100%");
     // Long messages start smaller, then fitMessage() trims until everything fits.
     var msgLen = (state.message || "").length;
     var baseMsg = (isTypographic ? 26 : (font.style === "cursive" ? 23 : 19)) * scale * fontSize;
-    if (msgLen > 160) baseMsg *= Math.max(0.6, Math.sqrt(160 / msgLen) * 1.1);
+    var autoFit = state.backAutoFit !== false;
+    if (autoFit && msgLen > 160) baseMsg *= Math.max(0.6, Math.sqrt(160 / msgLen) * 1.1);
     var msgEl = h("p", { style: "font-family:" + fontFamily + ";font-size:" + baseMsg + "px;font-weight:" + (isTypographic ? "800" : "400") + ";color:" + textColor.color + ";line-height:" + (isTypographic ? "1.3" : "1.65") + ";margin:0;max-width:" + maxWidth + ";word-break:break-word;overflow:hidden;white-space:pre-line;flex-shrink:0", "data-edit": "message" }, state.message || "Your message here...");
     msgEl.dataset.base = (isTypographic ? 26 : (font.style === "cursive" ? 23 : 19)) * scale * fontSize;
     inner.appendChild(msgEl);
@@ -2118,7 +2124,13 @@ function renderCardSide(side, size, interactive) {
       inner.appendChild(h("p", { style: "font-family:" + fontFamily + ";font-size:" + ((font.style === "cursive" ? 20 : 15) * scale) + "px;color:" + textColor.color + ";opacity:0.75;margin:" + (14 * scale) + "px 0 0;font-style:" + (font.style === "cursive" ? "normal" : "italic") }, state.senderName));
     }
     card.appendChild(inner);
-    requestAnimationFrame(function() { fitMessage(inner, msgEl, 10 * scale); });
+    requestAnimationFrame(function() {
+      if (!inner.isConnected) return;
+      if (autoFit) fitMessage(inner, msgEl, 10 * scale);
+      else msgEl.style.fontSize = msgEl.dataset.base + "px";
+      card.dataset.overflow = messageOverflows(inner) ? "1" : "0";
+      if (card._onfit) card._onfit();
+    });
   }
 
   // Stickers
@@ -2148,11 +2160,40 @@ function renderCardSide(side, size, interactive) {
   return card;
 }
 
+// True when the To / message / From block is taller than the space inside the margins.
+function messageOverflows(inner) {
+  var kids = inner.children;
+  if (!kids.length) return false;
+  var cs = getComputedStyle(inner);
+  var availH = inner.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  var first = kids[0], last = kids[kids.length - 1];
+  var used = last.offsetTop + last.offsetHeight - first.offsetTop;
+  var availW = inner.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  var wide = false;
+  for (var i = 0; i < kids.length; i++) if (kids[i].scrollWidth > availW + 1) wide = true;
+  return used > availH + 0.5 || wide;
+}
+// Measures the inside off screen; false when the message spills past the margins.
+function messageFits() {
+  var holder = h("div", { style: "position:fixed;left:-10000px;top:0;visibility:hidden" });
+  document.body.appendChild(holder);
+  var c = renderCardSide("back", 1, false);
+  holder.appendChild(c);
+  var p = c.querySelector('[data-edit="message"]');
+  var ok = true;
+  if (p) {
+    if (state.backAutoFit !== false) fitMessage(p.parentNode, p, 10);
+    else p.style.fontSize = p.dataset.base + "px";
+    ok = !messageOverflows(p.parentNode);
+  }
+  holder.remove();
+  return ok;
+}
 // Shrink the inside message until the whole thing fits on the card.
 function fitMessage(inner, p, minPx) {
   if (!inner || !p || !inner.isConnected) return;
   var max = parseFloat(p.dataset.base) || parseFloat(p.style.fontSize);
-  function fits(size) { p.style.fontSize = size + "px"; return inner.scrollHeight <= inner.clientHeight + 1; }
+  function fits(size) { p.style.fontSize = size + "px"; return !messageOverflows(inner); }
   if (fits(max)) return;
   // Largest size that still fits, found by halving the range.
   var lo = minPx, hi = max;
@@ -3288,7 +3329,7 @@ function buildPayload() {
   }
   return {
     f: f,
-    b: { bg: state.backBg.id, ly: state.backLayout.id, fn: state.backFont.id, tc: state.backTextColor.id, fs: state.backFontSize, ms: state.message, to: state.recipientName, fr: state.senderName, st: stickersOut(state.backStickers) },
+    b: { bg: state.backBg.id, ly: state.backLayout.id, fn: state.backFont.id, tc: state.backTextColor.id, fs: state.backFontSize, af: state.backAutoFit === false ? 0 : 1, ms: state.message, to: state.recipientName, fr: state.senderName, st: stickersOut(state.backStickers) },
     e: state.env
   };
 }
@@ -3530,7 +3571,19 @@ function renderSend(app) {
   col.appendChild(names);
 
   function fromName() { return (state.senderName || "").trim() || "Someone"; }
-  var opts = h("div", { className: "sd-opts" });
+  var fitsOk = messageFits();
+  if (!fitsOk) {
+    var blk = h("div", { className: "sd-block", role: "alert" });
+    blk.appendChild(icon("alert", 20));
+    var bt = h("div");
+    bt.appendChild(h("b", null, "Your message doesn't fit on the card."));
+    bt.appendChild(h("div", null, "Shorten it or make the text smaller, then come back to send."));
+    bt.appendChild(h("button", { onClick: function() { state.studioTool = state.studioTool || {}; state.studioTool.message = "style"; state.panelOpen = true; go("#/studio/message"); } }, "Fix my message"));
+    blk.appendChild(bt);
+    col.appendChild(blk);
+  }
+  var opts = h("div", { className: "sd-opts" + (fitsOk ? "" : " blocked") });
+  if (!fitsOk) opts.setAttribute("aria-disabled", "true");
   function opt(ic, title, sub, onClick, primary) {
     var b = h("button", { className: "sd-opt" + (primary ? " primary" : ""), onClick: onClick });
     var i = h("span", { className: "sd-opt-ic" });
@@ -3565,7 +3618,7 @@ function renderSend(app) {
   var linkBox = h("input", { className: "st-input sd-link", id: "sdLink", readonly: "readonly", "aria-label": "Card link" });
   linkBox.value = shareUrlNow();
   linkBox.addEventListener("focus", function() { linkBox.select(); });
-  col.appendChild(linkBox);
+  if (fitsOk) col.appendChild(linkBox);
   if (state.frontDesign && state.frontDesign.slot && state.frontPhoto) {
     col.appendChild(h("p", { className: "st-note" }, "Heads up: photos don't travel in the link yet. They'll see the card with an empty photo frame."));
   }
@@ -3792,7 +3845,7 @@ function saveDraft() {
         ds: state.frontDesign && state.frontDesign.id, tx: state.frontText, hf: state.frontHeadFont, ik: state.frontInk, fs: state.frontFontSize,
         st: state.frontStickers, ph: state.frontPhoto && state.frontPhoto.length < 1500000 ? state.frontPhoto : null, pc: state.frontPhotoCrop,
         bg: state.backBg && state.backBg.id, ly: state.backLayout && state.backLayout.id, fn: state.backFont && state.backFont.id,
-        tc: state.backTextColor && state.backTextColor.id, bfs: state.backFontSize, bst: state.backStickers,
+        tc: state.backTextColor && state.backTextColor.id, bfs: state.backFontSize, baf: state.backAutoFit === false ? 0 : 1, bst: state.backStickers,
         ms: state.message, to: state.recipientName, fr: state.senderName, e: state.env, et: state.envTouched, mt: state.messageTouched
       };
       localStorage.setItem("sendr-draft-v1", JSON.stringify(d));
@@ -3818,6 +3871,7 @@ function loadDraft() {
   state.backFont = findIn(ALL_FONTS, d.fn, "caveat");
   state.backTextColor = findIn(TEXT_COLORS, d.tc, "ink");
   state.backFontSize = clampNum(d.bfs, 0.5, 2, 1);
+  state.backAutoFit = d.baf !== 0;
   state.backStickers = sanitizeStickers(d.bst);
   state.message = typeof d.ms === "string" ? d.ms.slice(0, 400) : "";
   state.recipientName = typeof d.to === "string" ? d.to.slice(0, 40) : "";
@@ -3969,6 +4023,17 @@ function refreshStage() {
     sw2.appendChild(h("button", { role: "tab", "aria-selected": state.studioObj === o.id ? "true" : "false", className: state.studioObj === o.id ? "on" : "", onClick: function() { go("#/studio/" + o.id); } }, o.label));
   });
   stage.appendChild(sw2);
+  var warn = h("div", { className: "st-warn", role: "alert", id: "stWarn", hidden: "hidden" });
+  warn.appendChild(icon("alert", 18));
+  warn.appendChild(h("span", null, "Your message runs off the card. Shorten it or make the text smaller."));
+  var fixBtn = h("button", { onClick: function() { state.studioTool.message = "style"; state.panelOpen = true; go("#/studio/message"); render(); } }, "Text size");
+  warn.appendChild(fixBtn);
+  stage.appendChild(warn);
+  Array.prototype.forEach.call(stage.querySelectorAll(".st-obj"), function(o) {
+    var c = o.querySelector("[data-edit=message]");
+    if (c) { var cardEl = c.closest("[data-overflow]") || c.parentNode.parentNode; cardEl._onfit = updateFitWarning; }
+  });
+  requestAnimationFrame(function() { requestAnimationFrame(updateFitWarning); });
   saveDraft();
 }
 
@@ -4020,7 +4085,9 @@ function wireCardEditing(cardEl, side) {
       else {
         state.message = v.slice(0, 400); state.messageTouched = true;
         var sc = cardEl.offsetWidth / 360;
-        fitMessage(t.parentNode, t, 10 * sc);
+        if (state.backAutoFit !== false) fitMessage(t.parentNode, t, 10 * sc);
+        cardEl.dataset.overflow = messageOverflows(t.parentNode) ? "1" : "0";
+        updateFitWarning();
       }
       var mirror = document.querySelector('[data-field="' + (side === "front" ? "headline" : "message") + '"]');
       if (mirror && mirror !== document.activeElement) mirror.value = side === "front" ? state.frontText : state.message;
@@ -4065,6 +4132,12 @@ function wireCardEditing(cardEl, side) {
   });
 }
 
+function updateFitWarning() {
+  var w = document.getElementById("stWarn");
+  if (!w) return;
+  var over = !!document.querySelector('.st-stage [data-overflow="1"]');
+  if (over) w.removeAttribute("hidden"); else w.setAttribute("hidden", "hidden");
+}
 function focusField(name) {
   requestAnimationFrame(function() {
     var f = document.querySelector('[data-field="' + name + '"]');
@@ -4257,10 +4330,27 @@ var PANELS = {
       fonts.appendChild(h("button", { className: "st-font" + (state.backFont.id === id ? " on" : ""), style: "font-family:'" + f.name + "'," + f.style, onClick: function() { state.backFont = f; refreshStage(); refreshPanel(); } }, f.name));
     });
     el.appendChild(fonts);
-    el.appendChild(label("Size"));
-    var r = h("input", { type: "range", min: "0.7", max: "1.6", step: "0.05", className: "st-range", "aria-label": "Message size" });
+    el.appendChild(label("Text size"));
+    var auto = state.backAutoFit !== false;
+    var sizeChips = h("div", { className: "st-chips" });
+    var autoChip = chip("Auto fit", auto, function() { state.backAutoFit = true; state.backFontSize = 1; refreshStage(); refreshPanel(); });
+    var ownChip = chip("Set my own", !auto, function() { state.backAutoFit = false; refreshStage(); refreshPanel(); });
+    sizeChips.appendChild(autoChip);
+    sizeChips.appendChild(ownChip);
+    el.appendChild(sizeChips);
+    var sizeNote = h("p", { className: "st-note", style: "margin:6px 0 10px" }, auto ? "Text shrinks on its own so your whole message fits." : "Drag to choose a size. If the message runs off the card, you'll see a warning.");
+    el.appendChild(sizeNote);
+    var r = h("input", { type: "range", min: "0.5", max: "1.6", step: "0.02", className: "st-range", "aria-label": "Message size" });
     r.value = state.backFontSize || 1;
-    r.addEventListener("input", function() { state.backFontSize = parseFloat(r.value); refreshStage(); });
+    r.addEventListener("input", function() {
+      state.backFontSize = parseFloat(r.value);
+      if (state.backAutoFit !== false) {
+        state.backAutoFit = false;
+        autoChip.classList.remove("on"); ownChip.classList.add("on");
+        sizeNote.textContent = "Drag to choose a size. If the message runs off the card, you'll see a warning.";
+      }
+      refreshStage();
+    });
     el.appendChild(r);
     el.appendChild(label("Ink"));
     var inks = h("div", { className: "st-sws" });
