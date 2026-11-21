@@ -101,7 +101,7 @@ if (window.location.search.indexOf('card=') > -1) {
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Caveat:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Josefin+Sans:wght@300;400;600;700&family=Lora:wght@400;500;600;700&family=Mali:wght@300;400;600;700&family=Manrope:wght@300;400;600;700;800&family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:wght@400;700;900&family=Righteous&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Caprasimo&family=Abril+Fatface&family=Caveat:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Josefin+Sans:wght@300;400;600;700&family=Lora:wght@400;500;600;700&family=Mali:wght@300;400;600;700&family=Manrope:wght@300;400;600;700;800&family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:wght@400;700;900&family=Righteous&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 :root {
   --bg: #f7f6f3;
@@ -151,6 +151,10 @@ textarea:focus, input:focus { outline: none; border-color: var(--accent) !import
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <filter id="sg-grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="1.8" intercept="-0.35"/><feFuncG type="linear" slope="1.8" intercept="-0.35"/><feFuncB type="linear" slope="1.8" intercept="-0.35"/></feComponentTransfer></filter>
+  <filter id="sg-wob" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="turbulence" baseFrequency="0.028" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs></svg>
 <div id="app"></div>
 <script>
 // ═══════════════════════════════════════
@@ -242,6 +246,11 @@ var FONT_CATEGORIES = [
     { id: "righteous", name: "Righteous", style: "sans-serif", preview: "Retro and fun" },
     { id: "abril", name: "Abril Fatface", style: "serif", preview: "Dramatic headlines" },
     { id: "josefin", name: "Josefin Sans", style: "sans-serif", preview: "Chic and airy" }
+  ]},
+  { label: "Card", items: [
+    { id: "fraunces", name: "Fraunces", style: "serif", preview: "Soft and warm" },
+    { id: "instrument", name: "Instrument Serif", style: "serif", preview: "Quiet and elegant" },
+    { id: "caprasimo", name: "Caprasimo", style: "serif", preview: "Chunky and joyful" }
   ]}
 ];
 var ALL_FONTS = FONT_CATEGORIES.flatMap(function(c) { return c.items; });
@@ -386,6 +395,212 @@ var CARD_DESIGNS = [
   ]}
 ];
 var ALL_DESIGNS = CARD_DESIGNS.flatMap(function(c) { return c.items; });
+// Legacy photo/emoji designs above stay resolvable for links already sent.
+ALL_DESIGNS.forEach(function(d) { d.legacy = true; });
+
+// ═══ ILLUSTRATED DESIGNS ═══
+// Each art design draws an SVG scene (viewBox 360x480). The headline is real
+// DOM text on top, so people can edit it. Art strings are static code, never
+// built from user input.
+var ART_INK = "#2B1B12";
+
+function svgCard(paper, body, grain) {
+  return '<svg viewBox="0 0 360 480" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;display:block" aria-hidden="true">' +
+    '<rect width="360" height="480" fill="' + paper + '"/>' + body +
+    '<rect width="360" height="480" fill="#fff" filter="url(#sg-grain)" opacity="' + (grain || 0.22) + '" style="mix-blend-mode:multiply"/></svg>';
+}
+// Riso look: flat color fill nudged off the ink outline.
+function riso(shape, fill, dx, dy) {
+  return '<g transform="translate(' + (dx == null ? 4 : dx) + ',' + (dy == null ? 3 : dy) + ')" fill="' + fill + '" stroke="none">' + shape + '</g>' +
+    '<g fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' + shape + '</g>';
+}
+function wob(inner) { return '<g filter="url(#sg-wob)">' + inner + '</g>'; }
+function heartPath(cx, cy, s, rot) {
+  return '<path transform="translate(' + cx + ',' + cy + ') rotate(' + (rot || 0) + ') scale(' + s + ')" d="M0,14 C-22,-2 -18,-24 0,-12 C18,-24 22,-2 0,14 Z"/>';
+}
+function confetti(seed, n, colors, box) {
+  var out = "", x = seed;
+  function rnd() { x = (x * 9301 + 49297) % 233280; return x / 233280; }
+  for (var i = 0; i < n; i++) {
+    var cx = box[0] + rnd() * (box[2] - box[0]), cy = box[1] + rnd() * (box[3] - box[1]);
+    var c = colors[i % colors.length], r = Math.round(rnd() * 180);
+    out += (i % 3 === 0)
+      ? '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="3.2" fill="' + c + '"/>'
+      : '<rect x="' + (cx - 6).toFixed(1) + '" y="' + (cy - 2).toFixed(1) + '" width="12" height="4.5" rx="2" fill="' + c + '" transform="rotate(' + r + ' ' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ')"/>';
+  }
+  return out;
+}
+
+var ART = {
+  cake: function() {
+    var x0 = 92, x1 = 268, y = 318, n = 7, w = (x1 - x0) / n;
+    var icing = "M" + x0 + "," + (y + 4) + " Q" + x0 + "," + (y - 10) + " " + (x0 + 14) + "," + (y - 10) + " L" + (x1 - 14) + "," + (y - 10) + " Q" + x1 + "," + (y - 10) + " " + x1 + "," + (y + 4);
+    for (var i = n; i > 0; i--) {
+      var xa = x0 + i * w, xb = xa - w, dep = y + (i % 2 ? 34 : 18);
+      icing += " Q" + (xa - 1) + "," + dep + " " + ((xa + xb) / 2) + "," + dep + " Q" + (xb + 1) + "," + dep + " " + xb + "," + (y + 4);
+    }
+    icing += " Z";
+    var candles = "", flames = "", cx = [126, 153, 180, 207, 234], cc = ["#E8502F", "#5DA9A1", "#F2B233", "#5DA9A1", "#E8502F"];
+    for (var k = 0; k < cx.length; k++) {
+      candles += riso('<rect x="' + (cx[k] - 5) + '" y="266" width="10" height="44" rx="3"/>', cc[k], 3, 2);
+      flames += riso('<path d="M' + cx[k] + ',236 C' + (cx[k] + 9) + ',248 ' + (cx[k] + 7) + ',258 ' + cx[k] + ',259 C' + (cx[k] - 7) + ',258 ' + (cx[k] - 9) + ',248 ' + cx[k] + ',236 Z"/>', "#F2B233", 2, 2);
+    }
+    return svgCard("#F8E7C6",
+      confetti(7, 26, ["#E8502F", "#F49AB0", "#5DA9A1", "#F2B233"], [20, 200, 340, 260]) +
+      confetti(11, 10, ["#E8502F", "#F49AB0", "#5DA9A1"], [20, 300, 80, 440]) +
+      confetti(19, 10, ["#F2B233", "#F49AB0", "#5DA9A1"], [282, 300, 340, 440]) +
+      wob(
+        riso('<ellipse cx="180" cy="420" rx="128" ry="15"/>', "#FFFFFF", 3, 3) +
+        riso('<rect x="92" y="316" width="176" height="100" rx="10"/>', "#F49AB0", 5, 4) +
+        '<path d="M96,372 Q118,362 140,372 T184,372 T228,372 T266,372" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
+        riso('<path d="' + icing + '"/>', "#FFF6E6", 3, 3) +
+        candles + flames
+      ));
+  },
+  tulips: function() {
+    function tulip(x, y, c, rot) {
+      return riso('<path transform="translate(' + x + ',' + y + ') rotate(' + rot + ')" d="M-19,0 Q-22,-32 -9,-38 L0,-24 L9,-38 Q22,-32 19,0 Q0,13 -19,0 Z"/>', c, 4, 3);
+    }
+    function stem(x1, y1) { return '<path d="M180,448 Q' + ((180 + x1) / 2) + ',' + ((448 + y1) / 2 + 20) + ' ' + x1 + ',' + y1 + '"/>'; }
+    var stems = '<g fill="none" stroke="#3F6B4A" stroke-width="3.5" stroke-linecap="round">' +
+      stem(126, 262) + stem(166, 236) + stem(206, 244) + stem(240, 274) + stem(148, 292) + stem(214, 296) + '</g>';
+    var leaves = riso('<path d="M150,380 Q104,350 96,300 Q140,322 160,370 Z"/>', "#7FA06B", 4, 3) +
+      riso('<path d="M210,380 Q258,352 266,302 Q222,324 200,370 Z"/>', "#7FA06B", 4, 3);
+    return svgCard("#DDE6D3",
+      '<g transform="translate(0,22)">' + wob(stems + leaves +
+        tulip(126, 262, "#E8502F", -14) + tulip(166, 236, "#F2A0A8", -4) + tulip(206, 244, "#F2B233", 8) +
+        tulip(240, 274, "#F2A0A8", 16) + tulip(148, 292, "#F2B233", -8) + tulip(214, 296, "#E8502F", 6) +
+        riso('<path d="M112,352 L248,352 L196,474 L164,474 Z"/>', "#E2B482", 5, 3) +
+        '<path d="M150,384 Q180,398 210,384" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
+        riso('<path d="M180,392 Q160,372 150,392 Q160,404 180,392 Q200,372 210,392 Q200,404 180,392 Z"/>', "#E8502F", 2, 2)
+      ) + '</g>');
+  },
+  hearts: function() {
+    var list = [[52, 64, 1.5, -18, "#D7263D"], [150, 40, 0.9, 10, "#F49AB0"], [300, 70, 1.9, 14, "#E8502F"], [236, 128, 0.8, -6, "#D7263D"],
+      [40, 170, 0.9, 22, "#F49AB0"], [320, 196, 1.1, -12, "#F49AB0"], [90, 128, 0.7, 8, "#E8502F"],
+      [62, 330, 1.2, -10, "#E8502F"], [312, 320, 1.6, 18, "#D7263D"], [130, 420, 2.1, 8, "#D7263D"], [258, 412, 1.0, -16, "#F49AB0"],
+      [200, 360, 0.7, 12, "#F49AB0"], [40, 436, 0.8, -20, "#F49AB0"], [330, 450, 0.8, 6, "#E8502F"]];
+    var out = "";
+    for (var i = 0; i < list.length; i++) out += riso(heartPath(list[i][0], list[i][1], list[i][2], list[i][3]), list[i][4], 4, 3);
+    return svgCard("#F8D8D0", wob(out));
+  },
+  sun: function() {
+    var rays = "";
+    for (var a = -168; a <= -12; a += 13) {
+      var r = a * Math.PI / 180;
+      rays += '<line x1="' + (180 + Math.cos(r) * 104).toFixed(1) + '" y1="' + (318 + Math.sin(r) * 104).toFixed(1) + '" x2="' + (180 + Math.cos(r) * 134).toFixed(1) + '" y2="' + (318 + Math.sin(r) * 134).toFixed(1) + '"/>';
+    }
+    return svgCard("#F4EADB", wob(
+      '<g stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round">' + rays + '</g>' +
+      riso('<circle cx="180" cy="318" r="88"/>', "#F2B233", 5, 4) +
+      '<g fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"><path d="M148,300 Q156,292 164,300"/><path d="M196,300 Q204,292 212,300"/><path d="M160,326 Q180,344 200,326"/></g>' +
+      '<circle cx="146" cy="318" r="7" fill="#F49AB0"/><circle cx="214" cy="318" r="7" fill="#F49AB0"/>' +
+      riso('<path d="M-10,392 Q70,344 150,384 T370,370 L370,490 L-10,490 Z"/>', "#E9805E", 4, 3) +
+      riso('<path d="M-10,424 Q90,388 190,420 T370,404 L370,490 L-10,490 Z"/>', "#7FA06B", 4, 3) +
+      riso('<path d="M-10,452 Q120,428 230,452 T370,446 L370,490 L-10,490 Z"/>', "#2E5E4E", 4, 3)
+    ));
+  },
+  fireworks: function() {
+    function burst(cx, cy, r, n, c) {
+      var s = "";
+      for (var i = 0; i < n; i++) {
+        var a = (i / n) * Math.PI * 2;
+        s += '<line x1="' + (cx + Math.cos(a) * r * 0.32).toFixed(1) + '" y1="' + (cy + Math.sin(a) * r * 0.32).toFixed(1) + '" x2="' + (cx + Math.cos(a) * r).toFixed(1) + '" y2="' + (cy + Math.sin(a) * r).toFixed(1) + '"/>' +
+          '<circle cx="' + (cx + Math.cos(a) * (r + 9)).toFixed(1) + '" cy="' + (cy + Math.sin(a) * (r + 9)).toFixed(1) + '" r="3" fill="' + c + '" stroke="none"/>';
+      }
+      return '<g stroke="' + c + '" stroke-width="4" stroke-linecap="round">' + s + '</g>';
+    }
+    function star(x, y, s) { return '<path transform="translate(' + x + ',' + y + ') scale(' + s + ')" d="M0,-10 Q1.5,-1.5 10,0 Q1.5,1.5 0,10 Q-1.5,1.5 -10,0 Q-1.5,-1.5 0,-10 Z" fill="#F8E7C6"/>'; }
+    return svgCard("#1C2747", wob(
+      burst(108, 120, 66, 16, "#F2B233") + burst(262, 176, 58, 14, "#F49AB0") + burst(160, 262, 44, 12, "#E8502F") + burst(290, 300, 26, 10, "#F2B233") +
+      star(46, 236, 1) + star(316, 70, 0.8) + star(220, 72, 0.6) + star(60, 330, 0.7) + star(236, 330, 0.9)
+    ), 0.28);
+  },
+  envelope: function() {
+    return svgCard("#D5E3EC",
+      '<g transform="rotate(-8 180 318)">' + wob(
+        riso('<rect x="64" y="236" width="232" height="152" rx="6"/>', "#FBF6EC", 5, 4) +
+        '<path d="M68,240 L180,326 L292,240" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linejoin="round"/>' +
+        '<path d="M68,384 L150,312 M292,384 L210,312" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
+        riso('<rect x="236" y="250" width="46" height="56" rx="2"/>', "#E8502F", 3, 3) +
+        '<rect x="232" y="246" width="54" height="64" fill="none" stroke="' + ART_INK + '" stroke-width="2" stroke-dasharray="3 4"/>' +
+        heartPath(259, 278, 0.7, 0).replace('<path ', '<path fill="#FBF6EC" ') +
+        '<g fill="none" stroke="#3E5C7A" stroke-width="2.5" stroke-linecap="round"><circle cx="214" cy="272" r="22" stroke-dasharray="5 5"/><path d="M168,262 Q178,256 188,262 T208,262 M164,276 Q174,270 184,276 T204,276 M168,290 Q178,284 188,290 T208,290"/></g>' +
+        '<g stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round" opacity=".55"><path d="M96,350 L176,350 M96,366 L150,366"/></g>'
+      ) + '</g>' +
+      riso(heartPath(80, 160, 0.8, -16), "#E8502F", 3, 2) + riso(heartPath(292, 430, 0.6, 14), "#F49AB0", 3, 2));
+  },
+  branch: function() {
+    var leaves = "", pts = [[118, 400, -60], [140, 368, 30], [150, 340, -70], [176, 314, 20], [184, 284, -64], [210, 262, 26], [216, 232, -58], [242, 214, 30], [250, 186, -50], [272, 168, 34]];
+    for (var i = 0; i < pts.length; i++) {
+      leaves += riso('<path transform="translate(' + pts[i][0] + ',' + pts[i][1] + ') rotate(' + pts[i][2] + ')" d="M0,0 Q22,-16 52,0 Q22,16 0,0 Z"/>', i % 3 === 0 ? "#8FA67E" : "#B5C3A3", 3, 3);
+    }
+    var sprig = '<path d="M60,470 Q84,420 74,360" fill="none" stroke="#5B6B4E" stroke-width="3" stroke-linecap="round"/>' +
+      riso('<path transform="translate(76,420) rotate(-130)" d="M0,0 Q18,-13 42,0 Q18,13 0,0 Z"/>', "#B5C3A3", 3, 3) +
+      riso('<path transform="translate(80,392) rotate(-40)" d="M0,0 Q18,-13 42,0 Q18,13 0,0 Z"/>', "#8FA67E", 3, 3) +
+      riso('<path transform="translate(75,364) rotate(-100)" d="M0,0 Q18,-13 42,0 Q18,13 0,0 Z"/>', "#B5C3A3", 3, 3);
+    return svgCard("#EDE8DF", wob(
+      sprig + '<path d="M86,452 Q150,360 196,280 T284,150" fill="none" stroke="#5B6B4E" stroke-width="3.5" stroke-linecap="round"/>' + leaves +
+      '<ellipse cx="164" cy="330" rx="6" ry="8" fill="#4A5A3E"/><ellipse cx="228" cy="236" rx="6" ry="8" fill="#4A5A3E"/>'
+    ), 0.2);
+  },
+  wreath: function() {
+    var s = "", berries = "";
+    for (var a = 0; a < 360; a += 10) {
+      var r = a * Math.PI / 180, x = 180 + Math.cos(r) * 124, y = 236 + Math.sin(r) * 124;
+      var r2 = (a + 5) * Math.PI / 180, x2 = 180 + Math.cos(r2) * 108, y2 = 236 + Math.sin(r2) * 108;
+      var rot = a + 90 + (a % 20 ? 30 : -30);
+      s += '<path transform="translate(' + x2.toFixed(1) + ',' + y2.toFixed(1) + ') rotate(' + (a + 95 - 30) + ') scale(1.1)" d="M-15,0 Q0,-9 15,0 Q0,9 -15,0 Z" fill="#3F6E48"/>';
+      s += '<path transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') rotate(' + rot + ') scale(1.35)" d="M-15,0 Q0,-9 15,0 Q0,9 -15,0 Z" fill="' + (a % 20 ? "#6E9B6A" : "#A3C49A") + '"/>';
+      if (a % 40 === 0 && (a < 50 || a > 130)) berries += '<circle cx="' + (x + 7).toFixed(1) + '" cy="' + (y - 5).toFixed(1) + '" r="5.5" fill="#E8502F"/><circle cx="' + (x - 4).toFixed(1) + '" cy="' + (y + 6).toFixed(1) + '" r="4.5" fill="#E8502F"/>';
+    }
+    var bow = riso('<path d="M180,344 Q150,320 138,340 Q150,362 180,344 Q210,320 222,340 Q210,362 180,344 Z M174,348 L160,386 M186,348 L200,386"/>', "#E8502F", 3, 2)
+      .replace(/stroke="#2B1B12"/g, 'stroke="#F8E7C6"');
+    return svgCard("#1F3D2F", wob(s + berries + '<g transform="translate(0,22) scale(1.15)" transform-origin="180 344">' + bow + '</g>'), 0.3);
+  }
+};
+
+// Photo-slot designs place the sender's photo in a frame. The slot box is a
+// fraction of the card (x, y, w, h) plus rotation in degrees.
+var ART_OVER = {
+  tape: function() {
+    return '<svg viewBox="0 0 360 480" width="100%" height="100%" style="position:absolute;inset:0;pointer-events:none;z-index:6" aria-hidden="true">' +
+      '<rect x="124" y="92" width="76" height="26" fill="#F2B233" opacity=".78" transform="rotate(-12 162 105)"/>' +
+      '<rect x="196" y="330" width="80" height="26" fill="#F49AB0" opacity=".8" transform="rotate(14 236 343)"/></svg>';
+  }
+};
+
+var OCCASIONS = [
+  { id: "birthday", label: "Birthday" },
+  { id: "thanks", label: "Thank you" },
+  { id: "love", label: "Love" },
+  { id: "just", label: "Just because" },
+  { id: "congrats", label: "Congrats" },
+  { id: "miss", label: "Miss you" },
+  { id: "sympathy", label: "Sympathy" },
+  { id: "holiday", label: "Holidays" }
+];
+
+var ART_DESIGNS = [
+  { id: "i-bd1", occasion: "birthday", label: "Five candles", art: "cake", headline: "Happy\nbirthday", font: "caprasimo", ink: "#D9472B", size: 54, pos: "top" },
+  { id: "i-bd2", occasion: "birthday", label: "Snapshot", art: "snapshotBg", over: "tape", slot: { x: 0.17, y: 0.2, w: 0.66, h: 0.56, rot: -4, frame: "polaroid" }, headline: "Happy birthday", font: "caveat", ink: "#2B1B12", size: 46, pos: "bottom" },
+  { id: "i-ty1", occasion: "thanks", label: "Tulips", art: "tulips", headline: "Thank\nyou", font: "instrument", italic: true, ink: "#1F3B2C", size: 80, pos: "top" },
+  { id: "i-lv1", occasion: "love", label: "Hearts", art: "hearts", headline: "You\n& me", font: "fraunces", italic: true, ink: "#8E1B2C", size: 72, pos: "center" },
+  { id: "i-jb1", occasion: "just", label: "Sunny", art: "sun", headline: "Thinking\nof you", font: "fraunces", ink: "#2B1B12", size: 50, pos: "top" },
+  { id: "i-cg1", occasion: "congrats", label: "Fireworks", art: "fireworks", headline: "Congrats!", font: "caprasimo", ink: "#F8E7C6", size: 60, pos: "bottom" },
+  { id: "i-my1", occasion: "miss", label: "Airmail", art: "envelope", headline: "Miss\nyou", font: "caveat", ink: "#1F2F4A", size: 92, pos: "top" },
+  { id: "i-sy1", occasion: "sympathy", label: "Olive branch", art: "branch", headline: "Holding you\nclose", font: "instrument", ink: "#3B3A36", size: 50, pos: "top" },
+  { id: "i-hd1", occasion: "holiday", label: "Wreath", art: "wreath", headline: "Happy\nholidays", font: "instrument", italic: true, ink: "#F8E7C6", size: 54, pos: "center", centerY: 0.49 }
+];
+ART.snapshotBg = function() {
+  return svgCard("#F3E1E6", confetti(3, 34, ["#E8502F", "#F2B233", "#5DA9A1", "#F49AB0"], [14, 14, 346, 466]));
+};
+ALL_DESIGNS = ALL_DESIGNS.concat(ART_DESIGNS);
+
+function findDesign(id) {
+  if (!id) return null;
+  return ALL_DESIGNS.find(function(d) { return d.id === id; }) || null;
+}
 
 var LAYOUT_MAP = {
   "centered":      { justifyContent: "center",    alignItems: "center",     textAlign: "center" },
@@ -576,11 +791,23 @@ function renderInstallBanner(parent) {
 }
 
 // Initialize state from shared data or defaults
+// Shared links are untrusted: keep only known emoji and clamp numbers.
+var ALLOWED_EMOJI = {};
+EMOJI_CATEGORIES.forEach(function(c) { c.emojis.forEach(function(e) { ALLOWED_EMOJI[e] = true; }); });
+function clampNum(v, lo, hi, dflt) { v = Number(v); return isFinite(v) ? Math.max(lo, Math.min(hi, v)) : dflt; }
+function sanitizeStickers(list) {
+  if (!Array.isArray(list)) return [];
+  return list.slice(0, 40).filter(function(s) { return s && ALLOWED_EMOJI[s.emoji]; }).map(function(s, i) {
+    return { emoji: s.emoji, x: clampNum(s.x, 0, 100, 50), y: clampNum(s.y, 0, 100, 50), rotation: clampNum(s.rotation, -180, 180, 0), scale: clampNum(s.scale, 0.3, 3, 1), size: clampNum(s.size, 10, 120, 28), id: i + Math.random() };
+  });
+}
+function safeHex(v) { return typeof v === "string" && /^#[0-9a-fA-F]{6}$/.test(v) ? v : null; }
+
 function initState() {
   if (sharedData) {
     var fb = sharedData.f || {};
     var bb = sharedData.b || {};
-    var restoredDesign = fb.ds ? ALL_DESIGNS.find(function(d) { return d.id === fb.ds; }) || null : null;
+    var restoredDesign = findDesign(fb.ds);
     // If design exists, use its background; otherwise use the encoded bg
     var restoredFrontBg = restoredDesign
       ? (ALL_BGS.find(function(b) { return b.id === restoredDesign.bg; }) || BG_CATEGORIES[0].items[0])
@@ -593,18 +820,21 @@ function initState() {
       frontLayout: ALL_LAYOUTS.find(function(l) { return l.id === "centered"; }),
       frontPhoto: null,
       frontDesign: restoredDesign,
-      frontStickers: fb.st ? fb.st.map(function(s, i) { s.id = i + Math.random(); return s; }) : [],
-      frontText: restoredDesign ? restoredDesign.text : (fb.tx || ""),
+      frontStickers: sanitizeStickers(fb.st),
+      frontText: restoredDesign && restoredDesign.art ? (typeof fb.tx === "string" ? fb.tx : null) : restoredDesign ? restoredDesign.text : (fb.tx || ""),
+      frontHeadFont: typeof fb.hf === "string" && ALL_FONTS.some(function(f) { return f.id === fb.hf; }) ? fb.hf : null,
+      frontInk: safeHex(fb.ik),
+      frontPhotoCrop: null,
       frontFont: ALL_FONTS.find(function(f) { return f.id === (fb.fn || "playfair"); }) || ALL_FONTS[0],
       frontTextColor: TEXT_COLORS.find(function(t) { return t.id === (fb.tc || "white"); }) || TEXT_COLORS[0],
-      frontFontSize: fb.fs || 1.0,
+      frontFontSize: clampNum(fb.fs, 0.5, 2, 1),
       // Back
       backBg: ALL_BGS.find(function(b) { return b.id === (bb.bg || "s8"); }) || ALL_BGS.find(function(b) { return b.id === "s8"; }),
       backLayout: ALL_LAYOUTS.find(function(l) { return l.id === (bb.ly || "centered"); }) || ALL_LAYOUTS.find(function(l) { return l.id === "centered"; }),
       backFont: ALL_FONTS.find(function(f) { return f.id === (bb.fn || "caveat"); }) || ALL_FONTS.find(function(f) { return f.id === "caveat"; }),
       backTextColor: TEXT_COLORS.find(function(t) { return t.id === (bb.tc || "ink"); }) || TEXT_COLORS.find(function(t) { return t.id === "ink"; }),
-      backFontSize: bb.fs || 1.0,
-      backStickers: bb.st ? bb.st.map(function(s, i) { s.id = i + Math.random(); return s; }) : [],
+      backFontSize: clampNum(bb.fs, 0.5, 2, 1),
+      backStickers: sanitizeStickers(bb.st),
       message: bb.ms || "",
       recipientName: bb.to || "",
       senderName: bb.fr || "",
@@ -754,6 +984,78 @@ function updateCharCounter() {
 
 // ── CARD RENDERER ──
 
+var FONT_WEIGHT = { caprasimo: 400, fraunces: 600, instrument: 400, caveat: 700, dancing: 700, abril: 400, righteous: 400 };
+
+function fontFamilyFor(id) {
+  var f = ALL_FONTS.find(function(x) { return x.id === id; }) || ALL_FONTS[0];
+  return "'" + f.name + "'," + f.style;
+}
+
+function artHeadline(d) {
+  return state.frontText == null ? d.headline : state.frontText;
+}
+
+function renderArtFront(card, d, scale) {
+  card.appendChild(h("div", { style: "position:absolute;inset:0", html: ART[d.art]() }));
+
+  if (d.slot) {
+    var s = d.slot, polaroid = s.frame === "polaroid";
+    var frame = h("div", { style: "position:absolute;left:" + (s.x * 100) + "%;top:" + (s.y * 100) + "%;width:" + (s.w * 100) + "%;height:" + (s.h * 100) + "%;transform:rotate(" + s.rot + "deg);background:#fff;box-sizing:border-box;padding:" + (polaroid ? (10 * scale) + "px " + (10 * scale) + "px " + (34 * scale) + "px" : (8 * scale) + "px") + ";box-shadow:0 " + (6 * scale) + "px " + (18 * scale) + "px rgba(43,27,18,0.18);z-index:4" });
+    var win = h("div", { style: "width:100%;height:100%;overflow:hidden;position:relative;background:#E9E1D6" });
+    if (state.frontPhoto) {
+      var crop = state.frontPhotoCrop || [50, 50, 1];
+      win.appendChild(h("img", { src: state.frontPhoto, alt: "", style: "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:" + crop[0] + "% " + crop[1] + "%;transform:scale(" + crop[2] + ");transform-origin:" + crop[0] + "% " + crop[1] + "%" }));
+    } else {
+      var ph = h("div", { style: "position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:" + (8 * scale) + "px;color:#8C7B6E;font-family:'Instrument Sans',sans-serif;font-size:" + (13 * scale) + "px;font-weight:500;background:repeating-linear-gradient(45deg,#EFE8DE 0 " + (10 * scale) + "px,#E9E1D6 " + (10 * scale) + "px " + (20 * scale) + "px)" });
+      ph.appendChild(icon("image", 28 * scale));
+      ph.appendChild(h("span", null, "Your photo here"));
+      win.appendChild(ph);
+    }
+    frame.appendChild(win);
+    card.appendChild(frame);
+  }
+  if (d.over && ART_OVER[d.over]) card.appendChild(h("div", { style: "position:absolute;inset:0;z-index:6;pointer-events:none", html: ART_OVER[d.over]() }));
+
+  var text = artHeadline(d);
+  if (text) {
+    var fontId = state.frontHeadFont || d.font;
+    var posCss = d.pos === "bottom" ? "bottom:7%;" : d.pos === "center" ? "top:" + ((d.centerY || 0.5) * 100) + "%;transform:translateY(-50%);" : "top:7%;";
+    card.appendChild(h("p", { style: "position:absolute;left:7%;right:7%;" + posCss + "margin:0;z-index:7;text-align:center;white-space:pre-line;text-wrap:balance;overflow-wrap:break-word;line-height:0.95;letter-spacing:-0.01em;" +
+      "font-family:" + fontFamilyFor(fontId) + ";font-weight:" + (FONT_WEIGHT[fontId] || 600) + ";font-style:" + (d.italic && fontId === d.font ? "italic" : "normal") + ";" +
+      "font-size:" + (d.size * scale * (state.frontFontSize || 1)) + "px;color:" + (state.frontInk || d.ink) }, text));
+  }
+}
+
+// ── ICONS (Lucide paths, MIT) ──
+var ICONS = {
+  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+  arrowRight: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  arrowLeft: '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+  rotate: '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
+  mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  message: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  share: '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  sliders: '<path d="M21 4h-7"/><path d="M10 4H3"/><path d="M21 12h-9"/><path d="M8 12H3"/><path d="M21 20h-5"/><path d="M12 20H3"/><path d="M14 2v4"/><path d="M8 10v4"/><path d="M16 18v4"/>',
+  upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/>',
+  smile: '<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/>',
+  type: '<path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/>',
+  palette: '<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 11.990 2z"/>',
+  layout: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>',
+  alert: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  sparkle: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>'
+};
+function icon(name, size, strokeWidth) {
+  var span = document.createElement("span");
+  span.style.cssText = "display:inline-flex;line-height:0;flex-shrink:0";
+  span.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="' + (size || 18) + '" height="' + (size || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (strokeWidth || 2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[name] || "") + '</svg>';
+  return span;
+}
+
 function renderCardSide(side, size, interactive) {
   var scaleMap = { small: 0.48, preview: 0.82, mobile: Math.min((window.innerWidth - 40) / 360, 0.85), previewMobile: Math.min((window.innerWidth - 40) / 360, (window.innerHeight - 180) / 480, 0.82), reveal: 0.88, normal: 1.15 };
   var scale = scaleMap[size] || 1;
@@ -777,7 +1079,9 @@ function renderCardSide(side, size, interactive) {
     // Front card: full bleed photo, pre-designed card, or background only
     var photoSrc = state.frontPhoto;
 
-    if (photoSrc) {
+    if (state.frontDesign && state.frontDesign.art) {
+      renderArtFront(card, state.frontDesign, scale);
+    } else if (photoSrc) {
       // Full bleed photo covers entire card
       card.appendChild(h("img", { src: photoSrc, style: "position:absolute;inset:0;width:100%;height:100%;object-fit:cover" }));
     } else if (state.frontDesign) {
@@ -828,10 +1132,10 @@ function renderCardSide(side, size, interactive) {
   // Stickers
   for (var si = 0; si < stickers.length; si++) {
     (function(sticker) {
+      // textContent only: sticker data can come from a shared link.
       var stickerEl = h("div", {
-        style: "position:absolute;left:" + sticker.x + "%;top:" + sticker.y + "%;transform:rotate(" + sticker.rotation + "deg) scale(" + sticker.scale + ");font-size:" + ((sticker.size || 28) * scale) + "px;user-select:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.12));touch-action:none;z-index:10;cursor:" + (interactive ? "grab" : "default"),
-        html: sticker.emoji
-      });
+        style: "position:absolute;left:" + sticker.x + "%;top:" + sticker.y + "%;transform:rotate(" + sticker.rotation + "deg) scale(" + sticker.scale + ");font-size:" + ((sticker.size || 28) * scale) + "px;user-select:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.12));touch-action:none;z-index:10;cursor:" + (interactive ? "grab" : "default")
+      }, String(sticker.emoji));
       stickerEl.dataset.sid = sticker.id;
       if (interactive) {
         stickerEl.addEventListener("mousedown", function(e) { e.preventDefault(); startDrag(sticker.id, e.clientX, e.clientY); });
