@@ -448,6 +448,64 @@ body.st-lock { overflow: hidden; }
   .op-arrive, .op-book, .op-settle { animation: none; }
   .op-flap, .op-card-in, .op-scene-wrap, .op-cover { transition: none; }
 }
+
+/* ═══ Browse ═══ */
+.br-head { text-align: center; padding: 56px 24px 24px; max-width: 1280px; margin: 0 auto; }
+.br-h1 { font-weight: 500; font-size: clamp(56px, 9vw, 128px); letter-spacing: -0.05em; line-height: .95; margin: 12px 0 28px; }
+.br-search { display: flex; align-items: center; gap: 10px; max-width: 560px; margin: 0 auto; background: var(--paper); border-radius: 999px; padding: 0 20px; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); }
+.br-search:focus-within { box-shadow: inset 0 0 0 2px var(--ink); }
+.br-search input { flex: 1; border: none; background: none; font: inherit; font-size: 16px; padding: 15px 0; color: var(--ink); outline: none; }
+.br-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+.br-pill { border: 1px solid var(--line); background: var(--paper); border-radius: 999px; padding: 9px 18px; font: inherit; font-size: 15px; color: var(--ink); cursor: pointer; }
+.br-pill:hover { border-color: var(--ink); }
+.br-pill.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.br-results { background: #fff; padding: 40px 0 96px; min-height: 50vh; }
+.br-row { max-width: 1280px; margin: 0 auto 40px; padding: 0 48px; }
+.br-row-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.br-row-h h2 { font-weight: 500; font-size: 30px; letter-spacing: -0.03em; margin: 0; }
+.br-row-ctl { display: flex; align-items: center; gap: 8px; }
+.br-all { background: none; border: none; font: inherit; font-size: 15px; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; margin-right: 8px; }
+.br-arrow { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink); }
+.br-arrow:hover { border-color: var(--ink); }
+.br-track { display: grid; grid-auto-flow: column; grid-auto-columns: 216px; gap: 28px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 6px 4px 12px; scrollbar-width: none; }
+.br-track::-webkit-scrollbar { display: none; }
+.br-card { scroll-snap-align: start; background: none; border: none; padding: 0; text-align: left; cursor: pointer; font: inherit; color: var(--ink); }
+.br-card-art { transition: transform .25s cubic-bezier(.2,.7,.2,1); }
+.br-card:hover .br-card-art { transform: translateY(-4px) rotate(-1deg); }
+.br-card:focus-visible { outline: 2px solid var(--tomato); outline-offset: 4px; border-radius: 12px; }
+.br-cap { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 16px; }
+.br-grid { max-width: 1280px; margin: 0 auto; padding: 0 48px; display: grid; grid-template-columns: repeat(auto-fill, 216px); justify-content: center; gap: 40px 28px; }
+.br-empty { text-align: center; color: var(--ink-2); font-size: 17px; padding: 40px 16px; }
+
+/* ═══ Card detail ═══ */
+.dt { position: fixed; inset: 0; z-index: 200; background: rgba(34,18,10,0.45); display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn .2s ease; }
+.dt-box { width: min(560px, 100%); max-height: calc(100dvh - 32px); overflow: auto; background: var(--paper); border-radius: 24px; box-shadow: 0 30px 80px rgba(34,18,10,0.35); animation: opRise .3s cubic-bezier(.2,.8,.2,1); }
+.dt-top { position: relative; height: 420px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.dt-scene { position: relative; width: 300px; height: 320px; }
+.dt-env { position: absolute; left: 0; top: 62px; transform: rotate(-8deg); }
+.dt-card { position: absolute !important; right: 10px; top: 10px; }
+.dt-btn { position: absolute; z-index: 3; border: none; background: var(--paper); color: var(--ink); border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 10px rgba(34,18,10,0.12); font: inherit; font-size: 14px; }
+.dt-btn:focus-visible { outline: 2px solid var(--tomato); outline-offset: 2px; }
+.dt-x { left: 16px; top: 16px; width: 40px; height: 40px; }
+.dt-pv { right: 16px; top: 16px; padding: 10px 16px; }
+.dt-prev, .dt-next { top: 50%; transform: translateY(-50%); width: 40px; height: 40px; }
+.dt-prev { left: 16px; }
+.dt-next { right: 16px; }
+.dt-info { padding: 22px 28px 28px; }
+.dt-info h2 { font-weight: 500; font-size: 32px; letter-spacing: -0.03em; margin: 6px 0 0; }
+.dt-start { width: 100%; justify-content: center; margin-top: 20px; padding: 16px; }
+@media (max-width: 760px) {
+  .br-head { padding: 32px 16px 16px; }
+  .br-pills { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; padding-bottom: 4px; }
+  .br-pill { white-space: nowrap; }
+  .br-row { padding: 0 16px; }
+  .br-row-h h2 { font-size: 22px; }
+  .br-arrow { display: none; }
+  .br-track { grid-auto-columns: 158px; gap: 16px; }
+  .br-grid { padding: 0 16px; grid-template-columns: repeat(2, 158px); gap: 24px 16px; }
+  .dt-top { height: 360px; }
+  .dt-scene { transform: scale(.88); }
+}
 </style>
 </head>
 <body>
@@ -2146,6 +2204,9 @@ function render() {
   if (state.screen === "studio") { ensureStudio(); document.body.classList.add("st-lock"); renderStudio(app); return; }
   document.body.classList.remove("st-lock");
 
+  if (state.screen === "browse") { renderBrowse(app, state.browseOcc); return; }
+  if (state.screen === "detail") { renderCardDetail(app, state.detailId); return; }
+
   // ═══ DESIGN GALLERY (review page, ?designs) ═══
   if (state.screen === "designs") { renderDesignGallery(app); return; }
 
@@ -2201,7 +2262,8 @@ function render() {
     logo.appendChild(document.createTextNode("Sendr"));
     nav.appendChild(logo);
     var links = h("div", { className: "mk-links" });
-    [["Cards", "occasions"], ["How it works", "how"], ["Photo cards", "photo"]].forEach(function(l) {
+    links.appendChild(h("button", { onClick: function() { go("#/cards"); } }, "Cards"));
+    [["How it works", "how"], ["Photo cards", "photo"]].forEach(function(l) {
       links.appendChild(h("button", { onClick: function() { goTo(l[1]); } }, l[0]));
     });
     nav.appendChild(links);
@@ -2219,7 +2281,7 @@ function render() {
       { id: "i-bd2", tag: "Your photo", style: "right:9%;top:430px;transform:rotate(-6deg)", tagPos: "left:-6px;bottom:-28px" }
     ];
     floats.forEach(function(f) {
-      var wrap = h("div", { className: "mk-float", style: f.style, onClick: function() { startWith(f.id); } });
+      var wrap = h("div", { className: "mk-float", style: f.style, onClick: function() { go("#/card/" + f.id); } });
       wrap.appendChild(h("span", { className: "mk-tag", style: f.tagPos }, f.tag));
       wrap.appendChild(artCard(f.id, "small"));
       hero.appendChild(wrap);
@@ -2231,7 +2293,7 @@ function render() {
     hero.appendChild(h("p", { className: "mk-sub" }, "Beautiful cards for birthdays, thank yous and every moment in between. Write a note, send it by text or email, and watch it open like the real thing."));
     var ctas = h("div", { className: "mk-ctas" });
     ctas.appendChild(pill("tomato", "Send a card", ctaAction, true));
-    ctas.appendChild(pill("paper", "Browse cards", function() { goTo("occasions"); }));
+    ctas.appendChild(pill("paper", "Browse cards", function() { go("#/cards"); }));
     hero.appendChild(ctas);
     var fan = h("div", { className: "mk-fan" });
     [["i-bd1", -10, -96], ["i-lv1", 0, 0], ["i-ty1", 10, 96]].forEach(function(c, i) {
@@ -2262,7 +2324,7 @@ function render() {
     var grid = h("div", { className: "mk-grid" });
     tiles.forEach(function(t) {
       var label = OCCASIONS.find(function(o) { return o.id === t.oc; }).label;
-      var tile = h("button", { className: "mk-tile", style: "background:" + t.bg, onClick: function() { startWith(t.card); }, "aria-label": "Browse " + label + " cards" });
+      var tile = h("button", { className: "mk-tile", style: "background:" + t.bg, onClick: function() { go("#/cards/" + t.oc); }, "aria-label": "Browse " + label + " cards" });
       tile.appendChild(h("span", { className: "mk-tile-t" }, label));
       var c = h("div", { className: "mk-tile-card", style: "--r:" + t.r + "deg" });
       c.appendChild(artCard(t.card, "small"));
@@ -3138,6 +3200,13 @@ function applyRoute() {
   } else if (parts[0] === "send") {
     ensureStudio();
     state.screen = "send";
+  } else if (parts[0] === "cards") {
+    state.screen = "browse";
+    state.browseOcc = OCCASIONS.some(function(o) { return o.id === parts[1]; }) ? parts[1] : null;
+    state.detailFrom = state.browseOcc;
+  } else if (parts[0] === "card") {
+    state.screen = "detail";
+    state.detailId = parts[1];
   } else if (parts[0] === "preview") {
     ensureStudio();
     state.screen = "preview";
@@ -3146,8 +3215,11 @@ function applyRoute() {
     state.screen = "marketing";
   }
   document.body.classList.toggle("st-lock", state.screen === "studio");
+  var keepScroll = state.screen === "detail" || (state.screen === "browse" && state.lastScreen === "detail");
+  state.lastScreen = state.screen;
+  var y = window.scrollY;
   render();
-  if (state.screen !== "studio") window.scrollTo(0, 0);
+  if (state.screen !== "studio") window.scrollTo(0, keepScroll ? y : 0);
 }
 window.addEventListener("hashchange", applyRoute);
 
@@ -3629,6 +3701,177 @@ function resizePhoto(file, max, q, done) {
     img.src = reader.result;
   };
   reader.readAsDataURL(file);
+}
+
+// ═══ BROWSE + CARD DETAIL ═══
+function artThumb(d, scale) {
+  return thumbWith({ frontDesign: d, frontText: null, frontPhoto: null, frontHeadFont: null, frontInk: null, frontFontSize: 1, frontStickers: [] }, scale);
+}
+function startDesign(d) {
+  ensureStudio();
+  state.frontStickers = [];
+  applyDesign(d);
+  go("#/studio/card");
+}
+function siteNav() {
+  var nav = h("nav", { className: "mk-nav" });
+  var logo = h("button", { className: "mk-logo", onClick: function() { go("#/"); }, "aria-label": "Sendr home" });
+  var mark = h("i");
+  mark.appendChild(icon("mail", 15, 2.2));
+  logo.appendChild(mark);
+  logo.appendChild(document.createTextNode("Sendr"));
+  nav.appendChild(logo);
+  var links = h("div", { className: "mk-links" });
+  links.appendChild(h("button", { onClick: function() { go("#/cards"); } }, "Cards"));
+  links.appendChild(h("button", { onClick: function() { go("#/"); setTimeout(function() { var el = document.getElementById("how"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 50); } }, "How it works"));
+  links.appendChild(h("button", { onClick: function() { var d = ART_DESIGNS.find(function(x) { return x.slot; }); if (d) startDesign(d); } }, "Photo cards"));
+  nav.appendChild(links);
+  var cta = h("button", { className: "mk-pill mk-pill-ink mk-pill-sm mk-nav-cta", onClick: function() { go("#/studio/card"); } }, "Send a card");
+  nav.appendChild(cta);
+  return nav;
+}
+function matchesQuery(d, q) {
+  if (!q) return true;
+  var occ = (OCCASIONS.find(function(o) { return o.id === d.occasion; }) || {}).label || "";
+  return (d.label + " " + occ + " " + (d.headline || "")).toLowerCase().indexOf(q.toLowerCase()) > -1;
+}
+
+function renderBrowse(app, occId) {
+  var root = h("div", { className: "mk br" });
+  root.appendChild(siteNav());
+  var head = h("header", { className: "br-head" });
+  var occ = OCCASIONS.find(function(o) { return o.id === occId; });
+  head.appendChild(h("div", { className: "mk-eyebrow", style: "color:var(--ink-2)" }, occ ? "Cards for" : "For every occasion"));
+  head.appendChild(h("h1", { className: "br-h1" }, occ ? occ.label : "Cards"));
+  var search = h("label", { className: "br-search" });
+  search.appendChild(icon("search", 18));
+  var q = h("input", { type: "search", placeholder: "Search for birthday, thank you, love...", "aria-label": "Search cards" });
+  q.value = state.browseQuery || "";
+  search.appendChild(q);
+  head.appendChild(search);
+  var pills = h("div", { className: "br-pills" });
+  pills.appendChild(h("button", { className: "br-pill" + (!occ ? " on" : ""), onClick: function() { go("#/cards"); } }, "All"));
+  OCCASIONS.forEach(function(o) {
+    if (!ART_DESIGNS.some(function(d) { return d.occasion === o.id; })) return;
+    pills.appendChild(h("button", { className: "br-pill" + (occ && occ.id === o.id ? " on" : ""), onClick: function() { go("#/cards/" + o.id); } }, o.label));
+  });
+  head.appendChild(pills);
+  root.appendChild(head);
+
+  var results = h("div", { className: "br-results" });
+  root.appendChild(results);
+
+  function card(d) {
+    var b = h("button", { className: "br-card", onClick: function() { go("#/card/" + d.id); }, "aria-label": d.label });
+    var art = h("div", { className: "br-card-art" });
+    art.appendChild(artThumb(d, isMobile() ? 0.44 : 0.6));
+    b.appendChild(art);
+    var cap = h("div", { className: "br-cap" });
+    cap.appendChild(h("span", null, d.label));
+    cap.appendChild(icon("arrowRight", 16, 1.5));
+    b.appendChild(cap);
+    return b;
+  }
+  function draw() {
+    results.innerHTML = "";
+    var query = (state.browseQuery || "").trim();
+    var list = ART_DESIGNS.filter(function(d) { return (!occ || d.occasion === occ.id) && matchesQuery(d, query); });
+    if (!list.length) {
+      results.appendChild(h("p", { className: "br-empty" }, "No cards match that yet. Try birthday, love or thanks."));
+      return;
+    }
+    if (occ || query) {
+      var grid = h("div", { className: "br-grid" });
+      list.forEach(function(d) { grid.appendChild(card(d)); });
+      results.appendChild(grid);
+      return;
+    }
+    OCCASIONS.forEach(function(o) {
+      var row = list.filter(function(d) { return d.occasion === o.id; });
+      if (!row.length) return;
+      var sec = h("section", { className: "br-row" });
+      var rh = h("div", { className: "br-row-h" });
+      rh.appendChild(h("h2", null, o.label + " cards"));
+      var ctl = h("div", { className: "br-row-ctl" });
+      var all = h("button", { className: "br-all", onClick: function() { go("#/cards/" + o.id); } }, "View all");
+      ctl.appendChild(all);
+      var track = h("div", { className: "br-track" });
+      var prev = h("button", { className: "br-arrow", "aria-label": "Scroll left", onClick: function() { track.scrollBy({ left: -track.clientWidth * 0.8, behavior: "smooth" }); } });
+      prev.appendChild(icon("chevronLeft", 18));
+      var next = h("button", { className: "br-arrow", "aria-label": "Scroll right", onClick: function() { track.scrollBy({ left: track.clientWidth * 0.8, behavior: "smooth" }); } });
+      next.appendChild(icon("chevronRight", 18));
+      ctl.appendChild(prev);
+      ctl.appendChild(next);
+      rh.appendChild(ctl);
+      sec.appendChild(rh);
+      row.forEach(function(d) { track.appendChild(card(d)); });
+      sec.appendChild(track);
+      results.appendChild(sec);
+    });
+  }
+  q.addEventListener("input", function() { state.browseQuery = q.value; draw(); });
+  draw();
+  app.appendChild(root);
+}
+
+function renderCardDetail(app, id) {
+  var d = findDesign(id);
+  if (!d || !d.art) { go("#/cards"); return; }
+  renderBrowse(app, state.detailFrom || null);
+  var siblings = ART_DESIGNS.filter(function(x) { return x.occasion === d.occasion; });
+  var i = siblings.indexOf(d);
+  var env = sanitizeEnv(OCCASION_DEFAULTS[d.occasion]);
+  var overlay = h("div", { className: "dt", role: "dialog", "aria-modal": "true", "aria-label": d.label });
+  function close() { go(state.detailFrom ? "#/cards/" + state.detailFrom : "#/cards"); }
+  overlay.addEventListener("click", function(e) { if (e.target === overlay) close(); });
+  var box = h("div", { className: "dt-box" });
+  var top = h("div", { className: "dt-top", style: backdropCss(env.k) });
+  var x = h("button", { className: "dt-btn dt-x", "aria-label": "Close", onClick: close });
+  x.appendChild(icon("x", 18));
+  top.appendChild(x);
+  var pv = h("button", { className: "dt-btn dt-pv", onClick: function() {
+    ensureStudio(); state.frontStickers = []; applyDesign(d); go("#/preview");
+  } });
+  pv.appendChild(icon("eye", 16));
+  pv.appendChild(h("span", null, "Preview"));
+  top.appendChild(pv);
+  var scene = h("div", { className: "dt-scene" });
+  var envEl = envelopeBack(env, 190);
+  envEl.className = "dt-env";
+  scene.appendChild(envEl);
+  var c = artThumb(d, 0.62);
+  c.classList.add("dt-card");
+  scene.appendChild(c);
+  top.appendChild(scene);
+  if (siblings.length > 1) {
+    var prev = h("button", { className: "dt-btn dt-prev", "aria-label": "Previous card", onClick: function() { go("#/card/" + siblings[(i - 1 + siblings.length) % siblings.length].id); } });
+    prev.appendChild(icon("chevronLeft", 20));
+    var next = h("button", { className: "dt-btn dt-next", "aria-label": "Next card", onClick: function() { go("#/card/" + siblings[(i + 1) % siblings.length].id); } });
+    next.appendChild(icon("chevronRight", 20));
+    top.appendChild(prev);
+    top.appendChild(next);
+  }
+  box.appendChild(top);
+  var info = h("div", { className: "dt-info" });
+  var occ = OCCASIONS.find(function(o) { return o.id === d.occasion; });
+  info.appendChild(h("div", { className: "mk-eyebrow", style: "color:var(--ink-2)" }, occ ? occ.label : ""));
+  info.appendChild(h("h2", null, d.label));
+  if (d.slot) info.appendChild(h("p", { className: "st-note", style: "margin:4px 0 0" }, "Has a frame for your own photo."));
+  var start = h("button", { className: "mk-pill mk-pill-ink dt-start", onClick: function() { startDesign(d); } }, "Start with this card");
+  start.appendChild(icon("arrowRight", 18));
+  info.appendChild(start);
+  box.appendChild(info);
+  overlay.appendChild(box);
+  app.appendChild(overlay);
+  document.body.classList.add("st-lock");
+  function onKey(e) {
+    if (!overlay.isConnected) { document.removeEventListener("keydown", onKey); return; }
+    if (e.key === "Escape") close();
+    if (e.key === "ArrowLeft" && siblings.length > 1) go("#/card/" + siblings[(i - 1 + siblings.length) % siblings.length].id);
+    if (e.key === "ArrowRight" && siblings.length > 1) go("#/card/" + siblings[(i + 1) % siblings.length].id);
+  }
+  document.addEventListener("keydown", onKey);
+  requestAnimationFrame(function() { start.focus({ preventScroll: true }); });
 }
 
 // Review page listing every illustrated design. Renders each design through
