@@ -4725,7 +4725,7 @@ function renderDesignGallery(app) {
   OCCASIONS.forEach(function(oc) { occLabel[oc.id] = oc.label; });
   var sec = h("div", { style: "max-width:1240px;margin:0 auto;padding:48px 24px 8px" });
   var row = h("div", { style: "display:grid;grid-template-columns:repeat(auto-fill,252px);justify-content:center;gap:40px 32px" });
-  [ART_DESIGNS].forEach(function(list) {
+  [ART_DESIGNS.slice(state.reviewFrom || 0)].forEach(function(list) {
     list.forEach(function(d) {
       state.frontDesign = d; state.frontText = null; state.frontPhoto = null; state.frontHeadFont = null; state.frontInk = null; state.frontFontSize = 1; state.frontStickers = [];
       var cell = h("div", { style: "width:252px" });
@@ -4795,7 +4795,16 @@ window.addEventListener("resize", function() {
     render();
   }, 200);
 });
-if (!sharedData && /^#\//.test(location.hash)) applyRoute(); else render();
+// Dev review: ?designs&pack=name loads .pack/name.js and shows only its designs.
+var packMatch = /[?&]pack=([a-z0-9_-]+)/.exec(location.search);
+if (state.screen === "designs" && packMatch) {
+  state.reviewFrom = ART_DESIGNS.length;
+  var packScript = document.createElement("script");
+  packScript.src = ".pack/" + packMatch[1] + ".js?v=" + Date.now();
+  packScript.onload = function() { ALL_DESIGNS = ALL_DESIGNS.concat(ART_DESIGNS.slice(state.reviewFrom)); render(); };
+  packScript.onerror = function() { document.title = "PACK LOAD ERROR"; render(); };
+  document.body.appendChild(packScript);
+} else if (!sharedData && /^#\//.test(location.hash)) applyRoute(); else render();
 
 </script>
 <script>
