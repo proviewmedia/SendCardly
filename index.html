@@ -394,7 +394,7 @@ body.st-lock { overflow: hidden; }
 .op-pocket { z-index: 3; pointer-events: none; filter: drop-shadow(0 10px 18px rgba(34,18,10,0.14)); }
 .op-holder { position: absolute; z-index: 2; clip-path: inset(-400% -30% 0 -30%); }
 .op-card-in { transition: transform .8s cubic-bezier(.3,.7,.2,1); box-shadow: 0 6px 18px rgba(34,18,10,0.12) !important; }
-.op-scene.pull .op-card-in { transform: translateY(-88%); }
+.op-scene.pull .op-card-in { transform: translateY(-62%); }
 .op-flap { position: absolute; left: 0; right: 0; top: 0; z-index: 4; transform-origin: top center; transform-style: preserve-3d; transition: transform .6s cubic-bezier(.4,0,.2,1); }
 .op-flap.behind { z-index: 1; }
 .op-scene.flap-open .op-flap { transform: rotateX(180deg); }
@@ -3363,14 +3363,28 @@ function renderOpening(app, isPreview) {
       scene.classList.add("flap-open");
       opLater(function() { flap.classList.add("behind"); }, fast ? 0 : 380);
       opLater(function() { scene.classList.add("pull"); }, fast ? 0 : 650);
-      opLater(function() { scene.classList.add("drop"); }, fast ? 0 : 1450);
-      opLater(showCard, fast ? 50 : 1900);
+      opLater(function() {
+        // Glide the card from where it left the envelope to exactly where the
+        // openable card will sit, then swap it in at that spot.
+        var cw = 360 * s, ch = 480 * s;
+        var sr = stage.getBoundingClientRect();
+        var tx = sr.left + W / 2 - cw / 2, ty = sr.top + Math.max(8, (H - ch) / 2);
+        var r = cardEl.getBoundingClientRect();
+        var natTop = r.top + r.height * 0.62, natLeft = r.left;
+        cardEl.style.transition = fast ? "none" : "transform .75s cubic-bezier(.33,.0,.2,1), border-radius .75s ease";
+        cardEl.style.transformOrigin = "0 0";
+        cardEl.style.transform = "translate(" + (tx - natLeft) + "px," + (ty - natTop) + "px) scale(" + (cw / r.width) + ")";
+        cardEl.style.borderTopLeftRadius = "0";
+        cardEl.style.borderBottomLeftRadius = "0";
+        scene.classList.add("drop");
+      }, fast ? 0 : 1450);
+      opLater(function() { showCard(false, true); }, fast ? 50 : 2250);
     });
   }
 
   // A real fold: the inside page sits right of the spine, the cover is hinged on the
   // spine and swings open to the left, showing its blank inside face. The card stays open.
-  function showCard(startOpen) {
+  function showCard(startOpen, seamless) {
     state.opPhase = startOpen ? "inside" : "card";
     stage.innerHTML = "";
     var cw = 360 * s, ch = 480 * s;
@@ -3397,7 +3411,7 @@ function renderOpening(app, isPreview) {
     backFace.appendChild(h("div", { className: "op-shade op-shade-back" }));
     cover.appendChild(backFace);
     book.appendChild(cover);
-    var riser = h("div", { className: "op-riser" + (startOpen ? "" : " op-rise") });
+    var riser = h("div", { className: "op-riser" + (startOpen || seamless ? "" : " op-rise") });
     riser.appendChild(book);
     stage.appendChild(riser);
 
