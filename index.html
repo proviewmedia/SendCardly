@@ -419,15 +419,17 @@ body.st-lock { overflow: hidden; }
 .op-riser.op-rise { animation: opRise .5s cubic-bezier(.2,.8,.2,1) both; }
 .op-flip { position: absolute; perspective: 1400px; cursor: pointer; }
 .op-flip:focus-visible { outline: 2px solid var(--tomato); outline-offset: 6px; border-radius: 16px; }
-.op-flip-in { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .85s cubic-bezier(.45,.05,.2,1); }
+.op-flip-in { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .8s cubic-bezier(.65,0,.35,1); }
+.op-flip.lift { animation: opLift .8s cubic-bezier(.65,0,.35,1); }
+@keyframes opLift { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 .op-flip.flipped .op-flip-in { transform: rotateY(180deg); }
 .op-flip.no-anim .op-flip-in { transition: none; }
 .op-side { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .op-side-back { transform: rotateY(180deg); }
 /* Swap faces exactly halfway through the flip, when the card is edge on, so
    nothing from one side can ever show through on the other. */
-.op-side-front { transition: visibility 0s linear .42s; }
-.op-side-back { visibility: hidden; transition: visibility 0s linear .42s; }
+.op-side-front { transition: visibility 0s linear .4s; }
+.op-side-back { visibility: hidden; transition: visibility 0s linear .4s; }
 .op-flip.flipped .op-side-front { visibility: hidden; }
 .op-flip.flipped .op-side-back { visibility: visible; }
 .op-flip.no-anim .op-side { transition: none; }
@@ -468,6 +470,7 @@ body.st-lock { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .op-arrive, .op-riser, .op-settle { animation: none !important; }
   .op-flip-in, .op-side { transition: none !important; }
+  .op-flip.lift { animation: none; }
   .op-flap, .op-card-in, .op-scene-wrap, .op-cover { transition: none; }
 }
 
@@ -3503,6 +3506,7 @@ function renderOpening(app, isPreview) {
 
     function setSide(showBack, animate) {
       flip.classList.toggle("no-anim", !animate);
+      if (animate) { flip.classList.remove("lift"); void flip.offsetWidth; flip.classList.add("lift"); }
       flip.classList.toggle("flipped", showBack);
       state.opPhase = showBack ? "inside" : "card";
       flip.setAttribute("aria-label", showBack ? "Flip to the front" : "Flip to read the message");
@@ -3795,7 +3799,7 @@ function stampSvg(id, paper, w) {
 function envelopeFront(env, w, name) {
   var col = findIn(ENV_COLORS, env.c, "cream"), sc = w / 400;
   var el = h("div", { style: "position:relative;width:" + w + "px;height:" + (290 * sc) + "px;border-radius:" + (6 * sc) + "px;overflow:hidden;box-shadow:0 " + (10 * sc) + "px " + (30 * sc) + "px rgba(34,18,10,0.18);background:" + col.v });
-  el.appendChild(h("div", { style: "position:absolute;inset:0", html: '<svg viewBox="0 0 400 290" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><path d="M0,290 L170,150 M400,290 L230,150" stroke="' + shadeHex(col.v, 0.1) + '" stroke-width="2" fill="none"/><rect width="400" height="290" fill="#fff" filter="url(#sg-grain)" opacity="0.14" style="mix-blend-mode:multiply"/><g fill="none" stroke="' + col.ink + '" stroke-width="2" opacity=".5"><circle cx="262" cy="64" r="30" stroke-dasharray="5 5"/><path d="M206,56 Q218,48 230,56 T254,56 T278,56 T302,56 M202,74 Q214,66 226,74 T250,74 T274,74 T298,74"/></g></svg>' }));
+  el.appendChild(h("div", { style: "position:absolute;inset:0", html: '<svg viewBox="0 0 400 290" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><rect width="400" height="290" fill="#fff" filter="url(#sg-grain)" opacity="0.14" style="mix-blend-mode:multiply"/><g fill="none" stroke="' + col.ink + '" stroke-width="2" opacity=".5"><circle cx="262" cy="64" r="30" stroke-dasharray="5 5"/><path d="M206,56 Q218,48 230,56 T254,56 T278,56 T302,56 M202,74 Q214,66 226,74 T250,74 T274,74 T298,74"/></g></svg>' }));
   var stamp = h("div", { style: "position:absolute;right:" + (22 * sc) + "px;top:" + (20 * sc) + "px;transform:rotate(4deg);filter:drop-shadow(0 " + sc + "px " + (2 * sc) + "px rgba(0,0,0,.15))", html: stampSvg(env.s, col.v, 70 * sc) });
   el.appendChild(stamp);
   var to = h("div", { style: "position:absolute;left:12%;right:12%;top:48%;text-align:center;color:" + col.ink + ";font-family:'Caveat',cursive;font-weight:600;line-height:1.05" });
