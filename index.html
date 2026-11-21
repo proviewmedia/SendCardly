@@ -372,6 +372,82 @@ body.st-lock { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .st-obj { animation: none; transition: none; }
 }
+
+/* ═══ Opening (recipient + preview) ═══ */
+.op { position: fixed; inset: 0; display: grid; grid-template-rows: 64px 1fr 96px; font-family: 'Instrument Sans', sans-serif; color: var(--ink); overflow: hidden; }
+.op-bar { position: relative; z-index: 5; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+.op-brand { display: inline-flex; align-items: center; gap: 8px; background: var(--paper); color: var(--ink); text-decoration: none; font-weight: 600; font-size: 15px; padding: 8px 14px 8px 10px; border-radius: 999px; box-shadow: 0 2px 10px rgba(34,18,10,0.1); }
+.op-brand i { width: 22px; height: 22px; border-radius: 50%; background: var(--tomato); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+.op-stage { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; min-height: 0; }
+.op-foot { position: relative; z-index: 5; display: flex; gap: 10px; justify-content: center; align-items: flex-start; flex-wrap: wrap; padding: 8px 16px; }
+.op-eyebrow { background: var(--paper); color: var(--ink); padding: 7px 14px; border-radius: 999px; margin-bottom: 22px; box-shadow: 0 2px 10px rgba(34,18,10,0.08); }
+.op-arrive { display: flex; flex-direction: column; align-items: center; animation: opArrive .7s cubic-bezier(.2,.8,.2,1) both; }
+.op-env { background: none; border: none; padding: 0; cursor: pointer; transform: rotate(-3deg); transition: transform .3s ease; }
+.op-env:hover { transform: rotate(-1deg) translateY(-4px); }
+.op-env:focus-visible { outline: 2px solid var(--tomato); outline-offset: 6px; border-radius: 8px; }
+@keyframes opArrive { from { opacity: 0; transform: translateY(60px) rotate(4deg); } to { opacity: 1; transform: none; } }
+
+.op-scene .op-layer, .op-scene .op-flap { transition: transform .6s cubic-bezier(.5,0,.75,0), opacity .5s ease; }
+.op-scene.drop .op-layer, .op-scene.drop .op-flap { transform: translateY(70vh) !important; opacity: 0; }
+.op-scene.drop .op-holder { clip-path: none; }
+.op-scene { position: relative; perspective: 1200px; }
+.op-layer { position: absolute; inset: 0; }
+.op-pocket { z-index: 3; pointer-events: none; filter: drop-shadow(0 10px 18px rgba(34,18,10,0.14)); }
+.op-holder { position: absolute; z-index: 2; clip-path: inset(-400% -30% 0 -30%); }
+.op-card-in { transition: transform .8s cubic-bezier(.3,.7,.2,1); box-shadow: 0 6px 18px rgba(34,18,10,0.12) !important; }
+.op-scene.pull .op-card-in { transform: translateY(-88%); }
+.op-flap { position: absolute; left: 0; right: 0; top: 0; z-index: 4; transform-origin: top center; transform-style: preserve-3d; transition: transform .6s cubic-bezier(.4,0,.2,1); }
+.op-flap.behind { z-index: 1; }
+.op-scene.flap-open .op-flap { transform: rotateX(180deg); }
+.op-flap-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.op-flap-in { transform: rotateX(180deg); }
+.op-seal { position: absolute; left: 50%; top: 100%; transform: translate(-50%, -78%) rotate(-4deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; filter: drop-shadow(0 1px 2px rgba(0,0,0,.18)); }
+
+.op-book { position: relative; perspective: 1600px; animation: opRise .5s cubic-bezier(.2,.8,.2,1) both; }
+.op-book > * { position: absolute !important; inset: 0; }
+.op-book > .op-inside { z-index: 1; }
+.op-book > .op-cover { z-index: 2; }
+.op-cover { background: none; border: none; padding: 0; cursor: pointer; transform-origin: left center; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.4,0,.2,1); }
+.op-cover:focus-visible { outline: 2px solid var(--tomato); outline-offset: 6px; border-radius: 12px; }
+.op-cover .op-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: translateZ(1px); }
+.op-cover-back { position: absolute; inset: 0; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: inset -12px 0 24px rgba(34,18,10,0.08); }
+.op-book.open .op-cover { transform: rotateY(-165deg); }
+.op-settle { animation: opRise .4s ease both; }
+@keyframes opRise { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: none; } }
+
+/* ═══ Send ═══ */
+.sd { min-height: 100vh; background: var(--cream); font-family: 'Instrument Sans', sans-serif; color: var(--ink); display: grid; grid-template-rows: 60px 1fr; }
+.sd-title { font-weight: 500; font-size: 16px; color: #F1EBE1; }
+.sd-body { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; max-width: 1120px; width: 100%; margin: 0 auto; padding: 48px 32px 64px; align-items: start; }
+.sd-tile { position: relative; border-radius: 24px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.sd-tile-in { position: relative; width: 250px; height: 300px; }
+.sd-tile-in > div:first-child { position: absolute; left: -30px; bottom: 20px; transform: rotate(-6deg); }
+.sd-card { position: absolute !important; right: -40px; top: 0; transform: rotate(5deg); }
+.sd-pv { position: absolute; left: 20px; bottom: 20px; }
+.sd-h1 { font-weight: 500; font-size: clamp(40px, 5vw, 64px); letter-spacing: -0.045em; line-height: 1; margin: 12px 0 28px; }
+.sd-names { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.sd-field { display: flex; flex-direction: column; }
+.sd-opts { display: flex; flex-direction: column; gap: 10px; }
+.sd-opt { display: flex; align-items: center; gap: 14px; text-align: left; border: 1px solid var(--line); background: var(--paper); border-radius: 16px; padding: 14px 16px; cursor: pointer; color: var(--ink); font-family: inherit; transition: border-color .15s ease, transform .15s ease; }
+.sd-opt:hover { border-color: var(--ink); transform: translateY(-1px); }
+.sd-opt:focus-visible { outline: 2px solid var(--tomato); outline-offset: 2px; }
+.sd-opt-ic { width: 44px; height: 44px; border-radius: 12px; background: var(--cream); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sd-opt.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.sd-opt.primary .sd-opt-ic { background: var(--tomato); color: #fff; }
+.sd-opt-t { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.sd-opt-t b { font-weight: 600; font-size: 16px; }
+.sd-opt-t span { font-size: 13px; opacity: .7; }
+.sd-link { margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+@media (max-width: 860px) {
+  .sd-body { grid-template-columns: 1fr; gap: 28px; padding: 20px 16px 48px; }
+  .sd-tile { aspect-ratio: 4 / 3; }
+  .sd-tile-in { transform: scale(.8); }
+  .sd-names { grid-template-columns: 1fr 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .op-arrive, .op-book, .op-settle { animation: none; }
+  .op-flap, .op-card-in, .op-scene-wrap, .op-cover { transition: none; }
+}
 </style>
 </head>
 <body>
@@ -1066,6 +1142,8 @@ function initState() {
       frontHeadFont: typeof fb.hf === "string" && ALL_FONTS.some(function(f) { return f.id === fb.hf; }) ? fb.hf : null,
       frontInk: safeHex(fb.ik),
       frontPhotoCrop: null,
+      env: null,
+      envRaw: sharedData.e || null,
       frontFont: ALL_FONTS.find(function(f) { return f.id === (fb.fn || "playfair"); }) || ALL_FONTS[0],
       frontTextColor: TEXT_COLORS.find(function(t) { return t.id === (fb.tc || "white"); }) || TEXT_COLORS[0],
       frontFontSize: clampNum(fb.fs, 0.5, 2, 1),
@@ -1381,7 +1459,7 @@ function renderCardSide(side, size, interactive) {
     inner.appendChild(h("p", { style: "font-family:" + fontFamily + ";font-size:" + ((isTypographic ? 26 : (font.style === "cursive" ? 23 : 19)) * scale * fontSize) + "px;font-weight:" + (isTypographic ? "800" : "400") + ";color:" + textColor.color + ";line-height:" + (isTypographic ? "1.3" : "1.65") + ";margin:0;max-width:" + maxWidth + ";word-break:break-word;overflow:hidden;white-space:pre-line", "data-edit": "message" }, state.message || "Your message here..."));
 
     if (state.senderName) {
-      inner.appendChild(h("p", { style: "font-family:" + fontFamily + ";font-size:" + (13 * scale) + "px;color:" + textColor.color + ";opacity:0.5;margin:" + (14 * scale) + "px 0 0;font-style:italic" }, state.senderName));
+      inner.appendChild(h("p", { style: "font-family:" + fontFamily + ";font-size:" + ((font.style === "cursive" ? 20 : 15) * scale) + "px;color:" + textColor.color + ";opacity:0.75;margin:" + (14 * scale) + "px 0 0;font-style:" + (font.style === "cursive" ? "normal" : "italic") }, state.senderName));
     }
     card.appendChild(inner);
   }
@@ -2508,231 +2586,296 @@ function render() {
     return;
   }
 
-  // ═══ PREVIEW SCREEN ═══
-  if (state.screen === "preview" && !state.showReveal) {
-    var screen = h("div", { style: mobile
-      ? "position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden;background:var(--area)"
-      : "min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:var(--area);animation:fadeUp 0.5s ease-out" });
-
-    if (mobile) {
-      var headerBar = h("div", { style: "padding:8px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid var(--borderLight);background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);flex-shrink:0" });
-      headerBar.appendChild(h("button", { style: "background:none;border:none;color:var(--text3);font-size:14px;padding:6px 8px;min-height:44px;display:flex;align-items:center;justify-self:start", onClick: function() { setState({ screen: "builder" }); } }, "\u2190 Edit"));
-      headerBar.appendChild(h("button", { style: "background:none;border:none;cursor:pointer;font-size:16px;font-weight:800;color:transparent;letter-spacing:-0.5px;background-image:linear-gradient(135deg, #FF6B35, #E8366D, #6C4FE0);background-size:200% auto;background-clip:text;-webkit-background-clip:text;justify-self:center;padding:4px 8px;min-height:44px;display:flex;align-items:center", onClick: function() { setState({ screen: "marketing" }); } }, "Sendr"));
-      headerBar.appendChild(h("div", { style: "justify-self:end" }));
-      screen.appendChild(headerBar);
-    }
-
-    var cardArea = h("div", { style: mobile
-      ? "flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 16px;overflow:hidden"
-      : "display:flex;flex-direction:column;align-items:center" });
-
-    if (!mobile) {
-      var header = h("div", { style: "text-align:center;margin-bottom:24px" });
-      header.appendChild(h("h2", { style: "font-size:24px;font-weight:700;margin:0 0 4px" }, "Looking good"));
-      header.appendChild(h("p", { style: "color:var(--text3);font-size:14px" }, "Tap the card to flip it"));
-      cardArea.appendChild(header);
-    } else {
-      cardArea.appendChild(h("p", { style: "color:var(--text2);font-size:14px;margin-bottom:8px;flex-shrink:0" }, "Tap to flip"));
-    }
-
-    var cardWrap = h("div", { style: mobile
-      ? "flex-shrink:1;min-height:0;display:flex;align-items:center;justify-content:center;margin-bottom:12px"
-      : "margin-bottom:32px" });
-    cardWrap.appendChild(renderFlipCard(mobile ? "previewMobile" : "preview", "front", false));
-    cardArea.appendChild(cardWrap);
-
-    var buttons = h("div", { style: "display:flex;gap:8px;flex-wrap:wrap;justify-content:center;" + (mobile ? "flex-shrink:0;padding-bottom:12px" : "") });
-    buttons.appendChild(h("button", { style: "border-radius:100px;padding:" + (mobile ? "8px 16px" : "10px 22px") + ";font-size:13px;font-weight:600;border:1px solid var(--border);background:#fff;color:var(--text);" + (mobile ? "min-height:44px" : ""), onClick: function() { setState({ screen: "builder" }); } }, "\u2190 Edit"));
-    buttons.appendChild(h("button", { style: "border-radius:100px;padding:" + (mobile ? "8px 20px" : "10px 26px") + ";font-size:13px;font-weight:700;border:none;background:var(--accent);color:#fff;" + (mobile ? "min-height:44px" : ""), onClick: function() { setState({ screen: "send" }); } }, "Send Card \u2192"));
-    buttons.appendChild(h("button", { style: "border-radius:100px;padding:" + (mobile ? "8px 14px" : "10px 18px") + ";font-size:12px;font-weight:600;border:1px solid var(--border);background:#fff;color:var(--text3);" + (mobile ? "min-height:44px" : ""), onClick: function() { setState({ showReveal: true, envelopeOpen: false, cardRevealed: false, revealSide: "front" }); } }, "Preview Reveal"));
-    cardArea.appendChild(buttons);
-
-    screen.appendChild(cardArea);
-    app.appendChild(screen);
+  // ═══ PREVIEW + RECIPIENT OPENING ═══
+  if (state.screen === "preview" || state.screen === "reveal") {
+    renderOpening(app, state.screen === "preview");
     return;
   }
 
-  // ═══ REVEAL SCREEN ═══
-  if (state.showReveal || state.screen === "reveal") {
-    var isFromSharedLink = !!shared && state.screen === "reveal";
-    var screen = h("div", { style: "min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:var(--bg);animation:fadeUp 0.6s ease-out" });
-
-    if (!state.envelopeOpen) {
-      // Envelope
-      var envelopeWrap = h("div", { style: "text-align:center" });
-      envelopeWrap.appendChild(h("p", { style: "color:var(--text2);font-size:" + (mobile ? "16px" : "18px") + ";margin-bottom:8px;font-weight:500" }, state.senderName ? state.senderName + " sent you something" : "You got something special"));
-      envelopeWrap.appendChild(h("p", { style: "color:var(--text4);font-size:13px;margin-bottom:32px" }, "Tap the envelope to open"));
-      var envelope = h("div", {
-        style: "width:" + (mobile ? "220px" : "260px") + ";height:" + (mobile ? "154px" : "182px") + ";margin:0 auto;background:linear-gradient(145deg, #2a2a2a, #444);border-radius:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;animation:pulse 2.5s ease-in-out infinite;box-shadow:0 16px 48px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08);position:relative;overflow:hidden;transition:transform 0.2s",
-        onClick: function() { setState({ envelopeOpen: true }); setTimeout(function() { setState({ cardRevealed: true }); }, 600); }
-      });
-      // Envelope flap
-      envelope.appendChild(h("div", { style: "position:absolute;top:0;left:0;right:0;height:55%;background:rgba(255,255,255,0.04);clip-path:polygon(0 0, 50% 70%, 100% 0)" }));
-      // Seal
-      envelope.appendChild(h("div", { style: "position:absolute;top:calc(55% - 16px);left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg, #FF6B35, #E8366D);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(232,54,109,0.3);z-index:2" }, [
-        h("span", { style: "font-size:14px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))" }, "S")
-      ]));
-      envelope.appendChild(h("span", { style: "font-size:" + (mobile ? "44px" : "52px") + ";z-index:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.2));margin-top:20px", html: "💌" }));
-      envelopeWrap.appendChild(envelope);
-      screen.appendChild(envelopeWrap);
-    } else if (!state.cardRevealed) {
-      screen.appendChild(h("div", { style: "width:16px;height:16px;border-radius:50%;background:var(--accent);margin:0 auto;animation:pulse 0.5s ease-in-out infinite" }));
-    } else {
-      var revealWrap = h("div", { style: "text-align:center;display:flex;flex-direction:column;align-items:center" });
-
-      // Confetti (fires on initial reveal)
-      var confettiContainer = h("div", { style: "position:fixed;top:35%;left:50%;pointer-events:none;z-index:10" });
-      var confettiEmojis = ["🎊","✨","💫","⭐","🎉","💖","🎈","🌟","🥳","💝"];
-      var confettiAnims = ["cA","cB","cC"];
-      for (var ci = 0; ci < confettiEmojis.length; ci++) {
-        confettiContainer.appendChild(h("span", {
-          style: "position:absolute;font-size:" + (18 + Math.random() * 8) + "px;animation:" + confettiAnims[ci % 3] + " " + (1.2 + Math.random() * 0.6) + "s ease-out " + (ci * 0.06) + "s forwards;left:" + (-70 + ci * 14) + "px",
-          html: confettiEmojis[ci]
-        }));
-      }
-      revealWrap.appendChild(confettiContainer);
-
-      // Card with flip animation
-      var cardWrap = h("div", { style: "animation:cardReveal 0.9s ease-out;margin-bottom:20px" });
-      cardWrap.appendChild(renderFlipCard(mobile ? "mobile" : "reveal", "front", false));
-      revealWrap.appendChild(cardWrap);
-
-      // Tap to flip hint
-      revealWrap.appendChild(h("p", { style: "color:var(--text3);font-size:13px;margin-bottom:20px;animation:fadeUp 0.5s ease-out 1s both" }, "Tap the card to flip it over"));
-
-      if (isFromSharedLink) {
-        var sharedFooter = h("div", { style: "animation:fadeUp 0.5s ease-out 1.2s both;display:flex;flex-direction:column;align-items:center;gap:12px" });
-        sharedFooter.appendChild(h("p", { style: "color:var(--text4);font-size:12px" }, "Sent with love via Sendr"));
-        sharedFooter.appendChild(h("button", {
-          style: "border-radius:100px;padding:12px 28px;font-size:14px;font-weight:600;border:none;background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.1)",
-          onClick: function() { window.history.replaceState(null, "", window.location.pathname); window.location.reload(); }
-        }, "Create Your Own Card"));
-        revealWrap.appendChild(sharedFooter);
-      } else {
-        revealWrap.appendChild(h("button", {
-          style: "border-radius:100px;padding:10px 24px;font-size:13px;font-weight:600;border:1px solid var(--border);background:#fff;color:var(--text);animation:fadeUp 0.5s ease-out 1s both",
-          onClick: function() { setState({ showReveal: false, envelopeOpen: false, cardRevealed: false, revealSide: "front" }); }
-        }, "\u2190 Back"));
-      }
-      screen.appendChild(revealWrap);
-    }
-    app.appendChild(screen);
-    return;
-  }
-
-  // ═══ SEND SCREEN ═══
+  // ═══ SEND ═══
   if (state.screen === "send") {
-    var cardPayload = {
-      f: {
-        bg: state.frontBg.id,
-        ly: state.frontLayout.id,
-        fn: state.frontFont.id,
-        tc: state.frontTextColor.id,
-        fs: state.frontFontSize,
-        tx: state.frontText,
-        ds: state.frontDesign ? state.frontDesign.id : null,
-        st: state.frontStickers.map(function(s) {
-          return { emoji: s.emoji, x: Math.round(s.x), y: Math.round(s.y), rotation: Math.round(s.rotation), scale: Math.round(s.scale * 100) / 100, size: s.size };
-        })
-      },
-      b: {
-        bg: state.backBg.id,
-        ly: state.backLayout.id,
-        fn: state.backFont.id,
-        tc: state.backTextColor.id,
-        fs: state.backFontSize,
-        ms: state.message,
-        to: state.recipientName,
-        fr: state.senderName,
-        st: state.backStickers.map(function(s) {
-          return { emoji: s.emoji, x: Math.round(s.x), y: Math.round(s.y), rotation: Math.round(s.rotation), scale: Math.round(s.scale * 100) / 100, size: s.size };
-        })
-      }
-    };
-    var shareUrl = BASE_URL + "?card=" + encodeCard(cardPayload);
-    var fromName = state.senderName || "Someone special";
-    var toName = state.recipientName || "you";
-    var emailSubject = fromName + " sent you a card on Sendr";
-    var emailBody = "Hey " + toName + "!\n\n" + fromName + " made you a personal greeting card on Sendr.\n\nOpen your card here:\n" + shareUrl + "\n\n— Sent with love via Sendr";
-    var smsBody = "💌 " + fromName + " sent you a card! Open it here: " + shareUrl;
-
-    var screen = h("div", { style: "min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:" + (mobile ? "30px 16px" : "40px 20px") });
-    var header = h("div", { style: "text-align:center;margin-bottom:20px" });
-    header.appendChild(h("h2", { style: "font-size:" + (mobile ? "20" : "24") + "px;font-weight:700;margin:0 0 4px" }, "Send your card"));
-    header.appendChild(h("p", { style: "color:var(--text3);font-size:14px" }, "Choose how to deliver it"));
-    screen.appendChild(header);
-    var cardWrap = h("div", { style: "margin-bottom:24px" });
-    cardWrap.appendChild(renderFlipCard("small", "front", false));
-    screen.appendChild(cardWrap);
-
-    // Link preview mockup
-    var linkPreview = h("div", { style: "width:100%;max-width:360px;margin-bottom:20px" });
-    linkPreview.appendChild(h("p", { style: "color:var(--text3);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin-bottom:6px;text-align:center" }, "Link Preview"));
-    var previewCard = h("div", { style: "background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04)" });
-    previewCard.appendChild(h("div", { style: "height:6px;background:linear-gradient(90deg, #FF6B35, #E8366D, #6C4FE0, #0EA5A5);border-radius:12px 12px 0 0" }));
-    var previewInner = h("div", { style: "padding:14px 16px" });
-    previewInner.appendChild(h("p", { style: "color:var(--text3);font-size:11px;margin:0 0 4px;font-weight:500" }, "sendrcards.com"));
-    previewInner.appendChild(h("p", { style: "font-size:14px;font-weight:700;margin:0 0 4px" }, fromName + " sent " + toName + " a card on Sendr"));
-    previewInner.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin:0" }, "You have been sent a personal greeting card. Tap to open and see your message!"));
-    previewCard.appendChild(previewInner);
-    linkPreview.appendChild(previewCard);
-    screen.appendChild(linkPreview);
-
-    // Send options
-    var optionsWrap = h("div", { style: "display:flex;flex-direction:column;gap:8px;width:100%;max-width:360px" });
-
-    function createSendOption(icon, label, desc, action) {
-      var button = h("button", {
-        style: "background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;transition:all 0.15s;width:100%;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.03)",
-        onClick: action
-      });
-      button.onmouseenter = function() { button.style.borderColor = "#aaa"; button.style.boxShadow = "0 4px 12px rgba(0,0,0,0.06)"; };
-      button.onmouseleave = function() { button.style.borderColor = ""; button.style.boxShadow = "0 1px 2px rgba(0,0,0,0.03)"; };
-      button.appendChild(h("span", { style: "font-size:18px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--input);border-radius:10px;flex-shrink:0;color:var(--text2)" }, icon));
-      var textWrap = h("div", { style: "text-align:left;flex:1" });
-      textWrap.appendChild(h("p", { style: "font-size:14px;font-weight:600;margin:0" }, label));
-      textWrap.appendChild(h("p", { style: "color:var(--text3);font-size:12px;margin:2px 0 0" }, desc));
-      button.appendChild(textWrap);
-      button.appendChild(h("span", { style: "color:var(--text4);font-size:14px" }, "→"));
-      optionsWrap.appendChild(button);
-    }
-
-    createSendOption("📧", "Send via Email", "Opens your email with a ready message", function() {
-      window.location.href = "mailto:?subject=" + encodeURIComponent(emailSubject) + "&body=" + encodeURIComponent(emailBody);
-    });
-    createSendOption("💬", "Send via Text", "Opens your messaging app", function() {
-      window.location.href = "sms:?&body=" + encodeURIComponent(smsBody);
-    });
-    createSendOption(state.copied ? "✅" : "🔗", state.copied ? "Link Copied!" : "Copy Link", "Paste it anywhere you want", function() {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(shareUrl).then(function() {
-          state.copied = true;
-          render();
-          setTimeout(function() { state.copied = false; render(); }, 3000);
-        });
-      }
-    });
-
-    if (typeof navigator !== "undefined" && navigator.share) {
-      var nativeShare = h("button", {
-        style: "background:var(--accent);border:none;border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;width:100%;cursor:pointer",
-        onClick: function() { navigator.share({ title: fromName + " sent you a card on Sendr", text: fromName + " made you a personal greeting card!", url: shareUrl }).catch(function() {}); }
-      });
-      nativeShare.appendChild(h("span", { style: "font-size:18px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.15);border-radius:10px;flex-shrink:0;color:#fff" }, "📤"));
-      var nativeText = h("div", { style: "text-align:left;flex:1" });
-      nativeText.appendChild(h("p", { style: "color:#fff;font-size:14px;font-weight:600;margin:0" }, "Share"));
-      nativeText.appendChild(h("p", { style: "color:rgba(255,255,255,0.6);font-size:11px;margin:2px 0 0" }, "Use your device share menu"));
-      nativeShare.appendChild(nativeText);
-      optionsWrap.appendChild(nativeShare);
-    }
-
-    screen.appendChild(optionsWrap);
-    screen.appendChild(h("button", { style: "background:none;border:none;color:var(--text3);font-size:13px;margin-top:24px;cursor:pointer", onClick: function() { setState({ screen: "preview" }); } }, "← Back to Preview"));
-    app.appendChild(screen);
+    renderSend(app);
     return;
   }
 }
 
+// One payload builder for every share link.
+function stickersOut(list) {
+  return (list || []).map(function(s) {
+    return { emoji: s.emoji, x: Math.round(s.x), y: Math.round(s.y), rotation: Math.round(s.rotation), scale: Math.round(s.scale * 100) / 100, size: s.size };
+  });
+}
+function buildPayload() {
+  var f = { ds: state.frontDesign ? state.frontDesign.id : null, fs: state.frontFontSize, st: stickersOut(state.frontStickers) };
+  if (state.frontDesign && state.frontDesign.art) {
+    if (typeof state.frontText === "string") f.tx = state.frontText;
+    if (state.frontHeadFont) f.hf = state.frontHeadFont;
+    if (state.frontInk) f.ik = state.frontInk;
+  } else {
+    f.bg = state.frontBg.id; f.ly = state.frontLayout.id; f.fn = state.frontFont.id; f.tc = state.frontTextColor.id; f.tx = state.frontText;
+  }
+  return {
+    f: f,
+    b: { bg: state.backBg.id, ly: state.backLayout.id, fn: state.backFont.id, tc: state.backTextColor.id, fs: state.backFontSize, ms: state.message, to: state.recipientName, fr: state.senderName, st: stickersOut(state.backStickers) },
+    e: state.env
+  };
+}
+
+// ── Opening: envelope arrives, flap opens, card slides out, card opens like a book ──
+var opTimers = [];
+function opClear() { opTimers.forEach(clearTimeout); opTimers = []; }
+function opLater(fn, ms) { opTimers.push(setTimeout(fn, ms)); }
+function prefersReducedMotion() {
+  try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; }
+}
+
+function renderOpening(app, isPreview) {
+  opClear();
+  if (!state.env) state.env = sanitizeEnv(state.envRaw || (state.frontDesign && OCCASION_DEFAULTS[state.frontDesign.occasion]) || null);
+  if (!state.opPhase) state.opPhase = "arrive";
+  var root = h("div", { className: "op", style: backdropCss(state.env.k) });
+  root.appendChild(h("div", { className: "st-grain", html: '<svg width="100%" height="100%" aria-hidden="true"><rect width="100%" height="100%" fill="#fff" filter="url(#sg-grain)" opacity=".16" style="mix-blend-mode:multiply"/></svg>' }));
+
+  var bar = h("div", { className: "op-bar" });
+  var brand = h("a", { className: "op-brand", href: isPreview ? "#/studio/envelope" : "./" });
+  if (isPreview) {
+    brand.appendChild(icon("arrowLeft", 16));
+    brand.appendChild(h("span", null, "Back to editing"));
+  } else {
+    var m = h("i");
+    m.appendChild(icon("mail", 13, 2.2));
+    brand.appendChild(m);
+    brand.appendChild(h("span", null, "Sendr"));
+  }
+  bar.appendChild(brand);
+  if (isPreview) {
+    var sendBtn = h("button", { className: "mk-pill mk-pill-tomato mk-pill-sm", onClick: function() { go("#/send"); } }, "Send");
+    sendBtn.appendChild(icon("send", 15));
+    bar.appendChild(sendBtn);
+  }
+  root.appendChild(bar);
+
+  var stage = h("div", { className: "op-stage" });
+  root.appendChild(stage);
+  var foot = h("div", { className: "op-foot" });
+  root.appendChild(foot);
+  app.appendChild(root);
+
+  var W = stage.clientWidth, H = stage.clientHeight;
+  var s = Math.max(0.42, Math.min((H - 24) / 480, (W - 32) / 360, 1.15));
+  var envW = Math.min(W - 32, 360 * s * 1.08);
+  var from = (state.senderName || "").trim();
+
+  function eyebrow(text) { return h("div", { className: "mk-eyebrow op-eyebrow" }, text); }
+  function setFoot(nodes) { foot.innerHTML = ""; nodes.forEach(function(n) { foot.appendChild(n); }); }
+
+  function showArrive() {
+    state.opPhase = "arrive";
+    stage.innerHTML = "";
+    var wrap = h("div", { className: "op-arrive" });
+    wrap.appendChild(eyebrow(from ? "A card from " + from : "You got a card"));
+    var envBtn = h("button", { className: "op-env", "aria-label": "Open the envelope", onClick: startOpen });
+    envBtn.appendChild(envelopeFront(state.env, envW, state.recipientName));
+    wrap.appendChild(envBtn);
+    stage.appendChild(wrap);
+    var open = h("button", { className: "mk-pill mk-pill-ink", onClick: startOpen }, "Open it");
+    setFoot([open]);
+  }
+
+  // The envelope seen from the back: liner panel, card tucked inside, pocket folds, and the flap.
+  function startOpen() {
+    state.opPhase = "opening";
+    stage.innerHTML = "";
+    setFoot([]);
+    var col = findIn(ENV_COLORS, state.env.c, "cream"), v = col.v, dd = shadeHex(v, 0.12);
+    var bodyH = envW * 0.725, flapH = envW * 0.46;
+    var scene = h("div", { className: "op-scene", style: "width:" + envW + "px;height:" + bodyH + "px" });
+    scene.appendChild(h("div", { className: "op-layer", html: '<svg viewBox="0 0 400 290" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><rect width="400" height="290" rx="6" fill="' + shadeHex(v, 0.06) + '"/><path d="M10,6 L390,6 L200,150 Z" fill="url(#ln-' + state.env.l + ')"/></svg>' }));
+    var cardScale = (envW * 0.86) / 360;
+    var holder = h("div", { className: "op-holder", style: "left:7%;width:86%;top:5%;bottom:0" });
+    var cardEl = renderCardSide("front", cardScale, false);
+    cardEl.classList.add("op-card-in");
+    holder.appendChild(cardEl);
+    scene.appendChild(holder);
+    scene.appendChild(h("div", { className: "op-layer op-pocket", html: '<svg viewBox="0 0 400 290" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 L200,150 L0,290 Z" fill="' + v + '" stroke="' + dd + '" stroke-width="1.5"/><path d="M400,0 L200,150 L400,290 Z" fill="' + v + '" stroke="' + dd + '" stroke-width="1.5"/><path d="M0,290 L200,118 L400,290 Z" fill="' + shadeHex(v, 0.02) + '" stroke="' + dd + '" stroke-width="1.5"/></svg>' }));
+    var flap = h("div", { className: "op-flap", style: "height:" + flapH + "px" });
+    flap.appendChild(h("div", { className: "op-flap-face", html: '<svg viewBox="0 0 400 184" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 L400,0 L200,184 Z" fill="' + v + '" stroke="' + dd + '" stroke-width="1.5"/></svg>' }));
+    flap.appendChild(h("div", { className: "op-flap-face op-flap-in", html: '<svg viewBox="0 0 400 184" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 L400,0 L200,184 Z" fill="' + v + '"/><path d="M16,0 L384,0 L200,168 Z" fill="url(#ln-' + state.env.l + ')"/></svg>' }));
+    var seal = h("div", { className: "op-seal", html: stampSvg(state.env.s, v, envW * 0.12) });
+    flap.appendChild(seal);
+    scene.appendChild(flap);
+    var sceneWrap = h("div", { className: "op-scene-wrap", style: "padding-top:" + (bodyH * 0.9) + "px" });
+    sceneWrap.appendChild(scene);
+    stage.appendChild(sceneWrap);
+
+    var fast = prefersReducedMotion();
+    requestAnimationFrame(function() {
+      scene.classList.add("flap-open");
+      opLater(function() { flap.classList.add("behind"); }, fast ? 0 : 380);
+      opLater(function() { scene.classList.add("pull"); }, fast ? 0 : 650);
+      opLater(function() { scene.classList.add("drop"); }, fast ? 0 : 1450);
+      opLater(showCard, fast ? 50 : 1900);
+    });
+  }
+
+  function showCard() {
+    state.opPhase = "card";
+    stage.innerHTML = "";
+    var book = h("div", { className: "op-book", style: "width:" + (360 * s) + "px;height:" + (480 * s) + "px" });
+    var inside = renderCardSide("back", s, false);
+    inside.classList.add("op-inside");
+    book.appendChild(inside);
+    var cover = h("div", { className: "op-cover", role: "button", tabindex: "0", "aria-label": "Open the card", onClick: openBook });
+    cover.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openBook(); } });
+    var face = renderCardSide("front", s, false);
+    face.classList.add("op-face");
+    cover.appendChild(face);
+    cover.appendChild(h("div", { className: "op-cover-back", style: "border-radius:" + (20 * s) + "px;" + getBgStyle(state.backBg) }));
+    book.appendChild(cover);
+    stage.appendChild(book);
+    var b = h("button", { className: "mk-pill mk-pill-ink", onClick: openBook }, "Open the card");
+    setFoot([b]);
+
+    function openBook() {
+      if (book.classList.contains("open")) return;
+      book.classList.add("open");
+      setFoot([]);
+      opLater(showInside, prefersReducedMotion() ? 0 : 950);
+    }
+  }
+
+  function showInside() {
+    state.opPhase = "inside";
+    stage.innerHTML = "";
+    var c = renderCardSide("back", s, false);
+    c.classList.add("op-settle");
+    stage.appendChild(c);
+    var front = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm", onClick: showCard }, "See the front");
+    var replay = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm", onClick: showArrive }, "Replay");
+    replay.insertBefore(icon("rotate", 15), replay.firstChild);
+    if (isPreview) {
+      var send = h("button", { className: "mk-pill mk-pill-tomato mk-pill-sm", onClick: function() { go("#/send"); } }, "Send it");
+      send.appendChild(icon("send", 15));
+      setFoot([front, replay, send]);
+    } else {
+      var back = h("button", { className: "mk-pill mk-pill-tomato mk-pill-sm", onClick: makeOneBack }, "Make one back");
+      back.appendChild(icon("arrowRight", 15));
+      setFoot([front, replay, back]);
+    }
+  }
+
+  function makeOneBack() {
+    var occ = state.frontDesign && state.frontDesign.occasion;
+    var d = ART_DESIGNS.find(function(x) { return x.occasion === occ; }) || ART_DESIGNS[0];
+    var to = state.senderName;
+    var url = BASE_URL.split("?")[0] + "#/studio/card";
+    try { sessionStorage.setItem("sendr-reply", JSON.stringify({ ds: d.id, to: to })); } catch (e) {}
+    location.href = url;
+  }
+
+  if (state.opPhase === "inside") showInside();
+  else if (state.opPhase === "card") showCard();
+  else showArrive();
+}
+
+// ── Send ──
+function renderSend(app) {
+  function shareUrlNow() { return BASE_URL + "?card=" + encodeCard(buildPayload()); }
+  var root = h("div", { className: "sd" });
+  var top = h("header", { className: "st-top" });
+  var back = h("button", { className: "st-top-btn", onClick: function() { go("#/studio/envelope"); } });
+  back.appendChild(icon("arrowLeft", 18));
+  back.appendChild(h("span", null, "Edit"));
+  top.appendChild(back);
+  top.appendChild(h("div", { className: "sd-title" }, "Send"));
+  top.appendChild(h("div"));
+  root.appendChild(top);
+
+  var body = h("div", { className: "sd-body" });
+  var tile = h("div", { className: "sd-tile", style: backdropCss(state.env.k) });
+  var tileInner = h("div", { className: "sd-tile-in" });
+  var mini = renderCardSide("front", 0.5, false);
+  mini.classList.add("sd-card");
+  tileInner.appendChild(envelopeFront(state.env, 250, state.recipientName));
+  tileInner.appendChild(mini);
+  tile.appendChild(tileInner);
+  var pv = h("button", { className: "mk-pill mk-pill-paper mk-pill-sm sd-pv", onClick: function() { state.opPhase = "arrive"; go("#/preview"); } });
+  pv.appendChild(icon("eye", 15));
+  pv.appendChild(h("span", null, "Preview what they'll see"));
+  tile.appendChild(pv);
+  body.appendChild(tile);
+
+  var col = h("div", { className: "sd-col" });
+  col.appendChild(h("div", { className: "mk-eyebrow", style: "color:var(--ink-2)" }, "Almost there"));
+  col.appendChild(h("h1", { className: "sd-h1" }, "Send your card"));
+  var names = h("div", { className: "sd-names" });
+  [["To", "recipientName", "Their name"], ["From", "senderName", "Your name"]].forEach(function(f) {
+    var wrap = h("label", { className: "sd-field" });
+    wrap.appendChild(h("span", { className: "st-label", style: "margin:0 0 6px" }, f[0]));
+    var inp = h("input", { className: "st-input", maxlength: "40", placeholder: f[2], "data-field": f[1] });
+    inp.value = state[f[1]] || "";
+    inp.addEventListener("input", function() {
+      state[f[1]] = inp.value;
+      saveDraft();
+      var box = document.getElementById("sdLink");
+      if (box) box.value = shareUrlNow();
+    });
+    wrap.appendChild(inp);
+    names.appendChild(wrap);
+  });
+  col.appendChild(names);
+
+  function fromName() { return (state.senderName || "").trim() || "Someone"; }
+  var opts = h("div", { className: "sd-opts" });
+  function opt(ic, title, sub, onClick, primary) {
+    var b = h("button", { className: "sd-opt" + (primary ? " primary" : ""), onClick: onClick });
+    var i = h("span", { className: "sd-opt-ic" });
+    i.appendChild(icon(ic, 20));
+    b.appendChild(i);
+    var t = h("span", { className: "sd-opt-t" });
+    t.appendChild(h("b", null, title));
+    t.appendChild(h("span", null, sub));
+    b.appendChild(t);
+    b.appendChild(icon("chevronRight", 18));
+    return b;
+  }
+  if (navigator.share) {
+    opts.appendChild(opt("share", "Share", "Send with any app on your phone", function() {
+      navigator.share({ title: fromName() + " sent you a card", text: fromName() + " sent you a card", url: shareUrlNow() }).catch(function() {});
+    }, true));
+  }
+  opts.appendChild(opt("message", "Text message", "Opens your messages app", function() { location.href = "sms:?&body=" + encodeURIComponent(fromName() + " sent you a card: " + shareUrlNow()); }));
+  opts.appendChild(opt("mail", "Email", "Opens your email app", function() {
+    var to = (state.recipientName || "").trim();
+    var body = (to ? "Hi " + to + ",\n\n" : "") + fromName() + " made you a card on Sendr. Open it here:\n" + shareUrlNow() + "\n\nSent with Sendr";
+    location.href = "mailto:?subject=" + encodeURIComponent(fromName() + " sent you a card") + "&body=" + encodeURIComponent(body);
+  }));
+  var copyBtn = opt(state.copied ? "check" : "link", state.copied ? "Link copied" : "Copy link", "Paste it anywhere", function() {
+    function done() { state.copied = true; render(); setTimeout(function() { state.copied = false; if (state.screen === "send") render(); }, 2500); }
+    function manual() { var box = document.getElementById("sdLink"); if (box) { box.focus(); box.select(); } }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(shareUrlNow()).then(done, manual);
+    else manual();
+  });
+  opts.appendChild(copyBtn);
+  col.appendChild(opts);
+  var linkBox = h("input", { className: "st-input sd-link", id: "sdLink", readonly: "readonly", "aria-label": "Card link" });
+  linkBox.value = shareUrlNow();
+  linkBox.addEventListener("focus", function() { linkBox.select(); });
+  col.appendChild(linkBox);
+  if (state.frontDesign && state.frontDesign.slot && state.frontPhoto) {
+    col.appendChild(h("p", { className: "st-note" }, "Heads up: photos don't travel in the link yet. They'll see the card with an empty photo frame."));
+  }
+  col.appendChild(h("p", { className: "st-note" }, "Anyone with the link can open the card."));
+  var fresh = h("button", { className: "st-link", onClick: function() {
+    try { localStorage.removeItem("sendr-draft-v1"); } catch (e) {}
+    state = initState();
+    go("#/studio/card");
+  } }, "Start a new card");
+  col.appendChild(fresh);
+  body.appendChild(col);
+  root.appendChild(body);
+  app.appendChild(root);
+}
 
 // ═══ CARD STUDIO ═══
 // Three objects on one stage: the card front (a design you pick), the inside
@@ -2885,7 +3028,7 @@ function envelopeFront(env, w, name) {
   return el;
 }
 // The back of an open envelope with the liner showing (400x470).
-function envelopeOpen(env, w) {
+function envelopeBack(env, w) {
   var col = findIn(ENV_COLORS, env.c, "cream"), sc = w / 400, v = col.v, d = shadeHex(v, 0.06), dd = shadeHex(v, 0.12);
   var svg = '<svg viewBox="0 0 400 470" width="' + w + '" height="' + (470 * sc) + '" aria-hidden="true" style="display:block;overflow:visible;filter:drop-shadow(0 ' + (10 * sc) + 'px ' + (16 * sc) + 'px rgba(34,18,10,0.16))">' +
     '<path d="M0,184 L200,8 L400,184 Z" fill="' + v + '"/><path d="M16,184 L200,24 L384,184 Z" fill="url(#ln-' + env.l + ')"/>' +
@@ -2915,6 +3058,16 @@ function applyDesign(d) {
   }
 }
 function ensureStudio() {
+  var reply = null;
+  try { reply = JSON.parse(sessionStorage.getItem("sendr-reply") || "null"); sessionStorage.removeItem("sendr-reply"); } catch (e) {}
+  if (reply && findDesign(reply.ds)) {
+    state.env = sanitizeEnv(null);
+    state.envTouched = false; state.messageTouched = false;
+    state.frontStickers = []; state.backStickers = [];
+    state.senderName = "";
+    state.recipientName = typeof reply.to === "string" ? reply.to.slice(0, 40) : "";
+    applyDesign(findDesign(reply.ds));
+  }
   if (!state.env) state.env = sanitizeEnv(null);
   if (!state.studioTool) state.studioTool = { card: "designs", message: "write", envelope: "backdrop" };
   if (!state.studioObj) state.studioObj = "card";
@@ -2988,6 +3141,7 @@ function applyRoute() {
   } else if (parts[0] === "preview") {
     ensureStudio();
     state.screen = "preview";
+    state.opPhase = "arrive";
   } else if (!sharedData) {
     state.screen = "marketing";
   }
@@ -3119,7 +3273,7 @@ function renderObject(obj, scale, isCenter) {
   // Envelope: the open back (liner) with the addressed front laid over it.
   var w = 360 * scale;
   var g = h("div", { style: "position:relative;width:" + w + "px;height:" + (480 * scale) + "px" });
-  var openEl = envelopeOpen(state.env, w * 0.86);
+  var openEl = envelopeBack(state.env, w * 0.86);
   openEl.style.cssText += ";position:absolute;left:0;top:0;transform:rotate(-4deg)";
   g.appendChild(openEl);
   var frontEl = envelopeFront(state.env, w * 0.86, state.recipientName);
