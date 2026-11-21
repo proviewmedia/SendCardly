@@ -424,6 +424,14 @@ body.st-lock { overflow: hidden; }
 .op-flip.no-anim .op-flip-in { transition: none; }
 .op-side { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .op-side-back { transform: rotateY(180deg); }
+/* Swap faces exactly halfway through the flip, when the card is edge on, so
+   nothing from one side can ever show through on the other. */
+.op-side-front { transition: visibility 0s linear .42s; }
+.op-side-back { visibility: hidden; transition: visibility 0s linear .42s; }
+.op-flip.flipped .op-side-front { visibility: hidden; }
+.op-flip.flipped .op-side-back { visibility: visible; }
+.op-flip.no-anim .op-side { transition: none; }
+.op-side * { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .op-side > div { box-shadow: 0 16px 40px rgba(34,18,10,0.18) !important; }
 .op-settle { animation: opRise .4s ease both; }
 @keyframes opRise { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: none; } }
@@ -459,7 +467,7 @@ body.st-lock { overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) {
   .op-arrive, .op-riser, .op-settle { animation: none !important; }
-  .op-flip-in { transition: none !important; }
+  .op-flip-in, .op-side { transition: none !important; }
   .op-flap, .op-card-in, .op-scene-wrap, .op-cover { transition: none; }
 }
 
