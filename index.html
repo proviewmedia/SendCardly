@@ -1303,6 +1303,253 @@ ART_DESIGNS.push(
   { id: "i-my5", occasion: "miss", label: "Call me", art: "phone", headline: "Call me\nsoon", font: "caprasimo", ink: "#8E1B2C", size: 56, pos: "top" },
   { id: "i-my6", occasion: "miss", label: "Stamp photo", art: "stampBg", slot: { x: 0.24, y: 0.18, w: 0.52, h: 0.48, rot: -3, frame: "bare" }, headline: "Wish you\nwere here", font: "caveat", ink: "#1F2F4A", size: 54, pos: "bottom" }
 );
+// ── Batch 3: sympathy, get well, new baby, holidays ──
+function flower5(cx, cy, r, fill, center) {
+  var p = "";
+  for (var a = 0; a < 360; a += 72) {
+    var t = (a - 90) * Math.PI / 180;
+    p += '<circle cx="' + (cx + Math.cos(t) * r * 0.62).toFixed(1) + '" cy="' + (cy + Math.sin(t) * r * 0.62).toFixed(1) + '" r="' + (r * 0.5).toFixed(1) + '"/>';
+  }
+  return riso(p, fill, 2, 2) + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.28).toFixed(1) + '" fill="' + (center || "#F2B233") + '"/>';
+}
+ART.lily = function() {
+  return svgCard("#E6E0D5", wob(
+    '<path d="M186,300 Q170,390 178,476" fill="none" stroke="#5B6B4E" stroke-width="4" stroke-linecap="round"/>' +
+    riso('<path d="M176,410 Q120,380 98,404 Q132,436 176,410 Z"/>', "#8FA67E", 3, 3) +
+    riso('<path d="M132,232 Q150,196 204,202 Q252,210 246,240 Q236,262 210,262 Q198,300 186,302 Q172,300 166,276 Q132,264 132,232 Z"/>', "#FBF7EF", 4, 3) +
+    '<path d="M182,236 Q188,262 186,290" fill="none" stroke="#E2B04A" stroke-width="6" stroke-linecap="round"/>' +
+    '<path d="M150,236 Q176,224 214,230" fill="none" stroke="' + ART_INK + '" stroke-width="2" stroke-linecap="round" opacity=".5"/>'
+  ), 0.2);
+};
+ART.dove = function() {
+  return svgCard("#DCE3E8", wob(
+    riso('<path d="M96,300 C120,250 190,236 236,262 C256,246 280,246 290,262 C276,264 270,272 268,282 C262,330 210,356 156,346 C130,342 104,330 84,340 C90,326 92,312 96,300 Z"/>', "#FBF7EF", 4, 3) +
+    riso('<path d="M150,290 C170,230 220,214 250,226 C226,248 206,276 196,300 Z"/>', "#EDE8DF", 3, 3) +
+    '<circle cx="270" cy="262" r="3.2" fill="' + ART_INK + '"/>' +
+    riso('<path d="M290,262 L306,268 L290,272 Z"/>', "#F2B233", 1, 1) +
+    '<path d="M302,270 Q320,286 334,282" fill="none" stroke="#5B6B4E" stroke-width="2.5" stroke-linecap="round"/>' +
+    riso('<path transform="translate(318,280) rotate(30)" d="M0,0 Q8,-6 18,0 Q8,6 0,0 Z"/>', "#8FA67E", 1, 1) +
+    riso('<path transform="translate(328,280) rotate(-40)" d="M0,0 Q8,-6 18,0 Q8,6 0,0 Z"/>', "#8FA67E", 1, 1)
+  ), 0.2);
+};
+ART.candle = function() {
+  return svgCard("#2B2A33", wob('<g transform="translate(0,46)">' +
+    '<circle cx="180" cy="230" r="90" fill="#F2B233" opacity=".14"/><circle cx="180" cy="230" r="54" fill="#F2B233" opacity=".16"/>' +
+    riso('<rect x="146" y="262" width="68" height="132" rx="6"/>', "#F3E7D3", 4, 3).replace(/stroke="#2B1B12"/, 'stroke="#C8BBA6"') +
+    '<path d="M180,262 L180,246" stroke="#C8BBA6" stroke-width="3" stroke-linecap="round"/>' +
+    '<path d="M180,198 C196,220 194,240 180,244 C166,240 164,220 180,198 Z" fill="#F2B233"/><path d="M180,216 C187,228 186,238 180,240 C174,238 173,228 180,216 Z" fill="#FFF6E6"/>' +
+    riso('<ellipse cx="180" cy="396" rx="70" ry="12"/>', "#8C7B6E", 2, 2).replace(/stroke="#2B1B12"/, 'stroke="#C8BBA6"') + '</g>'
+  ), 0.3);
+};
+ART.hills = function() {
+  return svgCard("#EFE8DC", wob(
+    riso('<circle cx="250" cy="250" r="34"/>', "#E9B07A", 3, 3) +
+    riso('<path d="M-10,330 Q90,262 190,320 T370,300 L370,490 L-10,490 Z"/>', "#C9D6BA", 4, 3) +
+    riso('<path d="M-10,380 Q110,330 220,370 T370,360 L370,490 L-10,490 Z"/>', "#9BB08A", 4, 3) +
+    riso('<path d="M-10,430 Q130,396 250,426 T370,420 L370,490 L-10,490 Z"/>', "#6E8A63", 4, 3)
+  ), 0.2);
+};
+ART.forgetMeNots = function() {
+  function spray(x, y, rot) {
+    var s = '<g transform="translate(' + x + ',' + y + ') rotate(' + rot + ')"><path d="M0,0 Q6,-50 0,-110" fill="none" stroke="#5B6B4E" stroke-width="3" stroke-linecap="round"/>';
+    s += riso('<path transform="translate(0,-30) rotate(-140)" d="M0,0 Q12,-8 26,0 Q12,8 0,0 Z"/>', "#8FA67E", 2, 2);
+    [[0, -112, 14], [-20, -96, 12], [18, -90, 12], [-6, -76, 10]].forEach(function(f) { s += flower5(f[0], f[1], f[2], "#8FB8D8"); });
+    return s + '</g>';
+  }
+  return svgCard("#F2EEE6", wob(spray(120, 430, -14) + spray(186, 440, 2) + spray(248, 430, 16)), 0.2);
+};
+ART.soup = function() {
+  return svgCard("#F4EADB", wob(
+    '<g fill="none" stroke="' + ART_INK + '" stroke-width="2.6" stroke-linecap="round"><path d="M148,276 C140,258 160,248 150,226 M180,272 C172,254 192,244 182,222 M212,276 C204,258 224,248 214,226"/></g>' +
+    riso('<path d="M238,300 L292,236"/>', "none", 0, 0) + riso('<ellipse cx="296" cy="230" rx="12" ry="7" transform="rotate(-50 296 230)"/>', "#C9A27A", 2, 2) +
+    riso('<ellipse cx="180" cy="300" rx="112" ry="22"/>', "#F2B233", 3, 2) +
+    riso('<path d="M68,300 Q72,400 180,404 Q288,400 292,300 Q180,326 68,300 Z"/>', "#5DA9A1", 5, 4) +
+    '<path d="M100,336 Q180,356 260,336" fill="none" stroke="#FFF6E6" stroke-width="5" stroke-linecap="round"/>' +
+    '<g fill="#E8502F"><circle cx="146" cy="296" r="5"/><circle cx="196" cy="304" r="5"/><circle cx="226" cy="294" r="4"/></g>' +
+    riso('<ellipse cx="180" cy="414" rx="90" ry="10"/>', "#E9C9A0", 2, 2)
+  ));
+};
+ART.tea = function() {
+  return svgCard("#DDE6D3", wob(
+    '<g fill="none" stroke="' + ART_INK + '" stroke-width="2.6" stroke-linecap="round"><path d="M160,256 C152,240 170,230 160,210 M196,256 C188,240 206,230 196,210"/></g>' +
+    riso('<ellipse cx="180" cy="392" rx="118" ry="18"/>', "#FFF6E6", 3, 3) +
+    '<g fill="none" stroke="' + ART_INK + '" stroke-width="3.2" stroke-linecap="round"><path d="M252,300 C292,298 290,350 246,346"/></g>' +
+    riso('<path d="M104,276 L256,276 Q254,372 180,378 Q106,372 104,276 Z"/>', "#E8875E", 5, 4) +
+    '<path d="M224,282 L246,330" stroke="' + ART_INK + '" stroke-width="1.6"/>' + riso('<rect x="236" y="326" width="22" height="26" rx="2" transform="rotate(-24 247 339)"/>', "#F2B233", 2, 2)
+  ));
+};
+ART.bandaid = function() {
+  return svgCard("#DCE8F0", wob(
+    riso(heartPath(180, 318, 4.4, 0), "#E8502F", 5, 4) +
+    '<g transform="rotate(-30 180 300)">' + riso('<rect x="110" y="282" width="140" height="40" rx="20"/>', "#E9C9A0", 3, 3) +
+    riso('<rect x="156" y="282" width="48" height="40"/>', "#F4DDBE", 2, 2) +
+    '<g fill="#B8946C"><circle cx="168" cy="294" r="2.4"/><circle cx="180" cy="294" r="2.4"/><circle cx="192" cy="294" r="2.4"/><circle cx="168" cy="310" r="2.4"/><circle cx="180" cy="310" r="2.4"/><circle cx="192" cy="310" r="2.4"/></g></g>'
+  ));
+};
+ART.citrus = function() {
+  function slice(x, y, r, c, rot) {
+    var seg = "";
+    for (var a = 0; a < 360; a += 45) {
+      var t = (a + rot) * Math.PI / 180;
+      seg += '<path d="M' + x + ',' + y + ' L' + (x + Math.cos(t) * r * 0.8).toFixed(1) + ',' + (y + Math.sin(t) * r * 0.8).toFixed(1) + '"/>';
+    }
+    return riso('<circle cx="' + x + '" cy="' + y + '" r="' + r + '"/>', c, 4, 3) + '<circle cx="' + x + '" cy="' + y + '" r="' + (r * 0.84) + '" fill="#FFE9B8"/>' +
+      '<g stroke="' + c + '" stroke-width="5" stroke-linecap="round">' + seg + '</g>';
+  }
+  return svgCard("#F8E7C6", wob(slice(124, 300, 62, "#F28C28", 0) + slice(244, 340, 54, "#F2B233", 20) + slice(170, 416, 40, "#F28C28", 10) +
+    riso('<path transform="translate(250,262) rotate(-40)" d="M0,0 Q16,-12 36,0 Q16,12 0,0 Z"/>', "#7FA06B", 2, 2)));
+};
+ART.bed = function() {
+  var stripes = "";
+  for (var x = 92; x < 290; x += 24) stripes += '<rect x="' + x + '" y="316" width="12" height="76" fill="#F49AB0"/>';
+  return svgCard("#F3E1E6", wob(
+    riso('<rect x="60" y="230" width="20" height="200" rx="4"/>', "#7A4A2A", 2, 2) +
+    riso('<rect x="280" y="290" width="20" height="140" rx="4"/>', "#7A4A2A", 2, 2) +
+    riso('<rect x="84" y="270" width="96" height="44" rx="18"/>', "#FFF6E6", 3, 3) +
+    '<g transform="translate(3,2)"><rect x="80" y="310" width="200" height="86" rx="6" fill="#FBE3EC"/></g>' + stripes +
+    '<rect x="80" y="310" width="200" height="86" rx="6" fill="none" stroke="' + ART_INK + '" stroke-width="3"/>' +
+    '<text x="200" y="250" font-family="Caveat, cursive" font-size="34" fill="' + ART_INK + '">z</text><text x="222" y="222" font-family="Caveat, cursive" font-size="26" fill="' + ART_INK + '">z</text>'
+  ));
+};
+ART.plasterBg = function() {
+  var out = "";
+  [[46, 70, 30], [316, 64, -30], [40, 410, -24], [320, 420, 34]].forEach(function(p) {
+    out += '<g transform="rotate(' + p[2] + ' ' + p[0] + ' ' + p[1] + ')">' + riso('<rect x="' + (p[0] - 30) + '" y="' + (p[1] - 10) + '" width="60" height="20" rx="10"/>', "#E9C9A0", 2, 2) + '</g>';
+  });
+  return svgCard("#E3EAD8", wob(out + riso(heartPath(300, 250, 0.6, 12), "#E8502F", 2, 2) + riso(heartPath(56, 250, 0.5, -12), "#F49AB0", 2, 2)));
+};
+ART.onesie = function() {
+  return svgCard("#DCE8F0", wob(
+    '<path d="M60,190 L300,190" stroke="' + ART_INK + '" stroke-width="2.6" stroke-linecap="round"/>' +
+    riso('<rect x="130" y="180" width="10" height="26" rx="3"/><rect x="220" y="180" width="10" height="26" rx="3"/>', "#F2B233", 1, 1) +
+    riso('<path d="M136,206 L224,206 L266,236 L250,276 L226,262 L230,370 Q206,420 196,420 L164,420 Q154,420 130,370 L134,262 L110,276 L94,236 Z"/>', "#FBF7EF", 5, 4) +
+    '<path d="M156,206 Q180,226 204,206" fill="none" stroke="' + ART_INK + '" stroke-width="2.6"/>' +
+    riso(heartPath(180, 296, 1.1, 0), "#F49AB0", 2, 2) +
+    '<g fill="' + ART_INK + '"><circle cx="168" cy="404" r="3"/><circle cx="180" cy="406" r="3"/><circle cx="192" cy="404" r="3"/></g>'
+  ));
+};
+ART.bottle = function() {
+  return svgCard("#F8E7C6", wob(
+    riso('<path d="M168,186 Q180,160 192,186 L196,206 L164,206 Z"/>', "#E8875E", 3, 2) +
+    riso('<rect x="150" y="204" width="60" height="26" rx="6"/>', "#5DA9A1", 3, 2) +
+    riso('<path d="M152,230 L208,230 Q226,250 226,286 L226,400 Q226,420 206,420 L154,420 Q134,420 134,400 L134,286 Q134,250 152,230 Z"/>', "#FBF7EF", 5, 4) +
+    '<path d="M136,330 L224,330 L224,400 Q224,418 206,418 L154,418 Q136,418 136,400 Z" fill="#F7EFE2"/>' +
+    '<g stroke="' + ART_INK + '" stroke-width="2.4" stroke-linecap="round"><path d="M200,272 L214,272 M200,300 L214,300 M200,328 L214,328 M200,356 L214,356"/></g>' +
+    riso(heartPath(160, 370, 0.7, -10), "#E8502F", 2, 2)
+  ));
+};
+ART.rattle = function() {
+  return svgCard("#F3E1E6", wob('<g transform="rotate(-28 180 300)">' +
+    riso('<rect x="170" y="296" width="20" height="120" rx="8"/>', "#5DA9A1", 3, 3) +
+    riso('<circle cx="180" cy="430" r="18"/>', "#F2B233", 3, 3) +
+    riso('<circle cx="180" cy="246" r="62"/>', "#F49AB0", 5, 4) +
+    '<path d="M126,232 Q180,256 234,232" fill="none" stroke="#FFF6E6" stroke-width="7" stroke-linecap="round"/>' +
+    '<g fill="#FFF6E6"><circle cx="158" cy="210" r="5"/><circle cx="196" cy="206" r="5"/><circle cx="176" cy="280" r="5"/><circle cx="210" cy="268" r="5"/></g></g>' +
+    star4(70, 230, 1, "#F2B233") + star4(300, 380, 0.8, "#5DA9A1")
+  ));
+};
+ART.mobile = function() {
+  function hang(x, len, shape) {
+    return '<path d="M' + x + ',96 L' + x + ',' + (96 + len) + '" stroke="' + ART_INK + '" stroke-width="2"/>' + shape;
+  }
+  return svgCard("#E6E0F0", wob(
+    '<path d="M70,96 Q180,64 290,96" fill="none" stroke="' + ART_INK + '" stroke-width="3" stroke-linecap="round"/>' +
+    '<path d="M180,40 L180,80" stroke="' + ART_INK + '" stroke-width="3"/>' +
+    hang(90, 80, riso(star4(90, 190, 1.8, "none").replace(' fill="none"', ''), "#F2B233", 2, 2)) +
+    hang(145, 130, riso('<path d="M152,224 A30,30 0 1,0 152,284 A22,22 0 1,1 152,224 Z"/>', "#F2B233", 3, 3)) +
+    hang(215, 110, riso('<path d="M190,238 C176,238 176,218 192,218 C194,200 218,198 224,212 C232,200 254,206 250,222 C264,222 264,238 250,238 Z"/>', "#FBF7EF", 3, 3)) +
+    hang(270, 70, riso(heartPath(270, 184, 0.9, 0), "#F49AB0", 2, 2))
+  ));
+};
+ART.socks = function() {
+  function sock(x, rot, c, stripe) {
+    return '<g transform="translate(' + x + ',230) rotate(' + rot + ')">' +
+      riso('<path d="M-26,0 L26,0 L26,104 Q26,130 52,136 Q72,142 68,166 Q64,184 40,182 L-4,178 Q-26,176 -26,150 Z"/>', c, 4, 3) +
+      '<path d="M-24,12 L24,12 M-24,26 L24,26" stroke="' + stripe + '" stroke-width="6"/>' +
+      '<path d="M-26,0 L26,0 L26,34 L-26,34 Z" fill="none" stroke="' + ART_INK + '" stroke-width="3"/></g>';
+  }
+  return svgCard("#E3EAD8", wob(sock(124, -8, "#F2B233", "#FFF6E6") + sock(220, 8, "#5DA9A1", "#FFF6E6") + riso(heartPath(180, 210, 0.7, 0), "#E8502F", 2, 2)));
+};
+ART.cloudsBg = function() {
+  function cloud(x, y, s) {
+    return riso('<path transform="translate(' + x + ',' + y + ') scale(' + s + ')" d="M-40,10 C-56,10 -56,-14 -38,-14 C-36,-34 -10,-38 -2,-22 C6,-40 36,-36 34,-14 C52,-16 54,10 38,10 Z"/>', "#FBF7EF", 3, 3);
+  }
+  return svgCard("#DCE8F0", wob(cloud(60, 64, 0.9) + cloud(300, 54, 0.8) + cloud(44, 300, 0.7) + cloud(318, 290, 0.8) + star4(180, 30, 0.8, "#F2B233") + star4(320, 160, 0.6, "#F2B233") + star4(36, 170, 0.6, "#F2B233")));
+};
+ART.bauble = function() {
+  return svgCard("#E8502F", wob(
+    '<path d="M180,150 L180,178" stroke="#FFF6E6" stroke-width="2.6"/>' +
+    riso('<rect x="160" y="176" width="40" height="24" rx="3"/>', "#F2B233", 2, 2) +
+    riso('<circle cx="180" cy="290" r="94"/>', "#1F3D2F", 5, 4) +
+    '<path d="M90,266 Q135,246 180,266 T270,266 M90,310 Q135,330 180,310 T270,310" fill="none" stroke="#F8E7C6" stroke-width="8" stroke-linecap="round"/>' +
+    '<g fill="#F2B233"><circle cx="134" cy="288" r="6"/><circle cx="180" cy="288" r="6"/><circle cx="226" cy="288" r="6"/></g>' +
+    '<path d="M126,232 Q140,212 160,206" fill="none" stroke="#FFF6E6" stroke-width="5" stroke-linecap="round" opacity=".7"/>'
+  ), 0.28);
+};
+ART.tree = function() {
+  return svgCard("#F4EADB", wob(
+    riso('<rect x="166" y="392" width="28" height="40"/>', "#7A4A2A", 2, 2) +
+    riso('<path d="M180,250 L268,400 L92,400 Z"/>', "#3F6E48", 4, 3) +
+    riso('<path d="M180,218 L250,336 L110,336 Z"/>', "#5E8C5A", 4, 3) +
+    riso('<path d="M180,186 L232,280 L128,280 Z"/>', "#7FA06B", 4, 3) +
+    riso(star4(180, 180, 2, "none").replace(' fill="none"', ''), "#F2B233", 2, 2) +
+    '<g fill="#E8502F"><circle cx="160" cy="300" r="6"/><circle cx="214" cy="362" r="6"/><circle cx="140" cy="372" r="6"/></g><g fill="#2C56C9"><circle cx="202" cy="258" r="5"/><circle cx="182" cy="340" r="5"/></g>'
+  ));
+};
+ART.mittens = function() {
+  function mitt(x, rot, c, flip) {
+    var sx = flip ? -1 : 1;
+    return '<g transform="translate(' + x + ',300) rotate(' + rot + ') scale(' + sx + ',1)">' +
+      riso('<path d="M-40,60 L-44,-20 Q-46,-70 0,-76 Q40,-78 42,-30 L44,10 Q60,-6 70,10 Q76,22 46,44 L44,60 Z"/>', c, 4, 3) +
+      riso('<rect x="-48" y="56" width="96" height="34" rx="8"/>', "#FFF6E6", 2, 2) +
+      '<g fill="#FFF6E6"><circle cx="-14" cy="-30" r="5"/><circle cx="10" cy="-10" r="5"/><circle cx="-18" cy="14" r="5"/></g></g>';
+  }
+  return svgCard("#DCE8F0", wob('<path d="M110,386 Q180,440 250,386" fill="none" stroke="#E8502F" stroke-width="3" stroke-linecap="round"/>' + mitt(118, -10, "#E8502F", true) + mitt(242, 10, "#2C56C9", false)));
+};
+ART.snowGlobe = function() {
+  var flakes = "";
+  [[150, 250], [204, 236], [230, 284], [130, 300], [176, 220], [244, 252], [118, 262]].forEach(function(p) { flakes += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3.4" fill="#FFF6E6"/>'; });
+  return svgCard("#2C3E5A", wob(
+    riso('<path d="M110,370 L250,370 L264,420 L96,420 Z"/>', "#7A4A2A", 4, 3) +
+    riso('<circle cx="180" cy="280" r="96"/>', "#BCD6E8", 4, 3) +
+    riso('<path d="M90,320 Q180,300 270,320 Q256,360 180,372 Q104,360 90,320 Z"/>', "#FFF6E6", 2, 2) +
+    riso('<rect x="156" y="282" width="48" height="40"/>', "#E8502F", 2, 2) + riso('<path d="M148,286 L180,258 L212,286 Z"/>', "#1F3D2F", 2, 2) +
+    flakes
+  ), 0.3);
+};
+ART.gingerbread = function() {
+  return svgCard("#F8E7C6", wob(
+    riso('<path d="M180,166 C210,166 222,190 214,214 C240,214 262,222 262,240 C262,258 238,260 220,256 L226,330 L246,392 C252,412 226,420 216,402 L180,346 L144,402 C134,420 108,412 114,392 L134,330 L140,256 C122,260 98,258 98,240 C98,222 120,214 146,214 C138,190 150,166 180,166 Z"/>', "#C47A44", 5, 4) +
+    '<g fill="none" stroke="#FFF6E6" stroke-width="4" stroke-linecap="round"><path d="M112,236 Q118,228 124,236 Q130,244 136,236"/><path d="M224,236 Q230,228 236,236 Q242,244 248,236"/><path d="M168,206 Q180,216 192,206"/><path d="M140,384 Q148,376 156,384"/><path d="M204,384 Q212,376 220,384"/></g>' +
+    '<g fill="' + ART_INK + '"><circle cx="170" cy="192" r="3.6"/><circle cx="190" cy="192" r="3.6"/></g>' +
+    '<g fill="#E8502F"><circle cx="180" cy="250" r="6"/><circle cx="180" cy="276" r="6"/><circle cx="180" cy="302" r="6"/></g>'
+  ));
+};
+
+ART_DESIGNS.push(
+  { id: "i-sy2", occasion: "sympathy", label: "Calla lily", art: "lily", headline: "With\nsympathy", font: "instrument", italic: true, ink: "#3B3A36", size: 54, pos: "top" },
+  { id: "i-sy3", occasion: "sympathy", label: "Dove", art: "dove", headline: "Peace and\ncomfort", font: "instrument", ink: "#2B3A4A", size: 50, pos: "top" },
+  { id: "i-sy4", occasion: "sympathy", label: "Candle", art: "candle", headline: "In loving\nmemory", font: "instrument", italic: true, ink: "#F3E7D3", size: 50, pos: "top" },
+  { id: "i-sy5", occasion: "sympathy", label: "Soft hills", art: "hills", headline: "Here for\nyou", font: "fraunces", ink: "#3B4A3A", size: 56, pos: "top" },
+  { id: "i-sy6", occasion: "sympathy", label: "Forget-me-nots", art: "forgetMeNots", headline: "Thinking\nof you", font: "instrument", italic: true, ink: "#2B3A4A", size: 56, pos: "top" },
+  { id: "i-gw1", occasion: "getwell", label: "Soup", art: "soup", headline: "Get well\nsoon", font: "caprasimo", ink: "#D9472B", size: 56, pos: "top" },
+  { id: "i-gw2", occasion: "getwell", label: "Cup of tea", art: "tea", headline: "Rest up", font: "caveat", ink: "#1F3B2C", size: 80, pos: "top" },
+  { id: "i-gw3", occasion: "getwell", label: "Mended heart", art: "bandaid", headline: "Feel better", font: "fraunces", italic: true, ink: "#2C56C9", size: 52, pos: "top" },
+  { id: "i-gw4", occasion: "getwell", label: "Citrus", art: "citrus", headline: "Vitamin C\nyou soon", font: "caprasimo", ink: "#E8502F", size: 46, pos: "top" },
+  { id: "i-gw5", occasion: "getwell", label: "Bed rest", art: "bed", headline: "Lots of\nrest", font: "caveat", ink: "#2B1B12", size: 66, pos: "top" },
+  { id: "i-gw6", occasion: "getwell", label: "Hug photo", art: "plasterBg", slot: { x: 0.16, y: 0.09, w: 0.68, h: 0.58, rot: -3, frame: "polaroid" }, headline: "Sending\nhugs", font: "caveat", ink: "#1F3B2C", size: 56, pos: "bottom" },
+  { id: "i-nb1", occasion: "baby", label: "Onesie", art: "onesie", headline: "Hello,\nlittle one", font: "fraunces", italic: true, ink: "#1F2F4A", size: 50, pos: "top", centerY: 0 },
+  { id: "i-nb2", occasion: "baby", label: "Bottle", art: "bottle", headline: "Oh baby!", font: "caprasimo", ink: "#E8502F", size: 62, pos: "top" },
+  { id: "i-nb3", occasion: "baby", label: "Rattle", art: "rattle", headline: "Welcome\nbaby", font: "caprasimo", ink: "#8E1B2C", size: 56, pos: "top" },
+  { id: "i-nb4", occasion: "baby", label: "Mobile", art: "mobile", headline: "Sweet\ndreams", font: "caveat", ink: "#3B2E5A", size: 64, pos: "bottom" },
+  { id: "i-nb5", occasion: "baby", label: "Tiny socks", art: "socks", headline: "Tiny toes,\nbig love", font: "instrument", italic: true, ink: "#1F3B2C", size: 52, pos: "top" },
+  { id: "i-nb6", occasion: "baby", label: "Cloud photo", art: "cloudsBg", slot: { x: 0.17, y: 0.12, w: 0.66, h: 0.495, rot: 0, frame: "circle" }, headline: "Welcome to\nthe world", font: "fraunces", italic: true, ink: "#1F2F4A", size: 44, pos: "bottom" },
+  { id: "i-hd2", occasion: "holiday", label: "Bauble", art: "bauble", headline: "Merry\neverything", font: "caprasimo", ink: "#FFF6E6", size: 50, pos: "top" },
+  { id: "i-hd3", occasion: "holiday", label: "Little tree", art: "tree", headline: "Season's\ngreetings", font: "fraunces", italic: true, ink: "#1F3D2F", size: 50, pos: "top" },
+  { id: "i-hd4", occasion: "holiday", label: "Mittens", art: "mittens", headline: "Warm\nwishes", font: "caprasimo", ink: "#D9472B", size: 56, pos: "top" },
+  { id: "i-hd5", occasion: "holiday", label: "Snow globe", art: "snowGlobe", headline: "Let it\nsnow", font: "caveat", ink: "#F8E7C6", size: 66, pos: "top" },
+  { id: "i-hd6", occasion: "holiday", label: "Gingerbread", art: "gingerbread", headline: "Sweet\nseason", font: "caprasimo", ink: "#7A4A2A", size: 52, pos: "top" }
+);
 ALL_DESIGNS = ALL_DESIGNS.concat(ART_DESIGNS);
 
 function findDesign(id) {
