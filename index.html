@@ -4851,21 +4851,34 @@ var LAYOUT_MAP = {
 
 // ── HELPERS ──
 
+// Card links carry the card as URL-safe base64 (- and _ instead of + and /, no padding).
+// Plain base64 broke links: a "+" in the link is read back as a space, so the card failed
+// to load and the home page showed instead.
 function encodeCard(data) {
-  try { return btoa(unescape(encodeURIComponent(JSON.stringify(data)))); }
-  catch (e) { return ""; }
+  try {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(data))))
+      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  } catch (e) { return ""; }
 }
 
+// Accepts every form a card link has had: URL-safe, plain base64, and plain base64 whose
+// "+" turned into spaces on the way (older links already sent).
 function decodeCard(str) {
-  try { return JSON.parse(decodeURIComponent(escape(atob(str)))); }
-  catch (e) { return null; }
+  try {
+    var b = String(str).replace(/ /g, "+").replace(/-/g, "+").replace(/_/g, "/").replace(/[^A-Za-z0-9+\/]/g, "");
+    while (b.length % 4) b += "=";
+    return JSON.parse(decodeURIComponent(escape(atob(b))));
+  } catch (e) { return null; }
 }
 
 function getSharedCard() {
   try {
-    var params = new URLSearchParams(window.location.search);
-    var cardParam = params.get("card");
-    return cardParam ? decodeCard(cardParam) : null;
+    // Read the raw value: URLSearchParams would turn "+" into a space.
+    var m = /[?&]card=([^&#]*)/.exec(window.location.search);
+    if (!m || !m[1]) return null;
+    var raw = m[1];
+    try { raw = decodeURIComponent(raw); } catch (e) {}
+    return decodeCard(raw);
   } catch (e) { return null; }
 }
 
