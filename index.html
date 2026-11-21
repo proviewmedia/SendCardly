@@ -172,6 +172,7 @@ textarea:focus, input:focus { outline: none; border-color: var(--accent) !import
 
 .mk-bar { background: var(--espresso); color: #F1EBE1; font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 48px; }
 .mk-bar b { font-family: 'DM Mono', monospace; font-weight: 500; font-size: 10px; letter-spacing: .12em; background: var(--tomato); color: #fff; border-radius: 999px; padding: 3px 8px; margin-right: 10px; }
+.mk-bar-short { display: none; }
 .mk-bar button { background: none; border: none; color: inherit; font: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
 
 .mk-nav { position: sticky; top: 0; z-index: 50; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 16px 48px; background: rgba(241,235,225,0.92); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
@@ -253,7 +254,10 @@ textarea:focus, input:focus { outline: none; border-color: var(--accent) !import
 }
 @media (max-width: 760px) {
   .mk-bar { padding: 9px 16px; }
-  .mk-bar span:last-child { display: none; }
+  .mk-bar > span:last-child { display: none; }
+  .mk-bar-long { display: none; }
+  .mk-bar-short { display: inline; }
+  .mk-foot > div:last-child { text-align: left !important; }
   .mk-nav { padding: 12px 16px; grid-template-columns: 1fr auto; }
   .mk-links { display: none; }
   .mk-hero { padding: 48px 16px 40px; }
@@ -1968,7 +1972,8 @@ function render() {
     var bar = h("div", { className: "mk-bar" });
     var barL = h("span");
     barL.appendChild(h("b", null, "FREE"));
-    barL.appendChild(document.createTextNode("Cards for every occasion. No account, no app, no catch."));
+    barL.appendChild(h("span", { className: "mk-bar-long" }, "Cards for every occasion. No account, no app, no catch."));
+    barL.appendChild(h("span", { className: "mk-bar-short" }, "No account. No app. No catch."));
     bar.appendChild(barL);
     var barR = h("span");
     var barBtn = h("button", { onClick: ctaAction }, "Start a card");
