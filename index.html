@@ -16,8 +16,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="Sendr"/>
 <!-- Open Graph: Default (site sharing) -->
-<meta property="og:title" content="Sendr — Say It With a Card"/>
-<meta property="og:description" content="Create and send beautiful digital greeting cards for free. Design the front, write your message on the back, and send it instantly."/>
+<meta property="og:title" content="A card, just for you"/>
+<meta property="og:description" content="Open it on Sendr. Free cards for every occasion, no app needed."/>
 <meta property="og:image" content="https://www.sendrcards.com/og-image.png"/>
 <meta property="og:url" content="https://www.sendrcards.com/"/>
 <meta property="og:image:width" content="1200"/>
@@ -27,13 +27,13 @@
 <meta property="og:locale" content="en_US"/>
 <!-- Twitter: Default (site sharing) -->
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Sendr — Say It With a Card"/>
-<meta name="twitter:description" content="Create and send beautiful digital greeting cards for free. Design the front, write your message on the back, and send it instantly."/>
+<meta name="twitter:title" content="A card, just for you"/>
+<meta name="twitter:description" content="Open it on Sendr. Free cards for every occasion, no app needed."/>
 <meta name="twitter:image" content="https://www.sendrcards.com/og-image.png"/>
 <!-- Additional SEO -->
 <meta name="robots" content="index, follow"/>
 <meta name="author" content="Sendr"/>
-<meta name="theme-color" content="#f7f6f3"/>
+<meta name="theme-color" content="#F1EBE1"/>
 <!-- Structured Data -->
 <script type="application/ld+json">
 {
@@ -79,16 +79,16 @@
 <script>
 if (window.location.search.indexOf('card=') > -1) {
   var metas = {
-    'og:title': "You've got a card",
-    'og:description': 'Someone made you something special. Tap to open it.',
-    'twitter:title': "You've got a card",
-    'twitter:description': 'Someone made you something special. Tap to open it.'
+    'og:title': "You\u2019ve got a card",
+    'og:description': 'Someone made you a card. Tap to open it.',
+    'twitter:title': "You\u2019ve got a card",
+    'twitter:description': 'Someone made you a card. Tap to open it.'
   };
   for (var key in metas) {
     var el = document.querySelector('meta[property="' + key + '"], meta[name="' + key + '"]');
     if (el) el.setAttribute('content', metas[key]);
   }
-  document.title = "You've got a card | Sendr";
+  document.title = "You\u2019ve got a card | Sendr";
 }
 </script>
 <!-- Google tag (gtag.js) -->
@@ -2786,6 +2786,7 @@ function render() {
   if (state.screen === "studio") { ensureStudio(); document.body.classList.add("st-lock"); renderStudio(app); return; }
   document.body.classList.remove("st-lock");
 
+  if (state.screen === "og") { renderOgArt(app); return; }
   if (state.screen === "browse") { renderBrowse(app, state.browseOcc); return; }
   if (state.screen === "detail") { renderCardDetail(app, state.detailId); return; }
 
@@ -3307,7 +3308,7 @@ function renderOpening(app, isPreview) {
 
   var W = stage.clientWidth, H = stage.clientHeight;
   var s = Math.max(0.42, Math.min((H - 24) / 480, (W - 32) / 360, 1.15));
-  var envW = Math.min(W - 32, 360 * s * 1.08);
+  var envW = Math.min(W - 64, 360 * s * 1.08);
   var from = (state.senderName || "").trim();
 
   function eyebrow(text) { return h("div", { className: "mk-eyebrow op-eyebrow" }, text); }
@@ -4491,7 +4492,47 @@ function renderDesignGallery(app) {
   app.appendChild(page);
 }
 
+// Link preview art (1200x630), rendered once to og-image.png from ?og.
+function renderOgArt(app) {
+  var root = h("div", { style: "position:fixed;left:0;top:0;width:1200px;height:630px;overflow:hidden;background:#F1EBE1;font-family:'Instrument Sans',sans-serif;color:#22120A" });
+  root.appendChild(h("div", { className: "st-grain", html: '<svg width="100%" height="100%" aria-hidden="true"><rect width="100%" height="100%" fill="#fff" filter="url(#sg-grain)" opacity=".18" style="mix-blend-mode:multiply"/></svg>' }));
+  var left = h("div", { style: "position:absolute;left:72px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;width:560px" });
+  var brand = h("div", { style: "display:flex;align-items:center;gap:12px;font-size:30px;font-weight:600;letter-spacing:-0.03em;margin-bottom:40px" });
+  var mk = h("i", { style: "width:40px;height:40px;border-radius:50%;background:#E8502F;color:#fff;display:inline-flex;align-items:center;justify-content:center" });
+  mk.appendChild(icon("mail", 21, 2.2));
+  brand.appendChild(mk);
+  brand.appendChild(document.createTextNode("Sendr"));
+  left.appendChild(brand);
+  var h1 = h("div", { style: "font-size:104px;font-weight:500;letter-spacing:-0.05em;line-height:.94" });
+  h1.appendChild(document.createTextNode("You\u2019ve got"));
+  h1.appendChild(h("br"));
+  h1.appendChild(h("span", { style: "color:#E8502F" }, "a card."));
+  left.appendChild(h1);
+  left.appendChild(h("div", { style: "font-family:'DM Mono',monospace;font-size:20px;letter-spacing:.16em;text-transform:uppercase;color:#6B5A50;margin-top:36px" }, "Tap to open it"));
+  root.appendChild(left);
+  var env = { c: "cream", l: "confetti", s: "heart", k: "cream" };
+  var e1 = envelopeBack(env, 330);
+  e1.style.cssText += ";position:absolute;left:640px;top:150px;transform:rotate(-8deg)";
+  root.appendChild(e1);
+  var keep = { frontDesign: state.frontDesign, frontText: state.frontText, frontPhoto: state.frontPhoto, frontStickers: state.frontStickers, frontHeadFont: state.frontHeadFont, frontInk: state.frontInk, frontFontSize: state.frontFontSize };
+  function card(id, x, y, rot, sc) {
+    state.frontDesign = findDesign(id); state.frontText = null; state.frontPhoto = null; state.frontStickers = []; state.frontHeadFont = null; state.frontInk = null; state.frontFontSize = 1;
+    var c = renderCardSide("front", sc, false);
+    var w = h("div", { style: "position:absolute;left:" + x + "px;top:" + y + "px;transform:rotate(" + rot + "deg)" });
+    w.appendChild(c);
+    root.appendChild(w);
+  }
+  card("i-ty1", 930, 70, 9, 0.6);
+  card("i-bd1", 760, 120, -3, 0.78);
+  for (var k in keep) state[k] = keep[k];
+  var front = envelopeFront(env, 300, "You");
+  front.style.position = "absolute"; front.style.left = "640px"; front.style.top = "392px"; front.style.transform = "rotate(4deg)";
+  root.appendChild(front);
+  app.appendChild(root);
+}
+
 // ── INIT ──
+if (/[?&]og(=|&|$)/.test(location.search)) { state.screen = "og"; }
 if (/[?&]designs(=|&|$)/.test(location.search)) { state.screen = "designs"; document.title = "Sendr design review"; }
 var resizeTimer;
 window.addEventListener("resize", function() {
