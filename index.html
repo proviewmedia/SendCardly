@@ -307,6 +307,7 @@ body.st-lock { overflow: hidden; }
 .st-note { font-size: 14px; color: var(--ink-2); line-height: 1.5; margin: 12px 0; }
 .st-input { width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 11px 13px; font: inherit; font-size: 15px; color: var(--ink); resize: vertical; }
 .st-input:focus { outline: none; border-color: var(--ink) !important; box-shadow: 0 0 0 3px rgba(34,18,10,0.08) !important; }
+.st-count.full { color: #C83E20; font-weight: 500; }
 .st-count { text-align: right; font-size: 12px; color: var(--ink-2); margin-top: 6px; font-family: 'DM Mono', monospace; }
 .st-link { background: none; border: none; color: var(--ink-2); text-decoration: underline; font-size: 13px; padding: 8px 0 0; cursor: pointer; }
 .st-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
@@ -2126,7 +2127,7 @@ function renderCardSide(side, size, interactive) {
     card.appendChild(inner);
     requestAnimationFrame(function() {
       if (!inner.isConnected) return;
-      if (autoFit) fitMessage(inner, msgEl, 10 * scale);
+      if (autoFit) fitMessage(inner, msgEl, MIN_MSG_PX * scale);
       else msgEl.style.fontSize = msgEl.dataset.base + "px";
       card.dataset.overflow = messageOverflows(inner) ? "1" : "0";
       if (card._onfit) card._onfit();
@@ -2161,6 +2162,34 @@ function renderCardSide(side, size, interactive) {
 }
 
 // True when the To / message / From block is taller than the space inside the margins.
+var MIN_MSG_PX = 14;
+// Longest start of the text that still fits on the card (binary search on length).
+function longestFittingMessage(text) {
+  var keep = state.message, lo = 0, hi = text.length;
+  while (lo < hi) {
+    var mid = Math.ceil((lo + hi) / 2);
+    state.message = text.slice(0, mid);
+    if (messageFits()) lo = mid; else hi = mid - 1;
+  }
+  state.message = keep;
+  return text.slice(0, lo);
+}
+// Accepts new message text only as far as it fits. Returns the text that was kept.
+function setMessageWithinCard(text) {
+  text = text.slice(0, 400);
+  var prev = state.message;
+  state.message = text;
+  if (messageFits()) { state.msgFull = false; return text; }
+  prev = prev || "";
+  // Deleting is always allowed, even if the card is still over.
+  if (text.length <= prev.length) { state.message = text; state.msgFull = false; return text; }
+  state.message = prev;
+  var kept = longestFittingMessage(text);
+  if (kept.length < prev.length) kept = prev;
+  state.message = kept;
+  state.msgFull = true;
+  return kept;
+}
 function messageOverflows(inner) {
   var kids = inner.children;
   if (!kids.length) return false;
@@ -2182,7 +2211,7 @@ function messageFits() {
   var p = c.querySelector('[data-edit="message"]');
   var ok = true;
   if (p) {
-    if (state.backAutoFit !== false) fitMessage(p.parentNode, p, 10);
+    if (state.backAutoFit !== false) fitMessage(p.parentNode, p, MIN_MSG_PX);
     else p.style.fontSize = p.dataset.base + "px";
     ok = !messageOverflows(p.parentNode);
   }
@@ -4083,9 +4112,15 @@ function wireCardEditing(cardEl, side) {
       var v = t.innerText.replace(/\n$/, "");
       if (side === "front") state.frontText = v.slice(0, 60);
       else {
-        state.message = v.slice(0, 400); state.messageTouched = true;
+        state.messageTouched = true;
+        var kept = setMessageWithinCard(v);
+        if (kept !== v) {
+          t.textContent = kept;
+          var rg = document.createRange(); rg.selectNodeContents(t); rg.collapse(false);
+          var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(rg);
+        }
         var sc = cardEl.offsetWidth / 360;
-        if (state.backAutoFit !== false) fitMessage(t.parentNode, t, 10 * sc);
+        if (state.backAutoFit !== false) fitMessage(t.parentNode, t, MIN_MSG_PX * sc);
         cardEl.dataset.overflow = messageOverflows(t.parentNode) ? "1" : "0";
         updateFitWarning();
       }
@@ -4146,7 +4181,9 @@ function focusField(name) {
 }
 function updateCount() {
   var c = document.getElementById("stCount");
-  if (c) c.textContent = (state.message || "").length + " / 400";
+  if (!c) return;
+  c.textContent = state.msgFull ? "Card is full" : (state.message || "").length + " / 400";
+  c.classList.toggle("full", !!state.msgFull);
 }
 
 // ── Panels ──
@@ -4304,9 +4341,19 @@ var PANELS = {
     el.appendChild(label("Message"));
     var ta = h("textarea", { className: "st-input", rows: "6", maxlength: "400", placeholder: "Write something they will want to keep", "data-field": "message" });
     ta.value = state.message;
-    ta.addEventListener("input", function() { state.message = ta.value; state.messageTouched = true; updateCount(); refreshStage(); });
+    ta.addEventListener("input", function() {
+      state.messageTouched = true;
+      var kept = setMessageWithinCard(ta.value);
+      if (kept !== ta.value) {
+        var pos = Math.min(ta.selectionStart, kept.length);
+        ta.value = kept;
+        ta.setSelectionRange(pos, pos);
+      }
+      updateCount();
+      refreshStage();
+    });
     el.appendChild(ta);
-    el.appendChild(h("div", { className: "st-count", id: "stCount" }, (state.message || "").length + " / 400"));
+    el.appendChild(h("div", { className: "st-count" + (state.msgFull ? " full" : ""), id: "stCount" }, state.msgFull ? "Card is full" : (state.message || "").length + " / 400"));
     el.appendChild(label("From"));
     var fr = h("input", { className: "st-input", maxlength: "40", placeholder: "Your name", "data-field": "from" });
     fr.value = state.senderName;
