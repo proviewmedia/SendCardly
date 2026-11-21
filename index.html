@@ -6904,7 +6904,7 @@ function renderSend(app) {
   var fresh = h("button", { className: "st-link", onClick: function() {
     try { localStorage.removeItem("sendr-draft-v1"); } catch (e) {}
     state = initState();
-    go("#/studio/card");
+    startSending();
   } }, "Start a new card");
   col.appendChild(fresh);
   body.appendChild(col);
@@ -7837,10 +7837,10 @@ function resizePhoto(file, max, q, done) {
 function artThumb(d, scale) {
   return thumbWith({ frontDesign: d, frontText: null, frontPhoto: null, frontHeadFont: null, frontInk: null, frontFontSize: 1, frontStickers: [] }, scale);
 }
-// Phones start by picking a card from the list; desktop opens the studio, which has the designs beside the card.
+// Sending always starts by picking a card from the list, never a card chosen for you.
 function startSending() {
-  if (isMobile()) { state.picking = true; go("#/cards"); }
-  else go("#/studio/card");
+  state.picking = true;
+  go("#/cards");
 }
 function startDesign(d) {
   state.picking = false;
