@@ -350,6 +350,12 @@ body.st-lock { overflow: hidden; }
 .st-editable:focus { outline: 1.5px solid var(--tomato); }
 .st-warn { position: absolute; left: 50%; top: 16px; transform: translateX(-50%); z-index: 12; display: flex; align-items: center; gap: 10px; background: #FFF1EC; color: #8A2A14; border: 1px solid #F2B8A6; border-radius: 14px; padding: 10px 10px 10px 14px; font-size: 14px; box-shadow: 0 8px 24px rgba(34,18,10,0.14); max-width: calc(100% - 32px); }
 .st-warn[hidden] { display: none; }
+.st-full { padding-right: 16px; }
+.st-card-full { outline: 2px solid #C83E20; outline-offset: 4px; }
+.st-bump { animation: stBump .32s ease; }
+@keyframes stBump { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.st-input-full { border-color: #C83E20 !important; box-shadow: 0 0 0 3px rgba(200,62,32,0.12) !important; }
+@media (prefers-reduced-motion: reduce) { .st-bump { animation: none; } }
 .st-warn button { border: none; background: #8A2A14; color: #fff; border-radius: 999px; padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
 .sd-block { display: flex; gap: 12px; align-items: flex-start; background: #FFF1EC; color: #8A2A14; border: 1px solid #F2B8A6; border-radius: 16px; padding: 14px 16px; margin-bottom: 16px; font-size: 15px; line-height: 1.45; }
 .sd-block button { margin-top: 10px; border: none; background: #8A2A14; color: #fff; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px; cursor: pointer; }
@@ -2127,7 +2133,11 @@ function renderCardSide(side, size, interactive) {
     card.appendChild(inner);
     requestAnimationFrame(function() {
       if (!inner.isConnected) return;
-      if (autoFit) fitMessage(inner, msgEl, MIN_MSG_PX * scale);
+      if (autoFit) {
+        fitMessage(inner, msgEl, MIN_MSG_PX * scale);
+        // A font or layout change can push past the floor; never let text leave the card.
+        if (messageOverflows(inner)) fitMessage(inner, msgEl, 9 * scale);
+      }
       else msgEl.style.fontSize = msgEl.dataset.base + "px";
       card.dataset.overflow = messageOverflows(inner) ? "1" : "0";
       if (card._onfit) card._onfit();
@@ -2162,7 +2172,8 @@ function renderCardSide(side, size, interactive) {
 }
 
 // True when the To / message / From block is taller than the space inside the margins.
-var MIN_MSG_PX = 14;
+var MIN_MSG_PX = 18;
+var MAX_MSG_CHARS = 600;
 // Longest start of the text that still fits on the card (binary search on length).
 function longestFittingMessage(text) {
   var keep = state.message, lo = 0, hi = text.length;
@@ -2176,10 +2187,11 @@ function longestFittingMessage(text) {
 }
 // Accepts new message text only as far as it fits. Returns the text that was kept.
 function setMessageWithinCard(text) {
-  text = text.slice(0, 400);
+  var overCap = text.length > MAX_MSG_CHARS;
+  text = text.slice(0, MAX_MSG_CHARS);
   var prev = state.message;
   state.message = text;
-  if (messageFits()) { state.msgFull = false; return text; }
+  if (messageFits()) { state.msgFull = overCap; return text; }
   prev = prev || "";
   // Deleting is always allowed, even if the card is still over.
   if (text.length <= prev.length) { state.message = text; state.msgFull = false; return text; }
@@ -2190,7 +2202,7 @@ function setMessageWithinCard(text) {
   state.msgFull = true;
   return kept;
 }
-function messageOverflows(inner) {
+function messageOverflows(inner, slack) {
   var kids = inner.children;
   if (!kids.length) return false;
   var cs = getComputedStyle(inner);
@@ -2200,7 +2212,7 @@ function messageOverflows(inner) {
   var availW = inner.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
   var wide = false;
   for (var i = 0; i < kids.length; i++) if (kids[i].scrollWidth > availW + 1) wide = true;
-  return used > availH + 0.5 || wide;
+  return used > availH - (slack || 0) + 0.5 || wide;
 }
 // Measures the inside off screen; false when the message spills past the margins.
 function messageFits() {
@@ -2211,18 +2223,18 @@ function messageFits() {
   var p = c.querySelector('[data-edit="message"]');
   var ok = true;
   if (p) {
-    if (state.backAutoFit !== false) fitMessage(p.parentNode, p, MIN_MSG_PX);
+    if (state.backAutoFit !== false) fitMessage(p.parentNode, p, MIN_MSG_PX, 10);
     else p.style.fontSize = p.dataset.base + "px";
-    ok = !messageOverflows(p.parentNode);
+    ok = !messageOverflows(p.parentNode, 10);
   }
   holder.remove();
   return ok;
 }
 // Shrink the inside message until the whole thing fits on the card.
-function fitMessage(inner, p, minPx) {
+function fitMessage(inner, p, minPx, slack) {
   if (!inner || !p || !inner.isConnected) return;
   var max = parseFloat(p.dataset.base) || parseFloat(p.style.fontSize);
-  function fits(size) { p.style.fontSize = size + "px"; return !messageOverflows(inner); }
+  function fits(size) { p.style.fontSize = size + "px"; return !messageOverflows(inner, slack); }
   if (fits(max)) return;
   // Largest size that still fits, found by halving the range.
   var lo = minPx, hi = max;
@@ -3902,7 +3914,7 @@ function loadDraft() {
   state.backFontSize = clampNum(d.bfs, 0.5, 2, 1);
   state.backAutoFit = d.baf !== 0;
   state.backStickers = sanitizeStickers(d.bst);
-  state.message = typeof d.ms === "string" ? d.ms.slice(0, 400) : "";
+  state.message = typeof d.ms === "string" ? d.ms.slice(0, MAX_MSG_CHARS) : "";
   state.recipientName = typeof d.to === "string" ? d.to.slice(0, 40) : "";
   state.senderName = typeof d.fr === "string" ? d.fr.slice(0, 40) : "";
   state.env = sanitizeEnv(d.e);
@@ -4007,9 +4019,20 @@ function renderStudio(app) {
   refreshStage();
 }
 
+function keepManualSizeOnCard() {
+  if (state.backAutoFit !== false || messageFits()) return;
+  var lo = 0.5, hi = state.backFontSize || 1;
+  for (var i = 0; i < 12; i++) {
+    var mid = (lo + hi) / 2;
+    state.backFontSize = mid;
+    if (messageFits()) lo = mid; else hi = mid;
+  }
+  state.backFontSize = lo;
+}
 function refreshStage() {
   var stage = studioEls.stage;
   if (!stage || !stage.isConnected) return;
+  keepManualSizeOnCard();
   stage.innerHTML = "";
   stage.style.cssText = backdropCss(state.env.k);
   stage.appendChild(h("div", { className: "st-grain", html: '<svg width="100%" height="100%" aria-hidden="true"><rect width="100%" height="100%" fill="#fff" filter="url(#sg-grain)" opacity=".16" style="mix-blend-mode:multiply"/></svg>' }));
@@ -4058,11 +4081,15 @@ function refreshStage() {
   var fixBtn = h("button", { onClick: function() { state.studioTool.message = "style"; state.panelOpen = true; go("#/studio/message"); render(); } }, "Text size");
   warn.appendChild(fixBtn);
   stage.appendChild(warn);
+  var fullB = h("div", { className: "st-warn st-full", role: "status", id: "stFull", hidden: "hidden" });
+  fullB.appendChild(icon("alert", 18));
+  fullB.appendChild(h("span", null, "Your card is full. Delete some words to add more."));
+  stage.appendChild(fullB);
   Array.prototype.forEach.call(stage.querySelectorAll(".st-obj"), function(o) {
     var c = o.querySelector("[data-edit=message]");
     if (c) { var cardEl = c.closest("[data-overflow]") || c.parentNode.parentNode; cardEl._onfit = updateFitWarning; }
   });
-  requestAnimationFrame(function() { requestAnimationFrame(updateFitWarning); });
+  requestAnimationFrame(function() { requestAnimationFrame(function() { if (state.msgFull) showCardFull(true, false); updateFitWarning(); }); });
   saveDraft();
 }
 
@@ -4114,6 +4141,7 @@ function wireCardEditing(cardEl, side) {
       else {
         state.messageTouched = true;
         var kept = setMessageWithinCard(v);
+        showCardFull(state.msgFull, kept !== v);
         if (kept !== v) {
           t.textContent = kept;
           var rg = document.createRange(); rg.selectNodeContents(t); rg.collapse(false);
@@ -4167,10 +4195,34 @@ function wireCardEditing(cardEl, side) {
   });
 }
 
+// Stop state: shown when typing is refused because the card is full.
+function showCardFull(full, bump, text) {
+  state.msgFull = !!full;
+  if (full && text) state.msgFullText = text;
+  if (!full) state.msgFullText = null;
+  text = state.msgFullText;
+  updateCount();
+  var b = document.getElementById("stFull");
+  if (b) {
+    if (full) b.removeAttribute("hidden"); else b.setAttribute("hidden", "hidden");
+    var span = b.querySelector("span:last-child");
+    if (span) span.textContent = text || "Your card is full. Delete some words to add more.";
+  }
+  var c = document.querySelector('.st-obj.center [data-edit="message"]');
+  var card = c && c.parentNode && c.parentNode.parentNode;
+  if (card) {
+    card.classList.toggle("st-card-full", !!full);
+    if (full && bump) {
+      card.classList.remove("st-bump");
+      void card.offsetWidth;
+      card.classList.add("st-bump");
+    }
+  }
+}
 function updateFitWarning() {
   var w = document.getElementById("stWarn");
   if (!w) return;
-  var over = !!document.querySelector('.st-stage [data-overflow="1"]');
+  var over = !!document.querySelector('.st-stage [data-overflow="1"]') && !state.msgFull;
   if (over) w.removeAttribute("hidden"); else w.setAttribute("hidden", "hidden");
 }
 function focusField(name) {
@@ -4182,7 +4234,7 @@ function focusField(name) {
 function updateCount() {
   var c = document.getElementById("stCount");
   if (!c) return;
-  c.textContent = state.msgFull ? "Card is full" : (state.message || "").length + " / 400";
+  c.textContent = state.msgFull ? "Card is full. Delete some words to add more." : (state.message || "").length + " / " + MAX_MSG_CHARS;
   c.classList.toggle("full", !!state.msgFull);
 }
 
@@ -4339,21 +4391,23 @@ var PANELS = {
     to.addEventListener("input", function() { state.recipientName = to.value; refreshStage(); });
     el.appendChild(to);
     el.appendChild(label("Message"));
-    var ta = h("textarea", { className: "st-input", rows: "6", maxlength: "400", placeholder: "Write something they will want to keep", "data-field": "message" });
+    var ta = h("textarea", { className: "st-input", rows: "6", placeholder: "Write something they will want to keep", "data-field": "message" });
     ta.value = state.message;
     ta.addEventListener("input", function() {
       state.messageTouched = true;
       var kept = setMessageWithinCard(ta.value);
-      if (kept !== ta.value) {
+      var blocked = kept !== ta.value;
+      if (blocked) {
         var pos = Math.min(ta.selectionStart, kept.length);
         ta.value = kept;
         ta.setSelectionRange(pos, pos);
       }
-      updateCount();
       refreshStage();
+      showCardFull(state.msgFull, blocked);
+      ta.classList.toggle("st-input-full", !!state.msgFull);
     });
     el.appendChild(ta);
-    el.appendChild(h("div", { className: "st-count" + (state.msgFull ? " full" : ""), id: "stCount" }, state.msgFull ? "Card is full" : (state.message || "").length + " / 400"));
+    el.appendChild(h("div", { className: "st-count" + (state.msgFull ? " full" : ""), id: "stCount" }, state.msgFull ? "Card is full. Delete some words to add more." : (state.message || "").length + " / " + MAX_MSG_CHARS));
     el.appendChild(label("From"));
     var fr = h("input", { className: "st-input", maxlength: "40", placeholder: "Your name", "data-field": "from" });
     fr.value = state.senderName;
@@ -4385,18 +4439,35 @@ var PANELS = {
     sizeChips.appendChild(autoChip);
     sizeChips.appendChild(ownChip);
     el.appendChild(sizeChips);
-    var sizeNote = h("p", { className: "st-note", style: "margin:6px 0 10px" }, auto ? "Text shrinks on its own so your whole message fits." : "Drag to choose a size. If the message runs off the card, you'll see a warning.");
+    var sizeNote = h("p", { className: "st-note", style: "margin:6px 0 10px" }, auto ? "Text shrinks on its own so your whole message fits." : "Drag to choose a size. It stops at the biggest size that fits.");
     el.appendChild(sizeNote);
     var r = h("input", { type: "range", min: "0.5", max: "1.6", step: "0.02", className: "st-range", "aria-label": "Message size" });
     r.value = state.backFontSize || 1;
     r.addEventListener("input", function() {
-      state.backFontSize = parseFloat(r.value);
+      var want = parseFloat(r.value);
+      state.backFontSize = want;
+      var capped = false;
+      if (!messageFits()) {
+        // Largest size that still keeps the whole message on the card.
+        var lo = 0.5, hi = want;
+        for (var i = 0; i < 12; i++) {
+          var mid = (lo + hi) / 2;
+          state.backFontSize = mid;
+          if (messageFits()) lo = mid; else hi = mid;
+        }
+        state.backFontSize = lo;
+        r.value = lo;
+        capped = true;
+      }
       if (state.backAutoFit !== false) {
         state.backAutoFit = false;
         autoChip.classList.remove("on"); ownChip.classList.add("on");
-        sizeNote.textContent = "Drag to choose a size. If the message runs off the card, you'll see a warning.";
+        sizeNote.textContent = "Drag to choose a size. It stops at the biggest size that fits.";
       }
       refreshStage();
+      if (capped) showCardFull(true, true, "That's the biggest the text can go on this card.");
+      else if (state.msgFull) showCardFull(false);
+      updateFitWarning();
     });
     el.appendChild(r);
     el.appendChild(label("Ink"));
