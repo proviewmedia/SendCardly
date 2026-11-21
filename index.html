@@ -34,6 +34,7 @@
 <meta name="robots" content="index, follow"/>
 <meta name="author" content="Sendr"/>
 <meta name="theme-color" content="#F1EBE1"/>
+<meta name="referrer" content="strict-origin-when-cross-origin"/>
 <!-- Structured Data -->
 <script type="application/ld+json">
 {
@@ -96,7 +97,9 @@ if (window.location.search.indexOf('card=') > -1) {
     gaS.src = 'https://www.googletagmanager.com/gtag/js?id=G-P65EQM0R01';
     document.head.appendChild(gaS);
     gtag('js', new Date());
-    gtag('config', 'G-P65EQM0R01', { page_location: location.origin + location.pathname });
+    // Strip queries from the previous page too: after "Send one back" the previous page is a card link.
+    var gaRef = document.referrer ? document.referrer.split(/[?#]/)[0] : '';
+    gtag('config', 'G-P65EQM0R01', { page_location: location.origin + location.pathname, page_referrer: gaRef });
   }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -6226,8 +6229,7 @@ function render() {
     }
     function startWith(id) {
       var d = findDesign(id);
-      if (d) { ensureStudio(); state.frontStickers = []; applyDesign(d); }
-      go("#/studio/card");
+      if (d) startDesign(d); else startSending();
     }
     function goTo(id) { var el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }
     function pill(kind, label, onClick, withArrow) {
@@ -6914,16 +6916,19 @@ function renderSend(app) {
   }
   if (navigator.share) {
     opts.appendChild(opt("share", "Share", "Send with any app on your phone", function() {
+      markSent();
       navigator.share({ title: fromName() + " sent you a card", text: fromName() + " sent you a card", url: shareUrlNow() }).catch(function() {});
     }, true));
   }
-  opts.appendChild(opt("message", "Text message", "Opens your messages app", function() { location.href = "sms:?&body=" + encodeURIComponent(fromName() + " sent you a card: " + shareUrlNow()); }));
+  opts.appendChild(opt("message", "Text message", "Opens your messages app", function() { markSent(); location.href = "sms:?&body=" + encodeURIComponent(fromName() + " sent you a card: " + shareUrlNow()); }));
   opts.appendChild(opt("mail", "Email", "Opens your email app", function() {
     var to = (state.recipientName || "").trim();
     var body = (to ? "Hi " + to + ",\n\n" : "") + fromName() + " made you a card on Sendr. Open it here:\n" + shareUrlNow() + "\n\nSent with Sendr";
+    markSent();
     location.href = "mailto:?subject=" + encodeURIComponent(fromName() + " sent you a card") + "&body=" + encodeURIComponent(body);
   }));
   var copyBtn = opt(state.copied ? "check" : "link", state.copied ? "Link copied" : "Copy link", "Paste it anywhere", function() {
+    markSent();
     function done() { state.copied = true; render(); setTimeout(function() { state.copied = false; if (state.screen === "send") render(); }, 2500); }
     function manual() { var box = document.getElementById("sdLink"); if (box) { box.focus(); box.select(); } }
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(shareUrlNow()).then(done, manual);
@@ -6940,8 +6945,7 @@ function renderSend(app) {
   }
   col.appendChild(h("p", { className: "st-note" }, "Anyone with the link can open the card."));
   var fresh = h("button", { className: "st-link", onClick: function() {
-    try { localStorage.removeItem("sendr-draft-v1"); } catch (e) {}
-    state = initState();
+    resetCard();
     startSending();
   } }, "Start a new card");
   col.appendChild(fresh);
@@ -7164,6 +7168,7 @@ function ensureStudio() {
 var draftTimer;
 function saveDraft() {
   clearTimeout(draftTimer);
+  if (state.sent) return;
   draftTimer = setTimeout(function() {
     try {
       var d = {
@@ -7875,14 +7880,27 @@ function resizePhoto(file, max, q, done) {
 function artThumb(d, scale) {
   return thumbWith({ frontDesign: d, frontText: null, frontPhoto: null, frontHeadFont: null, frontInk: null, frontFontSize: 1, frontStickers: [] }, scale);
 }
+// After a card goes out, the next card starts clean: no old message, names, stickers or photo.
+// The Send screen keeps the sent card until then, so it can be sent again.
+function markSent() {
+  state.sent = true;
+  try { localStorage.removeItem("sendr-draft-v1"); } catch (e) {}
+}
+function resetCard() {
+  try { localStorage.removeItem("sendr-draft-v1"); } catch (e) {}
+  state = initState();
+}
 // Sending always starts by picking a card from the list, never a card chosen for you.
 function startSending() {
+  if (state.sent) resetCard();
   state.picking = true;
   go("#/cards");
 }
 function startDesign(d) {
+  var fromList = state.screen === "detail" || state.screen === "browse", fromOcc = state.detailFrom;
+  if (state.sent) { resetCard(); state.detailFrom = fromOcc; }
   state.picking = false;
-  state.studioFrom = state.screen === "detail" || state.screen === "browse" ? (state.detailFrom ? "#/cards/" + state.detailFrom : "#/cards") : "#/";
+  state.studioFrom = fromList ? (fromOcc ? "#/cards/" + fromOcc : "#/cards") : "#/";
   ensureStudio();
   state.frontStickers = [];
   applyDesign(d);
