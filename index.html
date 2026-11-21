@@ -357,6 +357,7 @@ body.st-lock { overflow: hidden; }
 .st-switch { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; gap: 2px; background: var(--paper); border-radius: 999px; padding: 4px; box-shadow: 0 6px 24px rgba(34,18,10,0.16); z-index: 10; }
 .st-switch button { border: none; background: none; border-radius: 999px; padding: 10px 20px; font-size: 15px; color: var(--ink); cursor: pointer; }
 .st-switch button.on { background: var(--ink); color: var(--paper); }
+.st-hint { position: absolute; left: 50%; bottom: 66px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 48px); margin: 0; padding: 7px 14px; border-radius: 12px; background: rgba(250,247,242,0.9); color: var(--ink); font-size: 13px; line-height: 1.35; text-align: center; z-index: 9; box-shadow: 0 4px 16px rgba(34,18,10,0.1); }
 
 @media (max-width: 860px) {
   .st { grid-template-rows: 56px 1fr; }
@@ -551,7 +552,7 @@ body.st-lock { overflow: hidden; }
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
   <filter id="sg-grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="1.8" intercept="-0.35"/><feFuncG type="linear" slope="1.8" intercept="-0.35"/><feFuncB type="linear" slope="1.8" intercept="-0.35"/></feComponentTransfer></filter>
-  <filter id="sg-wob" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="turbulence" baseFrequency="0.028" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="sg-wob" filterUnits="userSpaceOnUse" x="-60" y="-60" width="480" height="600"><feTurbulence type="turbulence" baseFrequency="0.028" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter>
   <filter id="sg-paper" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.005 0.04" numOctaves="4" seed="9" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="0.55" intercept="0.6"/><feFuncG type="linear" slope="0.55" intercept="0.6"/><feFuncB type="linear" slope="0.55" intercept="0.6"/></feComponentTransfer></filter>
 </defs></svg>
 <div id="app"></div>
@@ -6165,7 +6166,7 @@ function render() {
 
   // ═══ MARKETING PAGE ═══
   if (state.screen === "marketing") {
-    var ctaAction = function() { go("#/studio/card"); };
+    var ctaAction = startSending;
     var screen = h("div", { className: "mk" });
     if (mobile) renderInstallBanner(screen);
 
@@ -7176,9 +7177,15 @@ function go(hash) {
 function applyRoute() {
   var parts = location.hash.replace(/^#\/?/, "").split("/");
   if (parts[0] === "studio") {
+    var prevObj = state.screen === "studio" ? state.studioObj : null;
     state.screen = "studio";
     if (STUDIO_OBJECTS.some(function(o) { return o.id === parts[1]; })) state.studioObj = parts[1];
     ensureStudio();
+    // Phones: each step opens on its main job. Message opens the writing box; card and envelope show the object.
+    if (isMobile() && prevObj !== state.studioObj) {
+      if (state.studioObj === "message") { state.studioTool.message = "write"; state.panelOpen = true; }
+      else state.panelOpen = false;
+    }
   } else if (parts[0] === "send") {
     ensureStudio();
     state.screen = "send";
@@ -7249,16 +7256,26 @@ function renderStudio(app) {
 
   var body = h("div", { className: "st-body" + (state.panelOpen ? " panel-open" : "") });
   var rail = h("nav", { className: "st-rail", "aria-label": "Tools" });
+  var phone = isMobile();
   STUDIO_TOOLS[state.studioObj].forEach(function(t) {
-    var on = state.panelOpen && state.studioTool[state.studioObj] === t.id;
+    // On phones the card list is the place to choose, so Designs becomes a way back to it.
+    var change = phone && t.id === "designs";
+    var on = !change && state.panelOpen && state.studioTool[state.studioObj] === t.id;
     var b = h("button", { className: "st-tool" + (on ? " on" : ""), "aria-pressed": on ? "true" : "false", onClick: function() {
+      if (change) {
+        var oc = state.frontDesign && state.frontDesign.occasion;
+        state.detailFrom = OCCASIONS.some(function(o) { return o.id === oc; }) ? oc : null;
+        state.picking = true;
+        go(state.detailFrom ? "#/cards/" + state.detailFrom : "#/cards");
+        return;
+      }
       if (on) state.panelOpen = false; else { state.studioTool[state.studioObj] = t.id; state.panelOpen = true; }
       render();
     } });
     var ic = h("span", { className: "st-tool-ic" });
     ic.appendChild(icon(t.icon, 20, 1.8));
     b.appendChild(ic);
-    b.appendChild(h("span", null, t.label));
+    b.appendChild(h("span", null, change ? "Change card" : t.label));
     rail.appendChild(b);
   });
   body.appendChild(rail);
@@ -7295,7 +7312,7 @@ function refreshStage() {
 
   var W = stage.clientWidth, H = stage.clientHeight;
   var mobile = W < 640;
-  var availH = H - (mobile ? 96 : 132);
+  var availH = H - (mobile ? (state.panelOpen ? 96 : 140) : 132);
   var s = Math.max(0.3, Math.min(availH / 480, (W * (mobile ? 0.8 : 0.5)) / 360, 1.25));
   var side = s * 0.7;
   var order = ["card", "message", "envelope"];
@@ -7326,6 +7343,10 @@ function refreshStage() {
   place(rightObj, side, cx + off, 1, false);
   place(state.studioObj, s, cx, 3, true);
 
+  if (mobile && !state.panelOpen) {
+    var hints = { card: "Change the words, add a photo or stickers. Or tap Message to keep going.", message: "Tap Write to add your message.", envelope: "Your envelope is ready. Change it below, or tap Send." };
+    stage.appendChild(h("p", { className: "st-hint" }, hints[state.studioObj]));
+  }
   var sw2 = h("div", { className: "st-switch", role: "tablist" });
   STUDIO_OBJECTS.forEach(function(o) {
     sw2.appendChild(h("button", { role: "tab", "aria-selected": state.studioObj === o.id ? "true" : "false", className: state.studioObj === o.id ? "on" : "", onClick: function() { go("#/studio/" + o.id); } }, o.label));
@@ -7816,7 +7837,13 @@ function resizePhoto(file, max, q, done) {
 function artThumb(d, scale) {
   return thumbWith({ frontDesign: d, frontText: null, frontPhoto: null, frontHeadFont: null, frontInk: null, frontFontSize: 1, frontStickers: [] }, scale);
 }
+// Phones start by picking a card from the list; desktop opens the studio, which has the designs beside the card.
+function startSending() {
+  if (isMobile()) { state.picking = true; go("#/cards"); }
+  else go("#/studio/card");
+}
 function startDesign(d) {
+  state.picking = false;
   state.studioFrom = state.screen === "detail" || state.screen === "browse" ? (state.detailFrom ? "#/cards/" + state.detailFrom : "#/cards") : "#/";
   ensureStudio();
   state.frontStickers = [];
@@ -7825,7 +7852,7 @@ function startDesign(d) {
 }
 function siteNav() {
   var nav = h("nav", { className: "mk-nav" });
-  var logo = h("button", { className: "mk-logo", onClick: function() { go("#/"); }, "aria-label": "Sendr home" });
+  var logo = h("button", { className: "mk-logo", onClick: function() { state.picking = false; go("#/"); }, "aria-label": "Sendr home" });
   var mark = h("i");
   mark.appendChild(icon("mail", 15, 2.2));
   logo.appendChild(mark);
@@ -7836,7 +7863,7 @@ function siteNav() {
   links.appendChild(h("button", { onClick: function() { go("#/"); setTimeout(function() { var el = document.getElementById("how"); if (el) el.scrollIntoView({ behavior: "smooth" }); }, 50); } }, "How it works"));
   links.appendChild(h("button", { onClick: function() { var d = ART_DESIGNS.find(function(x) { return x.slot; }); if (d) startDesign(d); } }, "Photo cards"));
   nav.appendChild(links);
-  var cta = h("button", { className: "mk-pill mk-pill-ink mk-pill-sm mk-nav-cta", onClick: function() { go("#/studio/card"); } }, "Send a card");
+  var cta = h("button", { className: "mk-pill mk-pill-ink mk-pill-sm mk-nav-cta", onClick: startSending }, "Send a card");
   nav.appendChild(cta);
   return nav;
 }
@@ -7863,6 +7890,9 @@ function renderBrowse(app, occId) {
     cx.appendChild(icon("x", 14));
     chip.appendChild(cx);
     head.appendChild(chip);
+  } else if (state.picking) {
+    head.appendChild(h("div", { className: "mk-eyebrow", style: "color:var(--ink-2)" }, occ ? occ.label + " cards" : "Send a card"));
+    head.appendChild(h("h1", { className: "br-h1" }, "Pick a card"));
   } else {
     head.appendChild(h("div", { className: "mk-eyebrow", style: "color:var(--ink-2)" }, occ ? "Cards for" : "For every occasion"));
     head.appendChild(h("h1", { className: "br-h1" }, occ ? occ.label : "Cards"));
