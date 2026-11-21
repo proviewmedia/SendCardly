@@ -170,7 +170,7 @@ textarea:focus, input:focus { outline: none; border-color: var(--accent) !import
 .mk-pill-tomato:hover { background: #D6431F; }
 .mk-pill-sm { padding: 10px 18px; font-size: 14px; }
 
-.mk-bar { background: var(--espresso); color: #F1EBE1; font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 48px; }
+.mk-bar { background: var(--espresso); color: #F1EBE1; font-size: 13px; display: flex; justify-content: center; text-align: center; align-items: center; gap: 12px; padding: 9px 48px; }
 .mk-bar b { font-family: 'DM Mono', monospace; font-weight: 500; font-size: 10px; letter-spacing: .12em; background: var(--tomato); color: #fff; border-radius: 999px; padding: 3px 8px; margin-right: 10px; }
 .mk-bar-short { display: none; }
 .mk-bar button { background: none; border: none; color: inherit; font: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
@@ -254,7 +254,6 @@ textarea:focus, input:focus { outline: none; border-color: var(--accent) !import
 }
 @media (max-width: 760px) {
   .mk-bar { padding: 9px 16px; }
-  .mk-bar > span:last-child { display: none; }
   .mk-bar-long { display: none; }
   .mk-bar-short { display: inline; }
   .mk-foot > div:last-child { text-align: left !important; }
@@ -280,7 +279,7 @@ textarea:focus, input:focus { outline: none; border-color: var(--accent) !import
 body.st-lock { overflow: hidden; }
 .st { position: fixed; inset: 0; display: grid; grid-template-rows: 60px 1fr; background: var(--cream); color: var(--ink); font-family: 'Instrument Sans', sans-serif; }
 .st button { font-family: inherit; }
-.st-top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 0 16px; background: var(--espresso); color: #F1EBE1; }
+.st-top { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; padding: 0 16px; background: var(--espresso); color: #F1EBE1; }
 .st-top-btn { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: inherit; font-size: 15px; padding: 8px 10px; border-radius: 999px; cursor: pointer; justify-self: start; }
 .st-top-btn:hover { background: rgba(241,235,225,0.1); }
 .st-top-r { justify-self: end; display: flex; align-items: center; gap: 8px; }
@@ -2834,11 +2833,6 @@ function render() {
     barL.appendChild(h("span", { className: "mk-bar-long" }, "Cards for every occasion. No account, no app, no catch."));
     barL.appendChild(h("span", { className: "mk-bar-short" }, "No account. No app. No catch."));
     bar.appendChild(barL);
-    var barR = h("span");
-    var barBtn = h("button", { onClick: ctaAction }, "Start a card");
-    barBtn.appendChild(icon("arrowRight", 14));
-    barR.appendChild(barBtn);
-    bar.appendChild(barR);
     screen.appendChild(bar);
 
     // ── Nav ──
@@ -3843,7 +3837,6 @@ function renderStudio(app) {
     b.appendChild(h("span", null, o.label));
     steps.appendChild(b);
   });
-  top.appendChild(steps);
   var right = h("div", { className: "st-top-r" });
   var pv = h("button", { className: "st-top-btn", onClick: function() { go("#/preview"); } });
   pv.appendChild(icon("eye", 18));
