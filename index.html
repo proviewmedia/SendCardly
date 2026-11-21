@@ -2106,12 +2106,19 @@ function renderCardSide(side, size, interactive) {
     }
 
     var maxWidth = layout.id === "photo-corner" ? "65%" : (layout.id.indexOf("offset") > -1 ? "80%" : "90%");
-    inner.appendChild(h("p", { style: "font-family:" + fontFamily + ";font-size:" + ((isTypographic ? 26 : (font.style === "cursive" ? 23 : 19)) * scale * fontSize) + "px;font-weight:" + (isTypographic ? "800" : "400") + ";color:" + textColor.color + ";line-height:" + (isTypographic ? "1.3" : "1.65") + ";margin:0;max-width:" + maxWidth + ";word-break:break-word;overflow:hidden;white-space:pre-line", "data-edit": "message" }, state.message || "Your message here..."));
+    // Long messages start smaller, then fitMessage() trims until everything fits.
+    var msgLen = (state.message || "").length;
+    var baseMsg = (isTypographic ? 26 : (font.style === "cursive" ? 23 : 19)) * scale * fontSize;
+    if (msgLen > 160) baseMsg *= Math.max(0.6, Math.sqrt(160 / msgLen) * 1.1);
+    var msgEl = h("p", { style: "font-family:" + fontFamily + ";font-size:" + baseMsg + "px;font-weight:" + (isTypographic ? "800" : "400") + ";color:" + textColor.color + ";line-height:" + (isTypographic ? "1.3" : "1.65") + ";margin:0;max-width:" + maxWidth + ";word-break:break-word;overflow:hidden;white-space:pre-line;flex-shrink:0", "data-edit": "message" }, state.message || "Your message here...");
+    msgEl.dataset.base = (isTypographic ? 26 : (font.style === "cursive" ? 23 : 19)) * scale * fontSize;
+    inner.appendChild(msgEl);
 
     if (state.senderName) {
       inner.appendChild(h("p", { style: "font-family:" + fontFamily + ";font-size:" + ((font.style === "cursive" ? 20 : 15) * scale) + "px;color:" + textColor.color + ";opacity:0.75;margin:" + (14 * scale) + "px 0 0;font-style:" + (font.style === "cursive" ? "normal" : "italic") }, state.senderName));
     }
     card.appendChild(inner);
+    requestAnimationFrame(function() { fitMessage(inner, msgEl, 10 * scale); });
   }
 
   // Stickers
@@ -2139,6 +2146,21 @@ function renderCardSide(side, size, interactive) {
   }
 
   return card;
+}
+
+// Shrink the inside message until the whole thing fits on the card.
+function fitMessage(inner, p, minPx) {
+  if (!inner || !p || !inner.isConnected) return;
+  var max = parseFloat(p.dataset.base) || parseFloat(p.style.fontSize);
+  function fits(size) { p.style.fontSize = size + "px"; return inner.scrollHeight <= inner.clientHeight + 1; }
+  if (fits(max)) return;
+  // Largest size that still fits, found by halving the range.
+  var lo = minPx, hi = max;
+  for (var i = 0; i < 10; i++) {
+    var mid = (lo + hi) / 2;
+    if (fits(mid)) lo = mid; else hi = mid;
+  }
+  p.style.fontSize = lo + "px";
 }
 
 // Render a flip card container showing both sides
@@ -3995,7 +4017,11 @@ function wireCardEditing(cardEl, side) {
     t.addEventListener("input", function() {
       var v = t.innerText.replace(/\n$/, "");
       if (side === "front") state.frontText = v.slice(0, 60);
-      else { state.message = v.slice(0, 400); state.messageTouched = true; }
+      else {
+        state.message = v.slice(0, 400); state.messageTouched = true;
+        var sc = cardEl.offsetWidth / 360;
+        fitMessage(t.parentNode, t, 10 * sc);
+      }
       var mirror = document.querySelector('[data-field="' + (side === "front" ? "headline" : "message") + '"]');
       if (mirror && mirror !== document.activeElement) mirror.value = side === "front" ? state.frontText : state.message;
       updateCount();
