@@ -358,6 +358,7 @@ body.st-lock { overflow: hidden; }
 .st-stage { position: relative; overflow: hidden; min-width: 0; }
 .st-grain { position: absolute; inset: 0; pointer-events: none; }
 .st-obj { position: absolute; transition: transform .3s cubic-bezier(.2,.7,.2,1), filter .3s ease; animation: stIn .35s ease both; }
+.st-obj.still { animation: none; }
 .st-obj.side { cursor: pointer; filter: saturate(.92); }
 .st-obj.side:hover { transform: translateY(-6px); }
 .st-obj.side:focus-visible { outline: 2px solid var(--tomato); outline-offset: 6px; border-radius: 8px; }
@@ -7351,9 +7352,13 @@ function keepManualSizeOnCard() {
   }
   state.backFontSize = lo;
 }
+// The objects fade in when the stage first shows or the step changes, never on a
+// redraw from typing or a style change (that made the card bounce on every key).
 function refreshStage() {
   var stage = studioEls.stage;
   if (!stage || !stage.isConnected) return;
+  var still = stage._shownFor === state.studioObj;
+  stage._shownFor = state.studioObj;
   keepManualSizeOnCard();
   stage.innerHTML = "";
   stage.style.cssText = backdropCss(state.env.k);
@@ -7370,7 +7375,7 @@ function refreshStage() {
   var cx = W / 2, cy = (mobile ? 24 : 40) + availH / 2;
 
   function place(obj, scale, x, z, isCenter) {
-    var wrap = h("div", { className: "st-obj" + (isCenter ? " center" : " side"), style: "z-index:" + z });
+    var wrap = h("div", { className: "st-obj" + (isCenter ? " center" : " side") + (still ? " still" : ""), style: "z-index:" + z });
     var el = renderObject(obj, scale, isCenter);
     wrap.appendChild(el);
     stage.appendChild(wrap);
