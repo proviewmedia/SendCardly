@@ -465,7 +465,6 @@ body.st-lock { overflow: hidden; }
 
 /* ═══ Send ═══ */
 .sd { min-height: 100vh; background: var(--cream); font-family: 'Instrument Sans', sans-serif; color: var(--ink); display: grid; grid-template-rows: 60px 1fr; }
-.sd-title { font-weight: 500; font-size: 16px; color: #F1EBE1; }
 .sd-body { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; max-width: 1120px; width: 100%; margin: 0 auto; padding: 48px 32px 64px; align-items: start; }
 .sd-tile { position: relative; border-radius: 24px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .sd-tile-in { position: relative; width: 250px; height: 300px; }
@@ -6850,13 +6849,24 @@ function renderSend(app) {
   // Card links go through /c/ so link previews say "You've got a card" instead of describing the site.
   function shareUrlNow() { return CARD_LINK_BASE + "c/?card=" + encodeCard(buildPayload()); }
   var root = h("div", { className: "sd" });
+  // Same top bar as the studio: Back, the step on phones, Preview.
   var top = h("header", { className: "st-top" });
   var back = h("button", { className: "st-top-btn", onClick: function() { go("#/studio/envelope"); } });
   back.appendChild(icon("arrowLeft", 18));
-  back.appendChild(h("span", null, "Edit"));
+  back.appendChild(h("span", null, "Back"));
   top.appendChild(back);
-  top.appendChild(h("div", { className: "sd-title" }, "Send"));
-  top.appendChild(h("div"));
+  var where = h("div", { className: "st-where" });
+  where.appendChild(h("span", { className: "st-where-n" }, "Ready to send"));
+  var dots = h("span", { className: "st-where-dots", "aria-hidden": "true" });
+  STUDIO_OBJECTS.forEach(function() { dots.appendChild(h("i", { className: "on" })); });
+  where.appendChild(dots);
+  top.appendChild(where);
+  var topR = h("div", { className: "st-top-r" });
+  var topPv = h("button", { className: "st-top-btn", onClick: function() { state.opPhase = "arrive"; state.opRead = false; go("#/preview"); } });
+  topPv.appendChild(icon("eye", 18));
+  topPv.appendChild(h("span", { className: "st-hide-sm" }, "Preview"));
+  topR.appendChild(topPv);
+  top.appendChild(topR);
   root.appendChild(top);
 
   var body = h("div", { className: "sd-body" });
