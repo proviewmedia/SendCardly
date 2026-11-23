@@ -7283,8 +7283,14 @@ function renderStudio(app) {
     if (isMobile() && idx > 0) go("#/studio/" + STUDIO_OBJECTS[idx - 1].id);
     else go(state.studioFrom || "#/");
   } });
+  // Say where Back goes: a step back on phones, otherwise out of the studio to the cards (or home).
+  var leavesTo = /^#\/cards/.test(state.studioFrom || "") ? "cards" : "home";
+  var backLabel = isMobile() && idx > 0 ? "Back"
+    : leavesTo === "cards" ? (isMobile() ? "Cards" : "Back to cards")
+    : (isMobile() ? "Home" : "Back to home");
+  back.setAttribute("aria-label", backLabel === "Back" ? "Back to " + STUDIO_OBJECTS[idx - 1].label.toLowerCase() : backLabel);
   back.appendChild(icon("arrowLeft", 18));
-  back.appendChild(h("span", null, "Back"));
+  back.appendChild(h("span", null, backLabel));
   top.appendChild(back);
   // Phones hide the step tabs, so say where you are and how far is left.
   var where = h("div", { className: "st-where", "aria-live": "polite" });
