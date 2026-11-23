@@ -465,7 +465,7 @@ body.st-lock { overflow: hidden; }
 
 /* ═══ Send ═══ */
 .sd { min-height: 100vh; background: var(--cream); font-family: 'Instrument Sans', sans-serif; color: var(--ink); display: grid; grid-template-rows: 60px 1fr; }
-.sd-body { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; max-width: 1120px; width: 100%; margin: 0 auto; padding: 48px 32px 64px; align-items: start; }
+.sd-body { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; max-width: 1120px; width: 100%; margin: 0 auto; padding: 48px 32px; align-items: center; align-self: center; }
 .sd-tile { position: relative; border-radius: 24px; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .sd-tile-in { position: relative; width: 250px; height: 300px; }
 .sd-tile-in > div:first-child { position: absolute; left: -30px; bottom: 20px; transform: rotate(-6deg); }
@@ -486,7 +486,7 @@ body.st-lock { overflow: hidden; }
 .sd-opt-t span { font-size: 13px; opacity: .7; }
 .sd-link { margin-top: 12px; font-size: 13px; color: var(--ink-2); }
 @media (max-width: 860px) {
-  .sd-body { grid-template-columns: 1fr; gap: 28px; padding: 20px 16px 48px; }
+  .sd-body { grid-template-columns: 1fr; gap: 28px; padding: 20px 16px 48px; align-self: start; }
   .sd-tile { aspect-ratio: 4 / 3; }
   .sd-tile-in { transform: scale(.8); }
   .sd-names { grid-template-columns: 1fr 1fr; }
