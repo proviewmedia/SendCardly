@@ -1,5 +1,5 @@
 {
-  "name": "Sendr: Say It With a Card",
+  "name": "Sendr",
   "short_name": "Sendr",
   "description": "Free illustrated greeting cards. Pick a design, write your note and send it by text, email or link.",
   "start_url": "/",
@@ -13,16 +13,25 @@
       "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["lifestyle", "social"],
+  "categories": [
+    "lifestyle",
+    "social"
+  ],
   "lang": "en",
   "dir": "ltr",
   "share_target": {
